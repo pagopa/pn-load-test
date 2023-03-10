@@ -97,7 +97,7 @@ resource "aws_codebuild_project" "main" {
 
   source {
     type            = "GITHUB"
-    location        = "https://github.com/pagopa/pdv-load-tests.git"
+    location        = "https://github.com/pagopa/pn-load-test.git"
     git_clone_depth = 1
 
     git_submodules_config {
