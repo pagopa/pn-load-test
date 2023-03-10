@@ -53,7 +53,7 @@ export let options = {
 
 const throttling = new Counter('throttling');
 
-
+//export let options = JSON.parse(open(__ENV.TEST_TYPE)); for select external options 
 
 export default function getNotification() {
 

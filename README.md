@@ -1,1 +1,8 @@
 "# pn-load-test" 
+
+## Comando per lanciare i test di carico in locale:
+- eseguire il comando
+```
+    docker run --rm -i -e ENV_NAME=envName -e API_KEY=apiKey grafana/k6 run - <src/ScriptName.js
+```
+sostiuendo ad envName il nome dell'ambiente su cui eseguire i test [dev,svil,coll...] ed ad apikey il valore dell'apikey per l'ambiente selezionato
