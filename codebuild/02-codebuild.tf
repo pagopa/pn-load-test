@@ -14,10 +14,7 @@ resource "aws_iam_role" "main" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "codebuild.amazonaws.com",
-        "AWS": [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.codebuild_role_name}"
-        ]
+        "Service": "codebuild.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
@@ -25,7 +22,6 @@ resource "aws_iam_role" "main" {
 }
 EOF
 }
-
 
 resource "aws_iam_role_policy" "main" {
   role = aws_iam_role.main.name
