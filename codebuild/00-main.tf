@@ -1,7 +1,15 @@
 terraform {
   required_version = ">= 1.1.5"
 
-  backend "s3" {}
+  backend "s3" {
+    region = "eu-south-1"
+    bucket = "terraform-backend-2972"
+    key     = "dev/pn-load-test/terraform.tfstate"
+    encrypt = true
+    dynamodb_table="terraform-lock"
+  }
+
+
 
   required_providers {
     aws = {

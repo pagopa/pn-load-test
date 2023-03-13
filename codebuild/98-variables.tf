@@ -18,7 +18,7 @@ variable "environment" {
 
 variable "env_short" {
   type        = string
-  default     = "d"
+  default     = "dev"
   description = "Evnironment short."
 }
 

@@ -16,8 +16,8 @@ resource "aws_iam_role" "main" {
       "Principal": {
         "Service": "codebuild.amazonaws.com",
         "AWS": [
-					"arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.codebuild_role_name}"
-				]
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.codebuild_role_name}"
+        ]
       },
       "Action": "sts:AssumeRole"
     }
