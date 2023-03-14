@@ -3,13 +3,13 @@
     "vus": 1,
     "stages": [
         {
-            "duration": "30",
-            "target": 3
+            "duration": "10",
+            "target": 5
         }
     ],
     "thresholds": {
-        "http_req_failed": [
-          "rate<0.001"
-        ]
+        "http_req_duration": [
+            "avg<2000"
+          ]
       }
 }

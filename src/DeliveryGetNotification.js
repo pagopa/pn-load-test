@@ -62,7 +62,7 @@ export default function getNotification(iun) {
     'status is 200': (r) => r.status === 200,
   });
 
-  if (r.status === 429) {
+  if (r.status === 403) {
     throttling.add(1);
   }
 

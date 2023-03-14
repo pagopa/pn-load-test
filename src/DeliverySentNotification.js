@@ -96,9 +96,9 @@ export default function sentNotification() {
         'status is 202': (r) => r.status === 202,
     });
 
-    console.log(r.body)
+    console.log('REQUEST-ID-LOG: '+r.body)
 
-    if (r.status === 429) {
+    if (r.status === 403) {
         throttling.add(1);
      }
 
