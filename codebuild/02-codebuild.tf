@@ -67,20 +67,18 @@ resource "aws_codebuild_project" "main" {
     privileged_mode             = true
 
     environment_variable {
-      name  = "HOST_NAME"
-      value = "/CodeBuild/hostname"
-      type  = "PARAMETER_STORE"
+      name  = "ENV_NAME"
+      value = "dev"
     }
-    environment_variable {
-      name  = "API_KEY"
-      value = "/CodeBuild/apikey"
-      type  = "PARAMETER_STORE"
+
+     environment_variable {
+      name  = "TEST_TYPE"
+      value = "localTest"
     }
 
     environment_variable {
       name  = "TEST_SCRIPT"
-      value = "/CodeBuild/testscript"
-      type  = "PARAMETER_STORE"
+      value = "DeliverySentNotification.js"
     }
   }
 

@@ -11,10 +11,12 @@ phases:
       - export AWS_ACCESS_KEY_ID=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.AccessKeyId')
       - export AWS_SECRET_ACCESS_KEY=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.SessionToken')
+      - API_KEY=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestApiKeyGA' )
   build:
     commands: |
         docker run -i -v $(pwd)/src:/src \
-        -e HOST_NAME=$HOST_NAME \
+        -e ENV_NAME=$ENV_NAME \
+        -e TEST_TYPE=$TEST_TYPE \
         -e API_KEY=$API_KEY \
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
