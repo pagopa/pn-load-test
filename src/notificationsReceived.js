@@ -2,12 +2,12 @@ import { notificationsReceived } from "./modules/notificationsReceived.js";
 import { check, sleep } from 'k6';
 import { Counter } from 'k6/metrics';
 
-export const options = {
+/*export const options = {
   vus: 1,
   duration: '1s',
-};
+};*/
 
-//export let options = JSON.parse(open('/modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const throttling = new Counter('throttling');
 
