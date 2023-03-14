@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Pull ghcr.io/pagopa/pn-load-test image..
-      - docker pull ghcr.io/pagopa/pn-load-test:setup-codebuild
+      - docker pull ghcr.io/pagopa/pn-load-test:main
       - ASSUME_ROLE_ARN="arn:aws:iam::751495842760:role/codebuild"
       - TEMP_ROLE=$(aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name AWSCodeBuild)
       - export TEMP_ROLE
@@ -21,7 +21,7 @@ phases:
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
         -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-        ghcr.io/pagopa/pn-load-test:setup-codebuild \
+        ghcr.io/pagopa/pn-load-test:main \
         /src/$TEST_SCRIPT
   post_build:
     commands:
