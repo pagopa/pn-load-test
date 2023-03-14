@@ -1,0 +1,25 @@
+{
+  "mandateId": null,
+  "delegator": {
+    "displayName": "Mario Cucumber",
+    "firstName": "Mario",
+    "lastName": "Cucumber",
+    "companyName": "",
+    "fiscalCode": "FRMTTR76M06B715E",
+    "person": true
+  },
+  "delegate": {
+    "displayName": "Mario Gherkin",
+    "firstName": "Mario",
+    "lastName": "Gherkin",
+    "companyName": "",
+    "fiscalCode": "CLMCST42R12D969Z",
+    "person": true
+  },
+  "status": "pending",
+  "visibilityIds": [],
+  "verificationCode": "24411",
+  "datefrom": "2023-03-09",
+  "dateto": "2023-03-10",
+  "groups": []
+}
