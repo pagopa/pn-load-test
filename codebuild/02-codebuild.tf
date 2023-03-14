@@ -103,7 +103,7 @@ resource "aws_codebuild_project" "main" {
     buildspec = "codebuild/buildspec.yml"
   }
 
-  source_version = "setup-codebuild"
+  source_version = "main"
 
   tags = {
     Environment = "Test"
