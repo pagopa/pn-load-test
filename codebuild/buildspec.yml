@@ -5,8 +5,8 @@ phases:
     commands:
       - echo Pull ghcr.io/pagopa/pn-load-test image..
       - docker pull ghcr.io/pagopa/pn-load-test:main
-      - ACCOUT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-      - ASSUME_ROLE_ARN="arn:aws:iam::$ACCOUT_ID:role/codebuild"
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+      - ASSUME_ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/codebuild"
       - TEMP_ROLE=$(aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name AWSCodeBuild)
       - export TEMP_ROLE
       - export AWS_ACCESS_KEY_ID=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.AccessKeyId')
