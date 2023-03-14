@@ -2,6 +2,7 @@ version: 0.2
 
 phases:
   pre_build:
+    on-failure: ABORT
     commands:
       - echo Pull ghcr.io/pagopa/pn-load-test image..
       - docker pull ghcr.io/pagopa/pn-load-test:main
@@ -14,6 +15,7 @@ phases:
       - export AWS_SESSION_TOKEN=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.SessionToken')
       - API_KEY=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestApiKeyGA' )
   build:
+    on-failure: ABORT
     commands: |
         docker run -i -v $(pwd)/src:/src \
         -e ENV_NAME=$ENV_NAME \

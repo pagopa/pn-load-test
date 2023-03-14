@@ -14,7 +14,8 @@ resource "aws_iam_role" "main" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "codebuild.amazonaws.com"
+        "Service": "codebuild.amazonaws.com",
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/codebuild"
       },
       "Action": "sts:AssumeRole"
     }
@@ -40,7 +41,11 @@ resource "aws_iam_role_policy" "main" {
         "logs:CreateLogStream",
         "logs:PutLogEvents",
         "ssm:GetParameters",
-        "cloudwatch:PutMetricData"
+        "cloudwatch:PutMetricData",
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds"
       ]
     }
   ]
