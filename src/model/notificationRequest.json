@@ -26,13 +26,12 @@
         "contentType": "application/pdf",
         "ref": {
           "key": "PN_NOTIFICATION_ATTACHMENTS-0001-30EG-Y4LI-X5KC-KIK8",
-          "versionToken": "NDonM20Wd2EcWn_hbl1wx7dEMuiyl5Vi"
+          "versionToken": "V1"
         },
         "title": "Test_PDF"
       }
     ],
     "physicalCommunicationType": "REGISTERED_LETTER_890",
-    "group": "63f359bc72337440a40f537e",
     "taxonomyCode": "010202N",
     "notificationFeePolicy": "FLAT_RATE",
     "senderDenomination": "Comune di Palermo",
