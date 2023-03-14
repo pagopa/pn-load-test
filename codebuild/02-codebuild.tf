@@ -106,6 +106,11 @@ resource "aws_codebuild_project" "main" {
     buildspec = "codebuild/buildspec.yml"
   }
 
+  cache {
+    type  = "LOCAL"
+    modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
+  }
+
   source_version = "main"
 
   tags = {
