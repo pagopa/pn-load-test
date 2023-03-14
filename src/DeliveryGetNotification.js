@@ -1,66 +1,52 @@
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check, sleep } from 'k6';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
+import sentNotification from './DeliverySentNotification.js';
+
+export let options = JSON.parse(open('/modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+
+var apiKey = `${__ENV.API_KEY}`
+var envName = `${__ENV.ENV_NAME}`
 
 
-export let options = {
-  // virtual users
-  vus: 44,
-  // duration: '60s',
-  //duration: '30s',
-  stages: [
-    { duration: "10s", 
-        target: 22,
-        thresholds: {
-            http_req_duration: ['p(95)<5000'],
-        } 
+
+export function setup() {
+ 
+  var result = JSON.parse(sentNotification().body);
+  console.log('result: '+result.notificationRequestId);
+  var url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
+  url.searchParams.append('notificationRequestId', result.notificationRequestId);
+
+  var params = {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey
     },
-    { duration: "10s", 
-        target: 44,
-        thresholds: {
-            http_req_duration: ['p(90)<5000'],
-        } 
-    },
-    { duration: "10s", 
-        target: 44,
-        thresholds: {
-            http_req_duration: ['max<50000'],
-        } 
-    },
-    { duration: "10s", 
-        target: 22,
-        thresholds: {
-            http_req_duration: ['p(95)<5000'],
-        } 
-    },
-    { duration: "10s", 
-        target: 11,
-        thresholds: {
-            http_req_duration: ['p(95)<5000'],
-        } 
-    },
-    { duration: "10s", 
-        target: 0,
-        thresholds: {
-            http_req_duration: ['p(95)<5000'],
-        } 
-    },
-  ] 
-   
-  //target serve per avere una crescita/decrescita nei vu da 0 a target/ da n a target linearmente 
-};
+  };
+  for(let i = 0; i < 8; i++){
+    sleep(30);
+    var notification = http.get(url.toString(), params);
+    notification = JSON.parse(notification.body);
+    
+    if(notification && notification.iun){
+      console.log("IUN: "+notification.iun)
+      return notification.iun;
+    }
+    console.log(JSON.stringify(notification))
+  }
+}
 
 
 const throttling = new Counter('throttling');
 
+//export let options = JSON.parse(open(__ENV.TEST_TYPE)); for select external options 
 
+export default function getNotification(iun) {
 
-export default function getNotification() {
-
-  var apiKey = `${__ENV.API_KEY}`
-  var envName = `${__ENV.ENV_NAME}`
-
-  var url = `https://api.${envName}.pn.pagopa.it/delivery/notifications/sent/YJVP-WZXH-RTAR-202303-G-1`;
+  console.log("INTERNAL IUN: "+iun);
+  var url = `https://api.${envName}.pn.pagopa.it/delivery/notifications/sent/${iun}`;
+  console.log('URL: '+url)
 
   var params = {
     headers: {

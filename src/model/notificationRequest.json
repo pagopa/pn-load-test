@@ -1,0 +1,40 @@
+{
+    "paProtocolNumber": "20231003000",
+    "subject": "Test",
+    "recipients": [
+      {
+        "denomination": "Cristoforo Colombo",
+        "recipientType": "PF",
+        "taxId": "CLMCST42R12D969Z",
+        "physicalAddress": {
+          "at": "Presso",
+          "address": "Via delle vie 100",
+          "addressDetails": "",
+          "zip": "0000",
+          "municipality": "Milano",
+          "municipalityDetails": "Milano",
+          "province": "MI",
+          "foreignState": "Italia"
+        }
+      }
+    ],
+    "documents": [
+      {
+        "digests": {
+          "sha256": "nvv+RCJlWuiwm59fel8Ajl9LiGCJJcNrqI7JJls3xZ0="
+        },
+        "contentType": "application/pdf",
+        "ref": {
+          "key": "PN_NOTIFICATION_ATTACHMENTS-0001-30EG-Y4LI-X5KC-KIK8",
+          "versionToken": "V1"
+        },
+        "title": "Test_PDF"
+      }
+    ],
+    "physicalCommunicationType": "REGISTERED_LETTER_890",
+    "taxonomyCode": "010202N",
+    "notificationFeePolicy": "FLAT_RATE",
+    "senderDenomination": "Comune di Palermo",
+    "senderTaxId": "80016350821",
+    "abstract": "Test"
+}
