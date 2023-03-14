@@ -3,7 +3,7 @@ import crypto from 'k6/crypto';
 import http from 'k6/http';
 
 
-export let options = JSON.parse(open('/modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 var apiKey = `${__ENV.API_KEY}`
 var envName = `${__ENV.ENV_NAME}`

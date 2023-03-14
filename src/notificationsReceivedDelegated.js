@@ -10,7 +10,7 @@ import { Counter } from 'k6/metrics';
   duration: '1s',
 };*/
 
-export let options = JSON.parse(open('/modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const throttling = new Counter('throttling');
 
