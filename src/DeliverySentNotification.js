@@ -8,9 +8,9 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 var apiKey = `${__ENV.API_KEY}`
 var envName = `${__ENV.ENV_NAME}`
 var sha256;
-var binFile = open('/resources/AvvisoPagoPA.pdf', 'b');
-var notificationRequest = JSON.parse(open('/model/notificationRequest.json'));
-var preloadFileRequest = JSON.parse(open('/model/preloadFile.json'));
+var binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+var notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
+var preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
 
 function preloadFile() {
     
