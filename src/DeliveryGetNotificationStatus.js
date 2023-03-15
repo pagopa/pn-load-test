@@ -19,7 +19,7 @@ export function setup() {
 const throttling = new Counter('throttling');
 
 
-export default function getNotification(notificationRequest) {
+export default function getNotificationStatus(notificationRequest) {
 
     var url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
     url.searchParams.append('notificationRequestId', notificationRequest.paProtocolNumber);
