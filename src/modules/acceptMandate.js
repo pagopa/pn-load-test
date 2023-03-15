@@ -1,7 +1,8 @@
 import http from 'k6/http';
-import { sleep } from 'k6';
 
 const apiVersion = 'v1'
+
+const payload = JSON.parse(open('../model/acceptMandate.json'));
 
 export function acceptMandate(mandateId) {
 
@@ -20,6 +21,6 @@ export function acceptMandate(mandateId) {
       },
     };
 
-    return http.patch(url, null, params);
+    return http.patch(url,JSON.stringify(payload),params);
 
 }

@@ -1,6 +1,7 @@
 import { check, sleep } from 'k6';
+import http from 'k6/http';
 import { Counter } from 'k6/metrics';
-
+import { sendNotificationToPn } from './modules/sendNotification.js';
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
@@ -41,6 +42,7 @@ export default function recipientRead(iun) {
       throttling.add(1);
     }
     sleep(1);
+    return r;
  
 }
 

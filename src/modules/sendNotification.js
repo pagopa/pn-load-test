@@ -25,8 +25,8 @@ export function sendNotificationToPn(userTaxId){
         notification = JSON.parse(notification.body);
     
         if(notification && notification.iun){
-         console.log("IUN: "+notification.iun)
-        return notification.iun;
+            console.log("IUN: "+notification.iun)
+            return notification.iun;
         }
         console.log(JSON.stringify(notification))
     }

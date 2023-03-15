@@ -1,13 +1,11 @@
 import { check, sleep } from 'k6';
+import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 import { acceptMandate } from "./modules/acceptMandate.js";
 import { createMandate } from "./modules/createMandate.js";
 import { revokeMandate } from "./modules/revokeMandate.js";
+import { sendNotificationToPn } from './modules/sendNotification.js';
 
-/*export const options = {
-  vus: 1,
-  duration: '1s',
-};*/
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
@@ -48,13 +46,13 @@ export function teardown(request) {
   }
 }
 
-export default function (request) {
+export default function delegateRead(request) {
   if(request && request.mandateId  && request.iun ) {
 
     var bearerToken = `${__ENV.BEARER_TOKEN_USER2}`
     var envName = `${__ENV.ENV_NAME}`
 
-	  var url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}?mandateId=${mandateId}`;
+	  var url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${request.iun}?mandateId=${request.mandateId}`;
 	  var token = 'Bearer ' + bearerToken;
   
 	  console.log(`Url ${url}`);
@@ -78,6 +76,7 @@ export default function (request) {
       throttling.add(1);
     }
     sleep(1);
+    return r;
   }
 }
 

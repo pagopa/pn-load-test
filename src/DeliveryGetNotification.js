@@ -46,4 +46,5 @@ export default function getNotification(iun) {
   }
 
   sleep(1);
+  return r;
 }
