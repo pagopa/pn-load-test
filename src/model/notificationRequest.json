@@ -3,7 +3,7 @@
     "subject": "Test",
     "recipients": [
       {
-        "denomination": "Cristoforo Colombo",
+        "denomination": "Test Carico",
         "recipientType": "PF",
         "taxId": "CLMCST42R12D969Z",
         "physicalAddress": {

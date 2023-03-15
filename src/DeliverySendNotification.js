@@ -57,7 +57,7 @@ function preloadFile() {
 }
 
 
-export default function sentNotification() {
+export default function sendNotification(userTaxId) {
 
     var resultPreload = preloadFile();
 
@@ -78,6 +78,11 @@ export default function sentNotification() {
         console.log(JSON.stringify(groupList));
         var group = groupList.find((elem) => elem.status === 'ACTIVE');
         notificationRequest.group = group.id;
+    }
+
+    if(userTaxId){
+        console.log("TAX-ID: "+userTaxId);
+        notificationRequest.recipients[0].taxId = userTaxId;
     }
 
     notificationRequest.paProtocolNumber = ("2023" + new Date().getTime().toString().padStart(14, '0'));

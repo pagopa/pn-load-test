@@ -1,8 +1,9 @@
-import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check, sleep } from 'k6';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
-import sentNotification from './DeliverySentNotification.js';
+import { sendNotificationToPn } from './modules/sendNotification.js';
+
+
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
@@ -12,29 +13,7 @@ var envName = `${__ENV.ENV_NAME}`
 
 
 export function setup() {
- 
-  var result = JSON.parse(sentNotification().body);
-  console.log('result: '+result.notificationRequestId);
-  var url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
-  url.searchParams.append('notificationRequestId', result.notificationRequestId);
-
-  var params = {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey
-    },
-  };
-  for(let i = 0; i < 8; i++){
-    sleep(30);
-    var notification = http.get(url.toString(), params);
-    notification = JSON.parse(notification.body);
-    
-    if(notification && notification.iun){
-      console.log("IUN: "+notification.iun)
-      return notification.iun;
-    }
-    console.log(JSON.stringify(notification))
-  }
+  return sendNotificationToPn("FRMTTR76M06B715E");
 }
 
 
