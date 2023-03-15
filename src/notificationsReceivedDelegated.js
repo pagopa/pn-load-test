@@ -1,9 +1,8 @@
-import { createMandate } from "./modules/createMandate.js";
-import { notificationsReceivedDelegated } from "./modules/notificationsReceivedDelegated.js";
-import { revokeMandate } from "./modules/revokeMandate.js";
-import { acceptMandate } from "./modules/acceptMandate.js";
 import { check, sleep } from 'k6';
 import { Counter } from 'k6/metrics';
+import { acceptMandate } from "./modules/acceptMandate.js";
+import { createMandate } from "./modules/createMandate.js";
+import { revokeMandate } from "./modules/revokeMandate.js";
 
 /*export const options = {
   vus: 1,
@@ -14,20 +13,11 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 const throttling = new Counter('throttling');
 
-//var mandateId = '4e432dbe-e2c5-4367-8e28-169c4287ea32';
-var iun = 'QZHD-TXMV-GUPU-202303-Q-1';
 
 export function setup() {
   var r = createMandate();
   console.log(r.body);
   
-  check(r, {
-      'status is 201': (r) => r.status === 201,
-  });
-
-  if (r.status === 429) {
-    throttling.add(1);
-  }
   sleep(1);
 
   if(r.status === 201) {
@@ -39,16 +29,9 @@ export function setup() {
     r = acceptMandate(mandateId);
     console.log(`Mandate Accept Status: ${r.status}`);
     console.log(`Body: ${r.body}`);
-    check(r, {
-      'status is 204': (r) => r.status === 204,
-    });
     
-    if(r.status === 429) {
-      throttling.add(1);
-    }
-    sleep(1);
-
-    //sendNotifications to USER1
+    var taxId = `${__ENV.TAX_ID_USER2}`
+    var iun = sendNotificationToPn(taxId);
 
     var response = {};
     response["mandateId"] = mandateId;
@@ -61,20 +44,30 @@ export function teardown(request) {
   if(request !== undefined && request.mandateId !== undefined) {
     var r = revokeMandate(request.mandateId);
     console.log(`Mandate Revoke Status: ${r.status}`);
-    check(r, {
-        'status is 204': (r) => r.status === 204,
-    });
-    
-    if (r.status === 429) {
-      throttling.add(1);
-    }
     sleep(1);
   }
 }
 
 export default function (request) {
-  if(request !== undefined && request.mandateId !== undefined && request.iun !== undefined) {
-    var r = notificationsReceivedDelegated(request.iun, request.mandateId);
+  if(request && request.mandateId  && request.iun ) {
+
+    var bearerToken = `${__ENV.BEARER_TOKEN_USER2}`
+    var envName = `${__ENV.ENV_NAME}`
+
+	  var url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}?mandateId=${mandateId}`;
+	  var token = 'Bearer ' + bearerToken;
+  
+	  console.log(`Url ${url}`);
+
+	  var params = {
+		  headers: {
+		  'Content-Type': 'application/json',
+		  'Authorization': token
+      }
+    };
+  
+    var r = http.get(url, params);
+
     console.log(`Notifications Received Iun Delegated Status: ${r.status}`);
     console.log(`Body: ${r.body}`);
     check(r, {

@@ -1,26 +1,34 @@
-import { notificationsReceived } from "./modules/notificationsReceived.js";
 import { check, sleep } from 'k6';
 import { Counter } from 'k6/metrics';
 
-/*export const options = {
-  vus: 1,
-  duration: '1s',
-};*/
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const throttling = new Counter('throttling');
+var bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
+var envName = `${__ENV.ENV_NAME}`
 
-//var mandateId = '4e432dbe-e2c5-4367-8e28-169c4287ea32';
-var mandateId;
-var iun = 'QZHD-TXMV-GUPU-202303-Q-1';
 
 export function setup() {
-    //sendNotifications to USER1
+  var taxId = `${__ENV.TAX_ID_USER1}`
+  return sendNotificationToPn(taxId);
 }
 
-export default function () {
-    var r = notificationsReceived(iun);
+export default function recipientRead(iun) {
+     
+    var url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}`;
+    var token = 'Bearer ' + bearerToken;
+
+    console.log(`Url ${url}`);
+
+    var params = {
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+      }
+    };
+
+    var r = http.get(url, params);
 
     console.log(`Notifications Received Iun Status: ${r.status}`);
     console.log(`Response body ${r.body}`);
