@@ -14,6 +14,10 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo "${TEMP_ROLE}" | jq -r '.Credentials.SessionToken')
       - API_KEY=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestApiKeyGA' )
+      - TAX_ID_USER1=$(aws ssm get-parameters --names /pn-test-e2e/userTaxId1 --query "Parameters[*].Value" --output text)
+      - TAX_ID_USER2=$(aws ssm get-parameters --names /pn-test-e2e/userTaxId2 --query "Parameters[*].Value" --output text)
+      - BEARER_TOKEN_USER2=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestBearerTokenCristoforoC' )
+      - BEARER_TOKEN_USER1=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestBearerTokenFieramoscaE' )
   build:
     on-failure: ABORT
     commands: |
@@ -21,6 +25,10 @@ phases:
         -e ENV_NAME=$ENV_NAME \
         -e TEST_TYPE=$TEST_TYPE \
         -e API_KEY=$API_KEY \
+        -e TAX_ID_USER1=$TAX_ID_USER1 \
+        -e TAX_ID_USER2=$TAX_ID_USER2 \
+        -e BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2 \
+        -e BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1 \
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
         -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \

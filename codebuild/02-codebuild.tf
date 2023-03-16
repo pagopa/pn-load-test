@@ -85,6 +85,10 @@ resource "aws_codebuild_project" "main" {
       name  = "TEST_SCRIPT"
       value = "DeliverySentNotification.js"
     }
+    environment_variable {
+      name  = "USE_IUN_FILE"
+      value = ""
+    }
   }
 
   logs_config {

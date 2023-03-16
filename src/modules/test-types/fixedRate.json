@@ -1,4 +1,5 @@
 {
+    "setupTimeout": "240s",
     "maxRedirects": 0,
     "scenarios": {
         "constant_request_rate": {
