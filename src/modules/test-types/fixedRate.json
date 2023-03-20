@@ -4,9 +4,9 @@
     "scenarios": {
         "constant_request_rate": {
             "executor": "constant-arrival-rate",
-            "rate": 10,
+            "rate": 20,
             "timeUnit": "1s", 
-            "duration": "30s",
+            "duration": "60s",
             "preAllocatedVUs": 100, 
             "maxVUs": 200
         }

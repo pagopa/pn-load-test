@@ -21,12 +21,12 @@ export function setup() {
     console.log("IUN_LENGTH: "+ iunArray.length);
     return iunArray
   }
-  return sendNotificationToPn("FRMTTR76M06B715E");
+  return sendNotificationToPn().iun;
 }
 
 
 
-export default function getNotification(iun) {
+export default function getNotificationWeb(iun) {
   var currentIun = iun;
   if(useIunFile && useIunFile !== 'undefined') {
     currentIun = iun[exec.scenario.iterationInTest % iun.length].trim();

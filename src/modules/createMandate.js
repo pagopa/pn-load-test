@@ -1,5 +1,4 @@
 import http from 'k6/http';
-import { sleep } from 'k6';
 
 const apiVersion = 'v1'
 
@@ -12,9 +11,6 @@ export function createMandate() {
 
   var url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate`;
   var token = 'Bearer ' + bearerToken;
-  
-  //console.log(`Token ${token}`);
-  //console.log(`Payload ${payload}`);
   
   var params = {
     headers: {

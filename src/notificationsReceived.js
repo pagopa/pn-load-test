@@ -12,7 +12,7 @@ var envName = `${__ENV.ENV_NAME}`
 
 export function setup() {
   var taxId = `${__ENV.TAX_ID_USER1}`
-  return sendNotificationToPn(taxId);
+  return sendNotificationToPn(taxId).iun;
 }
 
 export default function recipientRead(iun) {

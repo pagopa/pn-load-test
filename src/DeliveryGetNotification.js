@@ -21,7 +21,7 @@ export function setup() {
     console.log("IUN_LENGTH: "+ iunArray.length);
     return iunArray
   }
-  return sendNotificationToPn("FRMTTR76M06B715E");
+  return sendNotificationToPn("FRMTTR76M06B715E").iun;
 }
 
 

@@ -28,8 +28,8 @@ export function setup() {
     console.log(`Mandate Accept Status: ${r.status}`);
     console.log(`Body: ${r.body}`);
     
-    var taxId = `${__ENV.TAX_ID_USER2}`
-    var iun = sendNotificationToPn(taxId);
+    var taxId = `${__ENV.TAX_ID_USER1}`
+    var iun = sendNotificationToPn(taxId).iun;
 
     var response = {};
     response["mandateId"] = mandateId;

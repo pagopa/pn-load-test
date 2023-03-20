@@ -1,17 +1,17 @@
 {
   "mandateId": null,
   "delegator": {
-    "displayName": "Mario Cucumber",
-    "firstName": "Mario",
-    "lastName": "Cucumber",
+    "displayName": "User Uno",
+    "firstName": "User",
+    "lastName": "Uno",
     "companyName": "",
     "fiscalCode": "FRMTTR76M06B715E",
     "person": true
   },
   "delegate": {
-    "displayName": "Mario Gherkin",
-    "firstName": "Mario",
-    "lastName": "Gherkin",
+    "displayName": "User Due",
+    "firstName": "User",
+    "lastName": "Due",
     "companyName": "",
     "fiscalCode": "CLMCST42R12D969Z",
     "person": true
