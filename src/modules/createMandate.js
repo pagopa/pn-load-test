@@ -13,13 +13,13 @@ const payload = JSON.stringify(json);
 
 export function createMandate() {
 
-  var bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-  var envName = `${__ENV.ENV_NAME}`
+  let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
+  let envName = `${__ENV.ENV_NAME}`
 
-  var url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate`;
-  var token = 'Bearer ' + bearerToken;
+  let url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate`;
+  let token = 'Bearer ' + bearerToken;
   
-  var params = {
+  let params = {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token
