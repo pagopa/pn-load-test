@@ -5,15 +5,15 @@ import sendNotification from '/DeliverySendNotification.js';
 
 export function sendNotificationToPn(userTaxId){
 
-    var envName = `${__ENV.ENV_NAME}`
-    var apiKey = `${__ENV.API_KEY}`
+    let envName = `${__ENV.ENV_NAME}`
+    let apiKey = `${__ENV.API_KEY}`
 
-    var result = JSON.parse(sendNotification(userTaxId).body);
+    let result = JSON.parse(sendNotification(userTaxId).body);
     console.log('result: '+result.notificationRequestId);
-    var url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
+    let url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
     url.searchParams.append('notificationRequestId', result.notificationRequestId);
 
-    var params = {
+    let params = {
         headers: {
          'Content-Type': 'application/json',
          'x-api-key': apiKey
@@ -21,7 +21,7 @@ export function sendNotificationToPn(userTaxId){
     };
     for(let i = 0; i < 8; i++){
         sleep(30);
-        var notification = http.get(url.toString(), params);
+        let notification = http.get(url.toString(), params);
         notification = JSON.parse(notification.body);
     
         if(notification && notification.iun){
