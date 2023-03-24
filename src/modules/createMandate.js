@@ -2,7 +2,14 @@ import http from 'k6/http';
 
 const apiVersion = 'v1'
 
-const payload = JSON.stringify(JSON.parse(open('../model/mandateRequest.json')));
+var json = JSON.parse(open('../model/mandateRequest.json'));
+
+json.datefrom = new Date().toISOString().slice(0, 10);
+var dateTo = new Date();
+dateTo.setDate(dateTo.getDate() + 1);
+json.dateto = dateTo.toISOString().slice(0, 10);
+
+const payload = JSON.stringify(json);
 
 export function createMandate() {
 
