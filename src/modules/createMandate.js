@@ -5,7 +5,7 @@ const apiVersion = 'v1'
 var json = JSON.parse(open('../model/mandateRequest.json'));
 
 json.datefrom = new Date().toISOString().slice(0, 10);
-var dateTo = new Date();
+let dateTo = new Date();
 dateTo.setDate(dateTo.getDate() + 1);
 json.dateto = dateTo.toISOString().slice(0, 10);
 
