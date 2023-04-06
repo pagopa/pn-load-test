@@ -1,25 +1,23 @@
 {
   "mandateId": null,
   "delegator": {
-    "displayName": "Mario Cucumber",
-    "firstName": "Mario",
-    "lastName": "Cucumber",
-    "companyName": "",
+    "displayName": "User Uno",
+    "firstName": "User",
+    "lastName": "Uno",
     "fiscalCode": "FRMTTR76M06B715E",
     "person": true
   },
   "delegate": {
-    "displayName": "Mario Gherkin",
-    "firstName": "Mario",
-    "lastName": "Gherkin",
-    "companyName": "",
+    "displayName": "User Due",
+    "firstName": "User",
+    "lastName": "Due",
     "fiscalCode": "CLMCST42R12D969Z",
     "person": true
   },
   "status": "pending",
   "visibilityIds": [],
   "verificationCode": "24411",
-  "datefrom": "2023-03-09",
-  "dateto": "2023-03-10",
+  "datefrom": "2023-03-19",
+  "dateto": "2023-03-21",
   "groups": []
 }

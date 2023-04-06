@@ -18,6 +18,8 @@ phases:
       - TAX_ID_USER2=$(aws ssm get-parameters --names /pn-test-e2e/userTaxId2 --query "Parameters[*].Value" --output text)
       - BEARER_TOKEN_USER2=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestBearerTokenCristoforoC' )
       - BEARER_TOKEN_USER1=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestBearerTokenFieramoscaE' )
+      - TOKEN_PA_1=$( aws secretsmanager get-secret-value --secret-id secretsForTests | jq '.SecretString' | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g' | jq -r '.e2eTestBearerTokenPA1' )
+      - PA_TAX_ID_1=$(aws ssm get-parameters --names /pn-test-e2e/paTaxId1 --query "Parameters[*].Value" --output text)
   build:
     on-failure: ABORT
     commands: |
@@ -25,11 +27,15 @@ phases:
         -e ENV_NAME=$ENV_NAME \
         -e TEST_TYPE=$TEST_TYPE \
         -e API_KEY=$API_KEY \
+        -e PA_TAX_ID=$PA_TAX_ID_1 \
         -e TAX_ID_USER1=$TAX_ID_USER1 \
         -e TAX_ID_USER2=$TAX_ID_USER2 \
         -e BEARER_TOKEN_USER2=$BEARER_TOKEN_USER2 \
         -e BEARER_TOKEN_USER1=$BEARER_TOKEN_USER1 \
+        -e BEARER_TOKEN_PA=$TOKEN_PA_1 \
         -e USE_IUN_FILE=$USE_IUN_FILE \
+        -e WITH_PAYMENT=$SEND_WITH_PAYMENT \
+        -e WITH_GROUP=$SEND_WITH_GROUP \
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
         -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \

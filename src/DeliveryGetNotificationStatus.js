@@ -8,12 +8,12 @@ import sendNotification from './DeliverySendNotification.js';
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 
-var apiKey = `${__ENV.API_KEY}`
-var envName = `${__ENV.ENV_NAME}`
+let apiKey = `${__ENV.API_KEY}`
+let envName = `${__ENV.ENV_NAME}`
 
 
 export function setup() {
-    var result = JSON.parse(sendNotification().body);
+    let result = JSON.parse(sendNotification().body);
     sleep(60);
     return result;    
 }
@@ -24,17 +24,17 @@ const throttling = new Counter('throttling');
 
 export default function getNotificationStatus(notificationRequest) {
 
-    var url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
+    let url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
     url.searchParams.append('notificationRequestId', notificationRequest.notificationRequestId);
 
-    var params = {
+    let params = {
         headers: {
          'Content-Type': 'application/json',
          'x-api-key': apiKey
         },
     };
     
-    var r = http.get(url.toString(), params);
+    let r = http.get(url.toString(), params);
 
     console.log(`Status ${r.status}`);
 

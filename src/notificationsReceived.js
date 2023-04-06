@@ -6,30 +6,30 @@ import { sendNotificationToPn } from './modules/sendNotification.js';
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const throttling = new Counter('throttling');
-var bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-var envName = `${__ENV.ENV_NAME}`
+let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
+let envName = `${__ENV.ENV_NAME}`
 
 
 export function setup() {
-  var taxId = `${__ENV.TAX_ID_USER1}`
-  return sendNotificationToPn(taxId);
+  let taxId = `${__ENV.TAX_ID_USER1}`
+  return sendNotificationToPn(taxId).iun;
 }
 
 export default function recipientRead(iun) {
      
-    var url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}`;
-    var token = 'Bearer ' + bearerToken;
+    let url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}`;
+    let token = 'Bearer ' + bearerToken;
 
     console.log(`Url ${url}`);
 
-    var params = {
+    let params = {
       headers: {
       'Content-Type': 'application/json',
       'Authorization': token
       }
     };
 
-    var r = http.get(url, params);
+    let r = http.get(url, params);
 
     console.log(`Notifications Received Iun Status: ${r.status}`);
     console.log(`Response body ${r.body}`);

@@ -89,6 +89,14 @@ resource "aws_codebuild_project" "main" {
       name  = "USE_IUN_FILE"
       value = ""
     }
+    environment_variable {
+      name  = "SEND_WITH_PAYMENT"
+      value = ""
+    }
+     environment_variable {
+      name  = "SEND_WITH_GROUP"
+      value = ""
+    }
   }
 
   logs_config {

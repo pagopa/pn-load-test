@@ -9,40 +9,40 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 const throttling = new Counter('throttling');
 
-var apiKey = `${__ENV.API_KEY}`
-var envName = `${__ENV.ENV_NAME}`
-var useIunFile = `${__ENV.USE_IUN_FILE}`
-var iunFile = open('./resources/NotificationIUN.txt');
+let apiKey = `${__ENV.API_KEY}`
+let envName = `${__ENV.ENV_NAME}`
+let useIunFile = `${__ENV.USE_IUN_FILE}`
+let iunFile = open('./resources/NotificationIUN.txt');
 
 
 export function setup() {
   if(useIunFile && useIunFile !== 'undefined') {
-    var iunArray = iunFile.split(';');
+    let iunArray = iunFile.split(';');
     console.log("IUN_LENGTH: "+ iunArray.length);
     return iunArray
   }
-  return sendNotificationToPn("FRMTTR76M06B715E");
+  return sendNotificationToPn("FRMTTR76M06B715E").iun;
 }
 
 
 
 export default function getNotification(iun) {
-  var currentIun = iun;
+  let currentIun = iun;
   if(useIunFile && useIunFile !== 'undefined') {
     currentIun = iun[exec.scenario.iterationInTest % iun.length].trim();
   }
   
   console.log("INTERNAL IUN: "+currentIun);
-  var url = `https://api.${envName}.pn.pagopa.it/delivery/notifications/sent/${currentIun}`;
+  let url = `https://api.${envName}.pn.pagopa.it/delivery/notifications/sent/${currentIun}`;
   console.log('URL: '+url)
 
-  var params = {
+  let params = {
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': apiKey
     },
   };
-  var r = http.get(url, params);
+  let r = http.get(url, params);
 
   console.log(`Status ${r.status}`);
 

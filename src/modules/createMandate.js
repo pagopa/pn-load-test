@@ -1,22 +1,30 @@
 import http from 'k6/http';
-import { sleep } from 'k6';
 
 const apiVersion = 'v1'
 
-const payload = JSON.stringify(JSON.parse(open('../model/mandateRequest.json')));
+let json = JSON.parse(open('../model/mandateRequest.json'));
+
+
+
 
 export function createMandate() {
 
-  var bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-  var envName = `${__ENV.ENV_NAME}`
+  let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
+  let envName = `${__ENV.ENV_NAME}`
 
-  var url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate`;
-  var token = 'Bearer ' + bearerToken;
+  let dateFrom = new Date();
+  json.datefrom = dateFrom.toISOString().slice(0, 10);
+
+  let dateTo = new Date();
+  dateTo.setDate(dateTo.getDate() + 1);
+  json.dateto = dateTo.toISOString().slice(0, 10);
+
+  const payload = JSON.stringify(json);
+
+  let url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate`;
+  let token = 'Bearer ' + bearerToken;
   
-  //console.log(`Token ${token}`);
-  //console.log(`Payload ${payload}`);
-  
-  var params = {
+  let params = {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': token
