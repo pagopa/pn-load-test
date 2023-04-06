@@ -1,0 +1,15 @@
+{
+    "noticeCode": "302011680700400047",
+    "creditorTaxId": "77777777777",
+    "pagoPaForm": {
+        "digests": {
+            "sha256": "jezIVxlG1M1woCSUngM6KipUN3/p8cG5RMIPnuEanlE="
+        },
+        "contentType": "application/pdf",
+        "ref": {
+            "key": "PN_NOTIFICATION_ATTACHMENTS-d1ff521ab7e141e98cc8770e50758c41.pdf",
+            "versionToken": "v1"
+        }
+    }
+}
+

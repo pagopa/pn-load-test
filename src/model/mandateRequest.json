@@ -4,7 +4,6 @@
     "displayName": "User Uno",
     "firstName": "User",
     "lastName": "Uno",
-    "companyName": "",
     "fiscalCode": "FRMTTR76M06B715E",
     "person": true
   },
@@ -12,7 +11,6 @@
     "displayName": "User Due",
     "firstName": "User",
     "lastName": "Due",
-    "companyName": "",
     "fiscalCode": "CLMCST42R12D969Z",
     "person": true
   },

@@ -8,9 +8,10 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let apiKey = `${__ENV.API_KEY}`
 let envName = `${__ENV.ENV_NAME}`
 let sha256;
-let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+let binFile = open('./resources/AvvisoPagoPa.pdf', 'b');
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
+let paymentRequest = JSON.parse(open('./model/payment.json'));
 
 function preloadFile() {
     
@@ -62,6 +63,10 @@ export default function sendNotification(userTaxId) {
     let resultPreload = preloadFile();
 
     let withGroup = `${__ENV.WITH_GROUP}`
+
+    let withPayment = `${__ENV.WITH_PAYMENT}`
+
+    let paTaxId = `${__ENV.PA_TAX_ID}`
     
     let url = `https://api.${envName}.pn.pagopa.it/delivery/requests`;
 
@@ -80,10 +85,20 @@ export default function sendNotification(userTaxId) {
         notificationRequest.group = group.id;
     }
 
+    if(withPayment && withPayment !== 'undefined') {
+        let paymentAttachPreload = preloadFile();
+        paymentRequest.noticeCode = ("30201" + new Date().getTime().toString().padStart(11, '0'));
+        paymentRequest.pagoPaForm.digests.sha256 = sha256;
+        paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
+        notificationRequest.recipients[0].payment = paymentRequest;
+    }
+
     if(userTaxId){
         console.log("TAX-ID: "+userTaxId);
         notificationRequest.recipients[0].taxId = userTaxId;
     }
+
+    notificationRequest.senderTaxId = paTaxId;
 
     notificationRequest.paProtocolNumber = ("2023" + new Date().getTime().toString().padStart(14, '0'));
 
@@ -92,6 +107,8 @@ export default function sendNotification(userTaxId) {
 
     console.log('paprotocol: '+notificationRequest.paProtocolNumber);
     let payload = JSON.stringify(notificationRequest);
+
+    console.log('notificationRequest: '+notificationRequest);
 
     let r = http.post(url, payload, params);
 

@@ -3,7 +3,7 @@
     "vus": 1,
     "stages": [
         {
-            "duration": "10",
+            "duration": "240s",
             "target": 5
         }
     ],
