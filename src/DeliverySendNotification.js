@@ -13,7 +13,7 @@ let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
 let paymentRequest = JSON.parse(open('./model/payment.json'));
 
-function preloadFile() {
+export function preloadFile() {
     
     console.log(binFile);
 
@@ -34,6 +34,14 @@ function preloadFile() {
     console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
     console.log(preloadResponse.body);
+
+    check(preloadResponse, {
+        'status preload is 200': (preloadResponse) => preloadResponse.status === 200,
+    });
+
+    check(preloadResponse, {
+        'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+    });
     
     /*
     "secret": "...",
@@ -53,6 +61,15 @@ function preloadFile() {
     let urlSafeStorage = resultPreload.url;
     
     let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
+
+    check(safeStorageUploadResponde, {
+        'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+    });
+
+    check(safeStorageUploadResponde, {
+        'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+    });
+    
     console.log("RESULT PRELOAD: "+safeStorageUploadResponde.status);
     return resultPreload;   
 }
@@ -108,7 +125,7 @@ export default function sendNotification(userTaxId) {
     console.log('paprotocol: '+notificationRequest.paProtocolNumber);
     let payload = JSON.stringify(notificationRequest);
 
-    console.log('notificationRequest: '+notificationRequest);
+    console.log('notificationRequest: '+JSON.stringify(notificationRequest));
 
     let r = http.post(url, payload, params);
 
