@@ -13,7 +13,7 @@ let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
 let paymentRequest = JSON.parse(open('./model/payment.json'));
 
-export function preloadFile() {
+export function preloadFile(onlyPreloadUrl) {
     
     console.log(binFile);
 
@@ -33,7 +33,8 @@ export function preloadFile() {
     let payload = JSON.stringify(preloadFileRequest);
     console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
-    console.log(preloadResponse.body);
+    
+    console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
     check(preloadResponse, {
         'status preload is 200': (preloadResponse) => preloadResponse.status === 200,
@@ -49,29 +50,33 @@ export function preloadFile() {
     "url": "..."
     */
 
-    let resultPreload = JSON.parse(preloadResponse.body)[0];
-    let paramsSafeStorage = {
-        headers: {
-            'Content-Type': 'application/pdf',
-            'x-amz-checksum-sha256': sha256,
-            'x-amz-meta-secret': resultPreload.secret,
-        },
-    };
-
-    let urlSafeStorage = resultPreload.url;
+    if(!onlyPreloadUrl){
+        console.log("SONO DENTRO");
+        let resultPreload = JSON.parse(preloadResponse.body)[0];
+        let paramsSafeStorage = {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'x-amz-checksum-sha256': sha256,
+                'x-amz-meta-secret': resultPreload.secret,
+            },
+        };
     
-    let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
-
-    check(safeStorageUploadResponde, {
-        'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
-    });
-
-    check(safeStorageUploadResponde, {
-        'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
-    });
+        let urlSafeStorage = resultPreload.url;
+        
+        let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
     
-    console.log("RESULT PRELOAD: "+safeStorageUploadResponde.status);
-    return resultPreload;   
+        check(safeStorageUploadResponde, {
+            'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+        });
+    
+        check(safeStorageUploadResponde, {
+            'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+        });
+        
+        console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
+        return resultPreload;   
+    }
+   
 }
 
 
