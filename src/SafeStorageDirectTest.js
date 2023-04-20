@@ -10,8 +10,16 @@ let sha256;
 let binFile = open('./resources/AvvisoPagoPa.pdf', 'b');
 let preloadFileRequest = JSON.parse(open('./model/requestSafeStorage.json'));
 
+export function setup() {
+    let onlyPreloadUrlParam = `${__ENV.ONLY_PRELOAD_URL}`
+    let onlyPreloadUrl = false;
+    if(onlyPreloadUrlParam && onlyPreloadUrlParam !== 'undefined') {
+        onlyPreloadUrl = true;
+    }
+    return onlyPreloadUrl;
+}
 
-export default function preloadFileDirect() {
+export default function preloadFileDirect(onlyPreloadUrl) {
     
     console.log(binFile);
 
@@ -44,5 +52,32 @@ export default function preloadFileDirect() {
         'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
     
+
+    if(!onlyPreloadUrl){
+        let resultPreload = JSON.parse(preloadResponse.body);
+        console.log('PRELOAD RESPONSE: '+JSON.stringify(resultPreload));
+        let paramsSafeStorage = {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'x-amz-checksum-sha256': sha256,
+                'x-amz-meta-secret': resultPreload.secret,
+            },
+        };
+    
+        let urlSafeStorage = resultPreload.uploadUrl;
+        
+        let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
+    
+        check(safeStorageUploadResponde, {
+            'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+        });
+    
+        check(safeStorageUploadResponde, {
+            'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+        });
+        
+        console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
+        return resultPreload;   
+    }
    
 }

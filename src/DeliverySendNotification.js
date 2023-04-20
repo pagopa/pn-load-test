@@ -51,7 +51,6 @@ export function preloadFile(onlyPreloadUrl) {
     */
 
     if(!onlyPreloadUrl){
-        console.log("SONO DENTRO");
         let resultPreload = JSON.parse(preloadResponse.body)[0];
         let paramsSafeStorage = {
             headers: {
