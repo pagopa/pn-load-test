@@ -50,9 +50,9 @@ export default function delegateRead(request) {
   if(request && request.mandateId  && request.iun ) {
 
     let bearerToken = `${__ENV.BEARER_TOKEN_USER2}`
-    let envName = `${__ENV.ENV_NAME}`
+    let basePath = `${__ENV.WEB_BASE_PATH}`
 
-	  let url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${request.iun}?mandateId=${request.mandateId}`;
+	  let url = `https://${basePath}/delivery/notifications/received/${request.iun}?mandateId=${request.mandateId}`;
 	  
 	  console.log(`Url ${url}`);
 

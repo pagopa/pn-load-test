@@ -6,7 +6,7 @@ import http from 'k6/http';
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 let apiKey = `${__ENV.API_KEY}`
-let envName = `${__ENV.ENV_NAME}`
+let basePath = `${__ENV.BASE_PATH}`
 let sha256;
 let binFile = open('./resources/AvvisoPagoPa.pdf', 'b');
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
@@ -20,7 +20,7 @@ export function preloadFile(onlyPreloadUrl) {
     sha256 = crypto.sha256(binFile, 'base64');
     console.log('Sha: '+sha256);
 
-    let url = `https://api.${envName}.pn.pagopa.it/delivery/attachments/preload`;
+    let url = `https://${basePath}/delivery/attachments/preload`;
 
     let paramsDeliveryPreload = {
         headers: {
@@ -89,7 +89,7 @@ export default function sendNotification(userTaxId) {
 
     let paTaxId = `${__ENV.PA_TAX_ID}`
     
-    let url = `https://api.${envName}.pn.pagopa.it/delivery/requests`;
+    let url = `https://${basePath}/delivery/requests`;
 
      let params = {
         headers: {
@@ -99,7 +99,7 @@ export default function sendNotification(userTaxId) {
     };
 
     if(withGroup && withGroup !== 'undefined') {
-        let gruopUrl = `https://api.${envName}.pn.pagopa.it/ext-registry-b2b/pa/v1/groups?metadataOnly=true`;
+        let gruopUrl = `https://${basePath}/ext-registry-b2b/pa/v1/groups?metadataOnly=true`;
         let groupList = JSON.parse((http.get(gruopUrl, params)).body);
         console.log(JSON.stringify(groupList));
         let group = groupList.find((elem) => elem.status === 'ACTIVE');

@@ -10,7 +10,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 const throttling = new Counter('throttling');
 
 let apiKey = `${__ENV.API_KEY}`
-let envName = `${__ENV.ENV_NAME}`
+let basePath = `${__ENV.BASE_PATH}`
 let useIunFile = `${__ENV.USE_IUN_FILE}`
 let iunFile = open('./resources/NotificationIUN.txt');
 
@@ -33,7 +33,7 @@ export default function getNotification(iun) {
   }
   
   console.log("INTERNAL IUN: "+currentIun);
-  let url = `https://api.${envName}.pn.pagopa.it/delivery/notifications/sent/${currentIun}`;
+  let url = `https://${basePath}/delivery/notifications/sent/${currentIun}`;
   console.log('URL: '+url)
 
   let params = {

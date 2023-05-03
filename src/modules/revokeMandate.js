@@ -5,9 +5,9 @@ const apiVersion = 'v1'
 export function revokeMandate(mandateId) {
 
     let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-    let envName = `${__ENV.ENV_NAME}`
+    let basePath = `${__ENV.WEB_BASE_PATH}`
 
-    let url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate/${mandateId}/revoke`;
+    let url = `https://${basePath}/mandate/api/${apiVersion}/mandate/${mandateId}/revoke`;
     let token = 'Bearer ' + bearerToken;
     
     console.log(`Url ${url}`);

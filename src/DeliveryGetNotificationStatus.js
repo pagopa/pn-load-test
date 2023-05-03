@@ -9,7 +9,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 
 let apiKey = `${__ENV.API_KEY}`
-let envName = `${__ENV.ENV_NAME}`
+let basePath = `${__ENV.BASE_PATH}`
 
 
 export function setup() {
@@ -24,7 +24,7 @@ const throttling = new Counter('throttling');
 
 export default function getNotificationStatus(notificationRequest) {
 
-    let url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
+    let url = new URL(`https://${basePath}/delivery/requests`);
     url.searchParams.append('notificationRequestId', notificationRequest.notificationRequestId);
 
     let params = {

@@ -5,12 +5,12 @@ import sendNotification from '/DeliverySendNotification.js';
 
 export function sendNotificationToPn(userTaxId){
 
-    let envName = `${__ENV.ENV_NAME}`
+    let basePath = `${__ENV.BASE_PATH}`
     let apiKey = `${__ENV.API_KEY}`
 
     let result = JSON.parse(sendNotification(userTaxId).body);
     console.log('result: '+result.notificationRequestId);
-    let url = new URL(`https://api.${envName}.pn.pagopa.it/delivery/requests`);
+    let url = new URL(`https://${basePath}/delivery/requests`);
     url.searchParams.append('notificationRequestId', result.notificationRequestId);
 
     let params = {

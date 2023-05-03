@@ -7,9 +7,9 @@ const payload = JSON.parse(open('../model/acceptMandate.json'));
 export function acceptMandate(mandateId) {
 
     let bearerToken = `${__ENV.BEARER_TOKEN_USER2}`
-    let envName = `${__ENV.ENV_NAME}`
+    let basePath = `${__ENV.WEB_BASE_PATH}`
 
-    let url = `https://webapi.${envName}.pn.pagopa.it/mandate/api/${apiVersion}/mandate/${mandateId}/accept`;
+    let url = `https://${basePath}/mandate/api/${apiVersion}/mandate/${mandateId}/accept`;
     let token = 'Bearer ' + bearerToken;
     
     console.log(`Url ${url}`);

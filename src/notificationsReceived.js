@@ -7,7 +7,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 const throttling = new Counter('throttling');
 let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-let envName = `${__ENV.ENV_NAME}`
+let basePath = `${__ENV.WEB_BASE_PATH}`
 
 
 export function setup() {
@@ -17,7 +17,7 @@ export function setup() {
 
 export default function recipientRead(iun) {
      
-    let url = `https://webapi.${envName}.pn.pagopa.it/delivery/notifications/received/${iun}`;
+    let url = `https://${basePath}/delivery/notifications/received/${iun}`;
     let token = 'Bearer ' + bearerToken;
 
     console.log(`Url ${url}`);
