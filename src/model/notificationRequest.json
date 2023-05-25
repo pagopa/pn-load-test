@@ -1,6 +1,6 @@
 {
     "paProtocolNumber": "20231003000",
-    "subject": "Test",
+    "subject": "Test-di-carico",
     "recipients": [
       {
         "denomination": "Test Carico",
@@ -36,5 +36,5 @@
     "notificationFeePolicy": "FLAT_RATE",
     "senderDenomination": "Comune di Palermo",
     "senderTaxId": "80016350821",
-    "abstract": "Test"
+    "abstract": "Test-di-carico"
 }
