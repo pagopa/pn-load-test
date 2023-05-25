@@ -7,7 +7,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 let apiKey = `${__ENV.API_KEY}`
 let sha256;
-let binFile = open('./resources/AvvisoPagoPa.pdf', 'b');
+let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
 let preloadFileRequest = JSON.parse(open('./model/requestSafeStorage.json'));
 
 export function setup() {

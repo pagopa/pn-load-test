@@ -8,7 +8,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let apiKey = `${__ENV.API_KEY}`
 let basePath = `${__ENV.BASE_PATH}`
 let sha256;
-let binFile = open('./resources/AvvisoPagoPa.pdf', 'b');
+let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
 let paymentRequest = JSON.parse(open('./model/payment.json'));
