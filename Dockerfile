@@ -36,11 +36,17 @@ COPY --from=builder /root/go/bin/k6 /usr/bin/k6
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /opt/aws/amazon-cloudwatch-agent /opt/aws/amazon-cloudwatch-agent
 COPY codebuild/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
-ADD start.sh .
-RUN chmod +x start.sh
 
+
+COPY src /tests/src
+
+COPY docker-entry-point.sh /tests
+
+RUN chmod u+x /tests/docker-entry-point.sh
+
+WORKDIR /tests/
 
 ENV RUN_IN_CONTAINER=true
 ENV AWS_REGION=eu-south-1
 
-ENTRYPOINT [ "/bin/sh", "start.sh" ]
+ENTRYPOINT [ "/tests/docker-entry-point.sh" ]
