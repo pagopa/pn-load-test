@@ -30,7 +30,8 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
 
 
 FROM alpine:3.15
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils
+
 COPY --from=builder /root/go/bin/k6 /usr/bin/k6
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
@@ -41,8 +42,11 @@ COPY codebuild/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc
 COPY src /tests/src
 
 COPY docker-entry-point.sh /tests
-
 RUN chmod u+x /tests/docker-entry-point.sh
+
+COPY get_test_metrics /tests/get_test_metrics 
+RUN chmod u+x /tests/get_test_metrics/*.sh
+
 
 WORKDIR /tests/
 
@@ -50,3 +54,4 @@ ENV RUN_IN_CONTAINER=true
 ENV AWS_REGION=eu-south-1
 
 ENTRYPOINT [ "/tests/docker-entry-point.sh" ]
+
