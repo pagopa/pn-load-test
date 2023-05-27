@@ -139,6 +139,12 @@ echo ""
 # git clone https://github.com/pagopa/pn-load-test.git
 
 
+echo "Summarize response status with traceId"
+node src/result_parsing_utils/list_request_status_and_traceid.js \
+     /outputs/http-output.json \
+     > /outputs/status-by-request.json
+     
+
 echo "create directory for k6 test"
 dir=${folder}/monitoring_$(date '+%Y-%m-%d-%s')
 

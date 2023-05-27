@@ -29,7 +29,7 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
     rm -rf /tmp/*
 
 
-FROM alpine:3.15
+FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils
 
 COPY --from=builder /root/go/bin/k6 /usr/bin/k6
