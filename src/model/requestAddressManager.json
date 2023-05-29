@@ -1,0 +1,17 @@
+{
+    "correlationId": "VALIDATE_NORMALIZE_ADDRESSES_REQUEST_IUN_PZRK-JLXU-LUHZ-202305-Y-1",
+    "requestItems": [
+      {
+        "id": "0",
+        "address": {
+          "addressRow": "VIA BENEDETTO CROCE",
+          "addressRow2": "",
+          "cap": "87100",
+          "city": "Cosenza",
+          "city2": "Cosenza",
+          "pr": "CS",
+          "country": "ITALIA"
+        }
+      }
+    ]
+}

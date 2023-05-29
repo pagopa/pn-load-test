@@ -12,6 +12,7 @@ let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
 let paymentRequest = JSON.parse(open('./model/payment.json'));
+let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
 export function preloadFile(onlyPreloadUrl) {
     
@@ -83,11 +84,13 @@ export default function sendNotification(userTaxId) {
 
     let resultPreload = preloadFile();
 
-    let withGroup = `${__ENV.WITH_GROUP}`
+    let withGroup = `${__ENV.WITH_GROUP}`;
 
-    let withPayment = `${__ENV.WITH_PAYMENT}`
+    let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
 
-    let paTaxId = `${__ENV.PA_TAX_ID}`
+    let withPayment = `${__ENV.WITH_PAYMENT}`;
+
+    let paTaxId = `${__ENV.PA_TAX_ID}`;
     
     let url = `https://${basePath}/delivery/requests`;
 
@@ -117,6 +120,10 @@ export default function sendNotification(userTaxId) {
     if(userTaxId){
         console.log("TAX-ID: "+userTaxId);
         notificationRequest.recipients[0].taxId = userTaxId;
+    }
+
+    if(digitalWorkflow && digitalWorkflow !== 'undefined') {
+        notificationRequest.recipients[0].digitalDomicile = digitalDomicileRequest;
     }
 
     notificationRequest.senderTaxId = paTaxId;
