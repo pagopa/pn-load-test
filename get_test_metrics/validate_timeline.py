@@ -40,8 +40,8 @@ def decode_ids(ids: list[str]) -> list[str]:
 
 # for each passed iun, get from DynamoDB the records from "pn-Timelines" table
 # and process the corresponding timeline
-def get_timelines(iuns: list[str]) -> dict:
-    processed = dict()
+def get_timelines(iuns: list[str]) -> list:
+    processed = []
 
     for iun in iuns:
         response = dynamodb.query(
@@ -55,9 +55,8 @@ def get_timelines(iuns: list[str]) -> dict:
         items = response.get('Items', [])
         if len(items) > 0:
 
-            iun = items[0]['iun']['S'];
-
             new_element = {
+                "iun": items[0]['iun']['S'],
                 "isNotRefused": False,
                 "isRefined": False,
                 "timeline": []
@@ -79,8 +78,7 @@ def get_timelines(iuns: list[str]) -> dict:
                     "timestamp": timestamp
                 });
     
-            processed[iun] = new_element
-            #print(processed[iun])
+            processed.append(new_element)
 
     return processed
 
