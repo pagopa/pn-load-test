@@ -1,7 +1,9 @@
 # pip install boto3
 # python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines.json --profile sso_pn-core-dev
 #   or:
-# python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
+# python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
+#
+# tested with Python 3.11
 
 import base64
 import sys
@@ -15,7 +17,7 @@ table_name = 'pn-Timelines'
 
 # get filename from the command-line argument
 if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
-    print('Usage: python ./get_test_metrics/validate_timeline.py <source_filename> <destination_filename> --profile <profile_name>')
+    print('Usage: python3 ./validate_timeline.py <source_filename> <destination_filename> --profile <profile_name>')
     sys.exit(1)
 
 source_filename = sys.argv[1]
