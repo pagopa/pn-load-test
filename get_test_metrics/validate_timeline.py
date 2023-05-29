@@ -1,24 +1,31 @@
 # pip install boto3
-# python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt
+# python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines.json --profile sso_pn-core-dev
 
 import base64
 import sys
+import json
+
 import boto3
 
-session = boto3.Session(profile_name='sso_pn-core-dev')
-dynamodb = session.client('dynamodb')
-#dynamodb = boto3.client('dynamodb')
+
 
 table_name = 'pn-Timelines'
 
 # get filename from the command-line argument
-if len(sys.argv) < 2:
-    print('Please provide a filename as a command-line argument')
+if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
+    print('Usage: python ./get_test_metrics/validate_timeline.py <source_filename> <destination_filename> --profile <profile_name>')
     sys.exit(1)
-filename = sys.argv[1]
+
+source_filename = sys.argv[1]
+destination_filename = sys.argv[2]
+profile_name = sys.argv[4]
+
+session = boto3.Session(profile_name=profile_name)
+dynamodb = session.client('dynamodb')
+
 
 # read a text file and for each line, putting in a set to remove duplicates
-def get_unique_ids(filename: str) -> list[str]:
+def get_unique_ids_from_source_filename(filename: str) -> list[str]:
     ids = set()
     with open(filename) as f:
         for line in f:
@@ -27,11 +34,13 @@ def get_unique_ids(filename: str) -> list[str]:
 
 # take a list of base64 encoded ids and return a list of decoded ids
 def decode_ids(ids: list[str]) -> list[str]:
-    return [base64.b64decode(id).decode('utf-8') for id in ids]
+    return [base64.b64decode(id).decode('utf-8') for id in ids if id != '']
 
 # for each passed iun, get from DynamoDB the records from "pn-Timelines" table
 # and process the corresponding timeline
-def get_timelines(iuns: list[str]):
+def get_timelines(iuns: list[str]) -> dict:
+    processed = dict()
+
     for iun in iuns:
         response = dynamodb.query(
             TableName=table_name,
@@ -40,15 +49,43 @@ def get_timelines(iuns: list[str]):
                 ':val': {'S': iun}
             }
         )
-        search_items = []
+
         items = response.get('Items', [])
-        for item in items:
-            #field1 = item['attribute1']['S']
-            print(item)
+        if len(items) > 0:
+
+            iun = items[0]['iun']['S'];
+
+            new_element = {
+                "isNotRefused": False,
+                "isRefined": False,
+                "timeline": []
+            }
+
+            for item in items:
+                timelineElementId = item['timelineElementId']['S']
+                category = item['category']['S']
+                timestamp = item['timestamp']['S']
+
+                if category == 'REFINEMENT':
+                    new_element["isRefined"] = True
+                elif category == 'REQUEST_ACCEPTED':
+                    new_element["isNotRefused"] = True
+
+                new_element["timeline"].append({
+                    "timelineElementId": timelineElementId,
+                    "category": category,
+                    "timestamp": timestamp
+                });
+    
+            processed[iun] = new_element
+            #print(processed[iun])
+
+    return processed
 
 
 if __name__ == '__main__':
-    ids = get_unique_ids(filename=filename)
+    ids = get_unique_ids_from_source_filename(filename=source_filename)
     iuns = decode_ids(ids)
-    #print(iuns)
-    get_timelines(iuns)
+    processed = get_timelines(iuns)
+    processed_json = json.dumps(processed, indent=4)
+    print(processed_json)
