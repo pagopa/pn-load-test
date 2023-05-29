@@ -29,9 +29,14 @@ dynamodb = session.client('dynamodb')
 # read a text file and for each line, putting in a set to remove duplicates
 def get_unique_ids_from_source_filename(filename: str) -> list[str]:
     ids = set()
-    with open(filename) as f:
-        for line in f:
-           ids.add(line.strip())
+    try:
+        with open(filename) as f:
+            for line in f:
+                ids.add(line.strip())
+    except FileNotFoundError:
+        print(f'File {filename} not found')
+        sys.exit(1)
+
     return list(ids)
 
 # take a list of base64 encoded ids and return a list of decoded ids
@@ -44,13 +49,17 @@ def get_timelines(iuns: list[str]) -> list:
     processed = []
 
     for iun in iuns:
-        response = dynamodb.query(
-            TableName=table_name,
-            KeyConditionExpression='iun = :val',
-            ExpressionAttributeValues={
-                ':val': {'S': iun}
-            }
-        )
+        try:
+            response = dynamodb.query(
+                TableName=table_name,
+                KeyConditionExpression='iun = :val',
+                ExpressionAttributeValues={
+                    ':val': {'S': iun}
+                }
+            )
+        except:
+            print(f'Problem querying DynamoDB table {table_name} for iun {iun}')
+            sys.exit(1)
 
         items = response.get('Items', [])
         if len(items) > 0:
@@ -63,7 +72,7 @@ def get_timelines(iuns: list[str]) -> list:
             }
 
             for item in items:
-                timelineElementId = item['timelineElementId']['S']
+                timeline_element_id = item['timelineElementId']['S']
                 category = item['category']['S']
                 timestamp = item['timestamp']['S']
 
@@ -73,7 +82,7 @@ def get_timelines(iuns: list[str]) -> list:
                     new_element["isNotRefused"] = True
 
                 new_element["timeline"].append({
-                    "timelineElementId": timelineElementId,
+                    "timelineElementId": timeline_element_id,
                     "category": category,
                     "timestamp": timestamp
                 });
@@ -83,10 +92,13 @@ def get_timelines(iuns: list[str]) -> list:
     return processed
 
 # write the processed timelines to a file
-def write_to_file(processed: dict, filename: str):
-    with open(filename, 'w') as f:
-        json.dump(processed, f, indent=4)
-
+def write_to_file(processed: list, filename: str):
+    try:
+        with open(filename, 'w') as f:
+            json.dump(processed, f, indent=4)
+    except:
+        print(f'Problem writing to {filename}')
+        sys.exit(1)
 
 if __name__ == '__main__':
     ids = get_unique_ids_from_source_filename(filename=source_filename)
