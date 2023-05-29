@@ -1,5 +1,7 @@
 # pip install boto3
 # python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines.json --profile sso_pn-core-dev
+#   or:
+# python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
 
 import base64
 import sys
@@ -82,10 +84,14 @@ def get_timelines(iuns: list[str]) -> dict:
 
     return processed
 
+# write the processed timelines to a file
+def write_to_file(processed: dict, filename: str):
+    with open(filename, 'w') as f:
+        json.dump(processed, f, indent=4)
+
 
 if __name__ == '__main__':
     ids = get_unique_ids_from_source_filename(filename=source_filename)
     iuns = decode_ids(ids)
     processed = get_timelines(iuns)
-    processed_json = json.dumps(processed, indent=4)
-    print(processed_json)
+    write_to_file(processed, destination_filename)
