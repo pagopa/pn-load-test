@@ -144,6 +144,12 @@ node src/result_parsing_utils/list_request_status_and_traceid.js \
      /outputs/http-output.json \
      > /outputs/status-by-request.json
      
+echo "extract notificationRequestId from console-output.txt"
+grep notificationRequestId /outputs/console-output.txt \
+  | jq -r '.msg' \
+  | grep REQUEST-ID-LOG \
+  | sed -E 's/.*notificationRequestId\":\"//g' \
+  | sed -E 's/\",\"paProtocolNumber.*//g' > /outputs/notification-request-ids.txt
 
 echo "create directory for k6 test"
 dir=${folder}/monitoring_$(date '+%Y-%m-%d-%s')
