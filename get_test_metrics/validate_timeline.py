@@ -2,6 +2,13 @@
 #
 # pip install boto3
 
+# first launch:
+# grep notificationRequestId outputs/console-output.txt \
+#  | jq -r '.msg' \
+#  | grep REQUEST-ID-LOG \
+#  | sed -E 's/.*notificationRequestId\":\"//g' \
+#  | sed -E 's/\",\"paProtocolNumber.*//g' > outputs/notification-request-ids.txt
+
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines-small.json --profile sso_pn-core-dev
 #   or:
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
@@ -10,6 +17,9 @@
 
 # starting from a list of base64 encoded ids from file, get the corresponding timelines from DynamoDB, ordering each timeline by the timestamp of the last element,
 # and ordering the timeline so that the first element is the one with the oldest timestamp of the last element, and write the processed timelines to a file
+
+# get the IUNs where the timeline correctly completed, on the output file, with:
+# cat outputs/processed-timelines.json | jq -r '.[] | select(.isRefined == true) | .iun' > outputs/iuns-timelines-completed.txt
 
 import base64
 import sys
@@ -20,7 +30,7 @@ import boto3
 
 
 
-table_name = 'pn-Timelines'
+timelines_table_name = 'pn-Timelines'
 
 # get filename from the command-line argument
 if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
@@ -56,19 +66,20 @@ def decode_ids(ids: list[str]) -> list[str]:
 # and process the corresponding timeline
 def get_timelines(iuns: list[str]) -> list:
     processed = []
+    not_processed = []
 
     for iun in iuns:
         print(f'Processing iun {iun}...')
         try:
             response = dynamodb.query(
-                TableName=table_name,
+                TableName=timelines_table_name,
                 KeyConditionExpression='iun = :val',
                 ExpressionAttributeValues={
                     ':val': {'S': iun}
                 }
             )
         except:
-            print(f'Problem querying DynamoDB table {table_name} for iun {iun}')
+            print(f'Problem querying DynamoDB table {timelines_table_name} for iun {iun}')
             sys.exit(1)
 
         items = response.get('Items', [])
@@ -105,9 +116,28 @@ def get_timelines(iuns: list[str]) -> list:
     
             processed.append(new_element)
 
+    print(f'Found {len(processed)} timelines')
+
+    # we then add all the elements that are in iuns but not in processed
+    elements_not_found = [iun for iun in iuns if iun not in [element["iun"] for element in processed]]
+    print(f'{len(elements_not_found)} elements not found in DynamoDB')
+
+    for iun in elements_not_found:
+        new_element = {
+            "iun": iun,
+            "isNotRefused": False,
+            "isRefined": False,
+            "lastElementTimestamp": "",
+            "timeline": []
+        }
+        not_processed.append(new_element)
+
     # order processed by timestamp on the last element in each timeline
     print('Ordering timelines based on the timestamp of the last element...')
     processed.sort(key=lambda x: x["timeline"][-1]["timestamp"])
+
+    # concatenate processed and not_processed, with not_processed first
+    processed = not_processed + processed
 
     return processed
 
