@@ -182,8 +182,8 @@ def complete_timelines(processed: list, future_actions: list) -> list:
     for element in processed:
         iun = element["iun"]
         future_actions_for_iun = [item for item in future_actions if item["iun"]["S"] == iun]
+        element["futureActions"] = [] # initialize the futureActions array, event in case we don't have any future actions
         if len(future_actions_for_iun) > 0:
-            element["futureActions"] = []
             for item in future_actions_for_iun:
                 element["futureActions"].append({
                     "timeSlot": item["timeSlot"]["S"],
@@ -191,13 +191,6 @@ def complete_timelines(processed: list, future_actions: list) -> list:
                     "notBefore": item["notBefore"]["S"],
                     "type": item["type"]["S"]
                 })
-        
-        
-    # add a "futureActions" element with empty list to all the elements that don't have it
-    for element in processed:
-        if "futureActions" not in element:
-            element["futureActions"] = []
-
     return processed
 
 
