@@ -8,6 +8,9 @@
 #
 # tested with Python 3.11
 
+# starting from a list of base64 encoded ids from file, get the corresponding timelines from DynamoDB, ordering each timeline by the timestamp of the last element,
+# and ordering the timeline so that the first element is the one with the oldest timestamp of the last element, and write the processed timelines to a file
+
 import base64
 import sys
 import json
@@ -75,6 +78,7 @@ def get_timelines(iuns: list[str]) -> list:
                 "iun": items[0]['iun']['S'],
                 "isNotRefused": False,
                 "isRefined": False,
+                "lastElementTimestamp": "",
                 "timeline": []
             }
 
@@ -93,8 +97,17 @@ def get_timelines(iuns: list[str]) -> list:
                     "category": category,
                     "timestamp": timestamp
                 });
+            
+                # sort new_element["timeline"] by timestamp
+                new_element["timeline"].sort(key=lambda x: x["timestamp"])
+
+                new_element["lastElementTimestamp"] = new_element["timeline"][-1]["timestamp"]
     
             processed.append(new_element)
+
+    # order processed by timestamp on the last element in each timeline
+    print('Ordering timelines based on the timestamp of the last element...')
+    processed.sort(key=lambda x: x["timeline"][-1]["timestamp"])
 
     return processed
 
@@ -113,7 +126,7 @@ if __name__ == '__main__':
     ids = get_unique_ids_from_source_filename(filename=source_filename)
     print(f'Found {len(ids)} unique rows, decoding...')
     iuns = decode_ids(ids)
-    print(f'Decoded {len(iuns)} ids, querying DynamoDB for timelines...')
+    print(f'Decoded {len(iuns)} ids, querying DynamoDB for timelines and ordering them based on the timestamp of the last element...')
     processed = get_timelines(iuns)
     print(f'Processed {len(processed)} timelines, writing to {destination_filename}...')
     write_to_file(processed, destination_filename)
