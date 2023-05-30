@@ -31,6 +31,8 @@ import boto3
 
 
 timelines_table_name = 'pn-Timelines'
+futureaction_table_name = 'pn-FutureAction'
+
 
 # get filename from the command-line argument
 if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
@@ -150,15 +152,75 @@ def write_to_file(processed: list, filename: str):
         print(f'Problem writing to {filename}')
         sys.exit(1)
 
+# perform a scan on the "pn-FutureAction" table, with pagination using the LastEvaluatedKey
+# to get all the records
+def get_future_actions() -> list:
+    try:
+        response = dynamodb.scan(
+            TableName=futureaction_table_name,
+            FilterExpression='attribute_exists(iun)'
+        )
+    except:
+        print(f'Problem scanning DynamoDB table {futureaction_table_name}')
+        sys.exit(1)
+
+    items = response.get('Items', [])
+
+    while 'LastEvaluatedKey' in response:
+        response = dynamodb.scan(
+            TableName=futureaction_table_name,
+            FilterExpression='attribute_exists(iun)',
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
+        items.extend(response.get('Items', []))
+
+    return items
+
+# function that for each timeline, checks if there are future actions for that iun,
+# and if there are, adds them to the timeline
+def complete_timelines(processed: list, future_actions: list) -> list:
+    for element in processed:
+        iun = element["iun"]
+        future_actions_for_iun = [item for item in future_actions if item["iun"]["S"] == iun]
+        if len(future_actions_for_iun) > 0:
+            element["futureActions"] = []
+            for item in future_actions_for_iun:
+                element["futureActions"].append({
+                    "timeSlot": item["timeSlot"]["S"],
+                    "actionId": item["actionId"]["S"],
+                    "notBefore": item["notBefore"]["S"],
+                    "type": item["type"]["S"]
+                })
+        
+        
+    # add a "futureActions" element with empty list to all the elements that don't have it
+    for element in processed:
+        if "futureActions" not in element:
+            element["futureActions"] = []
+
+    return processed
+
+
 if __name__ == '__main__':
     start = time.time()
+
     print(f'Processing {source_filename}...')
     ids = get_unique_ids_from_source_filename(filename=source_filename)
+    
     print(f'Found {len(ids)} unique rows, decoding...')
     iuns = decode_ids(ids)
+    
     print(f'Decoded {len(iuns)} ids, querying DynamoDB for timelines and ordering them based on the timestamp of the last element...')
     processed = get_timelines(iuns)
-    print(f'Processed {len(processed)} timelines, writing to {destination_filename}...')
-    write_to_file(processed, destination_filename)
+    
+    print(f'Found {len(processed)} timelines, querying DynamoDB for future actions...')
+    future_actions = get_future_actions();
+    
+    print(f'Found {len(future_actions)} future actions, completing the timelines...')
+    processed_with_future_actions = complete_timelines(processed, future_actions)
+    
+    print(f'Processed {len(processed_with_future_actions)} timelines, writing to {destination_filename}...')
+    write_to_file(processed_with_future_actions, destination_filename)
+
     end = time.time()
     print(f'Finished in {end - start} seconds')
