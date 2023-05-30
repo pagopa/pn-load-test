@@ -182,7 +182,7 @@ def complete_timelines(processed: list, future_actions: list) -> list:
     for element in processed:
         iun = element["iun"]
         future_actions_for_iun = [item for item in future_actions if item["iun"]["S"] == iun]
-        element["futureActions"] = [] # initialize the futureActions array, even in case we don't have any future actions
+        element["futureActions"] = [] # initialize the futureActions array, even in case we don't have any futureActions
         if len(future_actions_for_iun) > 0:
             for item in future_actions_for_iun:
                 element["futureActions"].append({
