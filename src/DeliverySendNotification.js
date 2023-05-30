@@ -1,5 +1,6 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
+import exec from 'k6/execution';
 import http from 'k6/http';
 
 
@@ -111,7 +112,7 @@ export default function sendNotification(userTaxId) {
 
     if(withPayment && withPayment !== 'undefined') {
         let paymentAttachPreload = preloadFile();
-        paymentRequest.noticeCode = ("30201" + new Date().getTime().toString().padStart(11, '0'));
+        paymentRequest.noticeCode = ("30201" + (exec.instance.iterationsCompleted +''+ new Date().getTime().toString()).padStart(13, '0').substring(0, 13));
         paymentRequest.pagoPaForm.digests.sha256 = sha256;
         paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
         notificationRequest.recipients[0].payment = paymentRequest;
