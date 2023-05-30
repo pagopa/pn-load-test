@@ -1,6 +1,5 @@
-# aws sso login --profile sso_pn-core-dev
-#
-# pip install boto3
+# if the run fails on dynamoDB access, first run for logging in to AWS SSO:
+# aws sso login --profile sso_pn-core-dev
 
 # first launch:
 # grep notificationRequestId outputs/console-output.txt \
@@ -9,6 +8,9 @@
 #  | sed -E 's/.*notificationRequestId\":\"//g' \
 #  | sed -E 's/\",\"paProtocolNumber.*//g' > outputs/notification-request-ids.txt
 
+# pip install boto3
+#
+#
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines-small.json --profile sso_pn-core-dev
 #   or:
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
@@ -95,6 +97,7 @@ def get_timelines(iuns: list[str]) -> list:
                 "timeline": []
             }
 
+            # for each item in the timeline, add it to the new_element["timeline"] array
             for item in items:
                 timeline_element_id = item['timelineElementId']['S']
                 category = item['category']['S']
@@ -178,7 +181,7 @@ def get_future_actions() -> list:
 
 # function that for each timeline, checks if there are future actions for that iun,
 # and if there are, adds them to the timeline
-def complete_timelines(processed: list, future_actions: list) -> list:
+def complete_timelines_with_future_actions(processed: list, future_actions: list) -> list:
     for element in processed:
         iun = element["iun"]
         future_actions_for_iun = [item for item in future_actions if item["iun"]["S"] == iun]
@@ -198,7 +201,7 @@ if __name__ == '__main__':
     start = time.time()
 
     print(f'Processing {source_filename}...')
-    ids = get_unique_ids_from_source_filename(filename=source_filename)
+    ids = get_unique_ids_from_source_filename(source_filename)
     
     print(f'Found {len(ids)} unique rows, decoding...')
     iuns = decode_ids(ids)
@@ -210,7 +213,7 @@ if __name__ == '__main__':
     future_actions = get_future_actions();
     
     print(f'Found {len(future_actions)} future actions, completing the timelines...')
-    processed_with_future_actions = complete_timelines(processed, future_actions)
+    processed_with_future_actions = complete_timelines_with_future_actions(processed, future_actions)
     
     print(f'Processed {len(processed_with_future_actions)} timelines, writing to {destination_filename}...')
     write_to_file(processed_with_future_actions, destination_filename)
