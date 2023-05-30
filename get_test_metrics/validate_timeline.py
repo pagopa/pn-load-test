@@ -1,5 +1,8 @@
+# aws sso login --profile sso_pn-core-dev
+#
 # pip install boto3
-# python ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines.json --profile sso_pn-core-dev
+
+# python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines-small.json --profile sso_pn-core-dev
 #   or:
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
 #
@@ -8,6 +11,7 @@
 import base64
 import sys
 import json
+import time
 
 import boto3
 
@@ -51,6 +55,7 @@ def get_timelines(iuns: list[str]) -> list:
     processed = []
 
     for iun in iuns:
+        print(f'Processing iun {iun}...')
         try:
             response = dynamodb.query(
                 TableName=table_name,
@@ -103,7 +108,14 @@ def write_to_file(processed: list, filename: str):
         sys.exit(1)
 
 if __name__ == '__main__':
+    start = time.time()
+    print(f'Processing {source_filename}...')
     ids = get_unique_ids_from_source_filename(filename=source_filename)
+    print(f'Found {len(ids)} unique rows, decoding...')
     iuns = decode_ids(ids)
+    print(f'Decoded {len(iuns)} ids, querying DynamoDB for timelines...')
     processed = get_timelines(iuns)
+    print(f'Processed {len(processed)} timelines, writing to {destination_filename}...')
     write_to_file(processed, destination_filename)
+    end = time.time()
+    print(f'Finished in {end - start} seconds')
