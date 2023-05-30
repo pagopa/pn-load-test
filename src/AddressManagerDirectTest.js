@@ -13,7 +13,8 @@ export default function preloadFileDirect() {
     let paramsAddressManager = {
         headers: {
             'Content-Type': 'application/json',
-            'pn-address-manager-cx-id' : 'pn-delivery-push'
+            'pn-address-manager-cx-id' : 'pn-delivery-push',
+            'x-api-key' : ' '
         },
     };
 
