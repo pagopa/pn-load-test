@@ -1,5 +1,5 @@
-import getNotification from './DeliveryGetNotification.js';
-import sendNotification from './DeliverySendNotification.js';
+import getNotification from 'DeliveryGetNotification.js';
+import sendNotification from 'DeliverySendNotification.js';
 import { sendNotificationToPn } from './modules/sendNotification.js';
   
 
