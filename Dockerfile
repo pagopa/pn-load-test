@@ -30,7 +30,9 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
 
 
 FROM node:19-alpine
-RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils
+RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
+
+RUN pip install boto3
 
 COPY --from=builder /root/go/bin/k6 /usr/bin/k6
 
@@ -46,7 +48,6 @@ RUN chmod u+x /tests/docker-entry-point.sh
 
 COPY get_test_metrics /tests/get_test_metrics 
 RUN chmod u+x /tests/get_test_metrics/*.sh
-
 
 WORKDIR /tests/
 
