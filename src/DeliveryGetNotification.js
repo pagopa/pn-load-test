@@ -11,11 +11,11 @@ const throttling = new Counter('throttling');
 
 let apiKey = `${__ENV.API_KEY}`
 let basePath = `${__ENV.BASE_PATH}`
-let useIunFile = `${__ENV.USE_IUN_FILE}`
 let iunFile = open('./resources/NotificationIUN.txt');
 
 
 export function setup() {
+  let useIunFile = `${__ENV.USE_IUN_FILE}`
   if(useIunFile && useIunFile !== 'undefined') {
     let iunArray = iunFile.split(';');
     console.log("IUN_LENGTH: "+ iunArray.length);
@@ -27,6 +27,7 @@ export function setup() {
 
 
 export default function getNotification(iun) {
+  let useIunFile = `${__ENV.USE_IUN_FILE}`
   let currentIun = iun;
   if(useIunFile && useIunFile !== 'undefined') {
     currentIun = iun[exec.scenario.iterationInTest % iun.length].trim();
@@ -47,7 +48,7 @@ export default function getNotification(iun) {
   console.log(`Status ${r.status}`);
 
   check(r, {
-    'status is 200': (r) => r.status === 200,
+    'status get is 200': (r) => r.status === 200,
   });
 
   if (r.status === 403) {

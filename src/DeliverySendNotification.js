@@ -111,7 +111,7 @@ export default function sendNotification(userTaxId) {
 
     if(withPayment && withPayment !== 'undefined') {
         let paymentAttachPreload = preloadFile();
-        paymentRequest.noticeCode = ("30201" + new Date().getTime().toString().padStart(11, '0'));
+        paymentRequest.noticeCode = ("302" + (Math.floor(Math.random() * 99999) +''+ new Date().getTime().toString().substring(3,13)).padStart(15, '0').substring(0, 15));
         paymentRequest.pagoPaForm.digests.sha256 = sha256;
         paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
         notificationRequest.recipients[0].payment = paymentRequest;

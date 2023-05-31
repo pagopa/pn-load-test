@@ -1,7 +1,16 @@
-# aws sso login --profile sso_pn-core-dev
-#
-# pip install boto3
+# if the run fails on dynamoDB access, first run for logging in to AWS SSO:
+# aws sso login --profile sso_pn-core-dev
 
+# first launch:
+# grep notificationRequestId outputs/console-output.txt \
+#  | jq -r '.msg' \
+#  | grep REQUEST-ID-LOG \
+#  | sed -E 's/.*notificationRequestId\":\"//g' \
+#  | sed -E 's/\",\"paProtocolNumber.*//g' > outputs/notification-request-ids.txt
+
+# pip install boto3
+#
+#
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids-small.txt outputs/processed-timelines-small.json --profile sso_pn-core-dev
 #   or:
 # python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
@@ -10,6 +19,9 @@
 
 # starting from a list of base64 encoded ids from file, get the corresponding timelines from DynamoDB, ordering each timeline by the timestamp of the last element,
 # and ordering the timeline so that the first element is the one with the oldest timestamp of the last element, and write the processed timelines to a file
+
+# get the IUNs where the timeline correctly completed, on the output file, with:
+# cat outputs/processed-timelines.json | jq -r '.[] | select(.isRefined == true) | .iun' > outputs/iuns-timelines-completed.txt
 
 import base64
 import sys
@@ -20,7 +32,9 @@ import boto3
 
 
 
-table_name = 'pn-Timelines'
+timelines_table_name = 'pn-Timelines'
+futureaction_table_name = 'pn-FutureAction'
+
 
 # get filename from the command-line argument
 if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
@@ -56,19 +70,20 @@ def decode_ids(ids: list[str]) -> list[str]:
 # and process the corresponding timeline
 def get_timelines(iuns: list[str]) -> list:
     processed = []
+    not_processed = []
 
     for iun in iuns:
         print(f'Processing iun {iun}...')
         try:
             response = dynamodb.query(
-                TableName=table_name,
+                TableName=timelines_table_name,
                 KeyConditionExpression='iun = :val',
                 ExpressionAttributeValues={
                     ':val': {'S': iun}
                 }
             )
         except:
-            print(f'Problem querying DynamoDB table {table_name} for iun {iun}')
+            print(f'Problem querying DynamoDB table {timelines_table_name} for iun {iun}')
             sys.exit(1)
 
         items = response.get('Items', [])
@@ -82,6 +97,7 @@ def get_timelines(iuns: list[str]) -> list:
                 "timeline": []
             }
 
+            # for each item in the timeline, add it to the new_element["timeline"] array
             for item in items:
                 timeline_element_id = item['timelineElementId']['S']
                 category = item['category']['S']
@@ -105,9 +121,28 @@ def get_timelines(iuns: list[str]) -> list:
     
             processed.append(new_element)
 
+    print(f'Found {len(processed)} timelines')
+
+    # we then add all the elements that are in iuns but not in processed
+    elements_not_found = [iun for iun in iuns if iun not in [element["iun"] for element in processed]]
+    print(f'{len(elements_not_found)} elements not found in DynamoDB')
+
+    for iun in elements_not_found:
+        new_element = {
+            "iun": iun,
+            "isNotRefused": False,
+            "isRefined": False,
+            "lastElementTimestamp": "",
+            "timeline": []
+        }
+        not_processed.append(new_element)
+
     # order processed by timestamp on the last element in each timeline
     print('Ordering timelines based on the timestamp of the last element...')
     processed.sort(key=lambda x: x["timeline"][-1]["timestamp"])
+
+    # concatenate processed and not_processed, with not_processed first
+    processed = not_processed + processed
 
     return processed
 
@@ -120,15 +155,68 @@ def write_to_file(processed: list, filename: str):
         print(f'Problem writing to {filename}')
         sys.exit(1)
 
+# perform a scan on the "pn-FutureAction" table, with pagination using the LastEvaluatedKey
+# to get all the records
+def get_future_actions() -> list:
+    try:
+        response = dynamodb.scan(
+            TableName=futureaction_table_name,
+            FilterExpression='attribute_exists(iun)'
+        )
+    except:
+        print(f'Problem scanning DynamoDB table {futureaction_table_name}')
+        sys.exit(1)
+
+    items = response.get('Items', [])
+
+    while 'LastEvaluatedKey' in response:
+        response = dynamodb.scan(
+            TableName=futureaction_table_name,
+            FilterExpression='attribute_exists(iun)',
+            ExclusiveStartKey=response['LastEvaluatedKey']
+        )
+        items.extend(response.get('Items', []))
+
+    return items
+
+# function that for each timeline, checks if there are future actions for that iun,
+# and if there are, adds them to the timeline
+def complete_timelines_with_future_actions(processed: list, future_actions: list) -> list:
+    for element in processed:
+        iun = element["iun"]
+        future_actions_for_iun = [item for item in future_actions if item["iun"]["S"] == iun]
+        element["futureActions"] = [] # initialize the futureActions array, even in case we don't have any futureActions
+        if len(future_actions_for_iun) > 0:
+            for item in future_actions_for_iun:
+                element["futureActions"].append({
+                    "timeSlot": item["timeSlot"]["S"],
+                    "actionId": item["actionId"]["S"],
+                    "notBefore": item["notBefore"]["S"],
+                    "type": item["type"]["S"]
+                })
+    return processed
+
+
 if __name__ == '__main__':
     start = time.time()
+
     print(f'Processing {source_filename}...')
-    ids = get_unique_ids_from_source_filename(filename=source_filename)
+    ids = get_unique_ids_from_source_filename(source_filename)
+    
     print(f'Found {len(ids)} unique rows, decoding...')
     iuns = decode_ids(ids)
+    
     print(f'Decoded {len(iuns)} ids, querying DynamoDB for timelines and ordering them based on the timestamp of the last element...')
     processed = get_timelines(iuns)
-    print(f'Processed {len(processed)} timelines, writing to {destination_filename}...')
-    write_to_file(processed, destination_filename)
+    
+    print(f'Found {len(processed)} timelines, querying DynamoDB for future actions...')
+    future_actions = get_future_actions();
+    
+    print(f'Found {len(future_actions)} future actions, completing the timelines...')
+    processed_with_future_actions = complete_timelines_with_future_actions(processed, future_actions)
+    
+    print(f'Processed {len(processed_with_future_actions)} timelines, writing to {destination_filename}...')
+    write_to_file(processed_with_future_actions, destination_filename)
+
     end = time.time()
     print(f'Finished in {end - start} seconds')

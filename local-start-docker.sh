@@ -26,7 +26,7 @@ if ( [ "$execution_or_download" == "run" ] ) then
     -v $(pwd)/outputs/$output_subfolder:/outputs/ \
     k6 run \
     --log-format json \
-    src/DeliverySendNotification.js \
+    src/DeliveryGetAndSendTest.js \
     --out json=/outputs/result-timing.json \
     --http-debug \
     --console-output=/outputs/console-output.txt \
