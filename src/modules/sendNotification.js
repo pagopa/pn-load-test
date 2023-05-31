@@ -1,7 +1,7 @@
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { sleep } from 'k6';
 import http from 'k6/http';
-import sendNotification from './DeliverySendNotification.js';
+import sendNotification from '../DeliverySendNotification.js';
 
 export function sendNotificationToPn(userTaxId){
 
