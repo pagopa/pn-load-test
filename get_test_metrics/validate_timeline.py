@@ -143,6 +143,13 @@ def get_timelines(iuns: list[str]) -> list:
 
     print(f'Found {len(processed)} timelines')
 
+    # we find in processed the element with the max validationTime and set its isMaxValidationTime to True
+    max_validation_time = max([element["validationTime"] for element in processed if element["validationTime"] is not None])
+    for element in processed:
+        if element["validationTime"] == max_validation_time:
+            element["isMaxValidationTime"] = True
+    # there could be in theory more than one with the flag set, but it's unlikely
+
     # we then add all the elements that are in iuns but not in processed
     elements_not_found = [iun for iun in iuns if iun not in [element["iun"] for element in processed]]
     print(f'{len(elements_not_found)} elements not found in DynamoDB')
