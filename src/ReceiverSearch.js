@@ -11,14 +11,16 @@ let basePath = `${__ENV.WEB_BASE_PATH}`
 
 
 export default function recipientSearch() {
-    
+    /*
     var endDate = new Date().toISOString();
     
     var date = new Date();
     date.setDate(date.getDate() - 2);
     var startDate= date.toISOString();
+*/
 
-    let url = encodeURI(`https://${basePath}/delivery/notifications/received?startDate=${startDate}&endDate=${endDate}&size=10`);
+    //let url = encodeURI(`https://${basePath}/delivery/notifications/received?startDate=${startDate}&endDate=${endDate}&size=10`);
+    let url = 'https://webapi.dev.notifichedigitali.it/delivery/notifications/received?startDate=2023-05-29T00%3A00%3A00.000Z&endDate=2023-06-01T00%3A00%3A00.000Z&size=10';
     
     let token = 'Bearer ' + bearerToken;
 
@@ -38,6 +40,8 @@ export default function recipientSearch() {
     check(r, {
       'status search is 200': (r) => r.status === 200,
     });
+
+    console.log(JSON.parse(r.body))
 
     if (r.status === 429) {
       throttling.add(1);
