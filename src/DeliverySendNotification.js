@@ -9,16 +9,28 @@ let apiKey = `${__ENV.API_KEY}`
 let basePath = `${__ENV.BASE_PATH}`
 let sha256;
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+
+let anotherBinFile = [];
+let pdfNumber = 3;
+for(let i = 0; i< pdfNumber; i++){
+    anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
+}
+
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
+let notificationDocument = JSON.parse(open('./model/notificationDocument.json'));
 let paymentRequest = JSON.parse(open('./model/payment.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
-export function preloadFile(onlyPreloadUrl) {
+export function preloadFile(onlyPreloadUrl, otherFile) {
+    let currBinFile = binFile;
+    if(otherFile){
+        currBinFile = anotherBinFile[otherFile%pdfNumber]
+    }
     
-    console.log(binFile);
+    console.log(currBinFile);
 
-    sha256 = crypto.sha256(binFile, 'base64');
+    sha256 = crypto.sha256(currBinFile, 'base64');
     console.log('Sha: '+sha256);
 
     let url = `https://${basePath}/delivery/attachments/preload`;
@@ -63,7 +75,7 @@ export function preloadFile(onlyPreloadUrl) {
     
         let urlSafeStorage = resultPreload.url;
         
-        let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
+        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
             'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
@@ -83,6 +95,22 @@ export function preloadFile(onlyPreloadUrl) {
 export default function sendNotification(userTaxId) {
 
     let resultPreload = preloadFile();
+
+    notificationRequest.documents[0].ref.key = resultPreload.key;
+    notificationRequest.documents[0].digests.sha256 = sha256;
+
+    let moreAttach = `${__ENV.MORE_ATTACH}`;
+    if(moreAttach && moreAttach !== 'undefined') {
+        for(let i = 1; i <= moreAttach; i++){
+            let preloadDocument = preloadFile(false,i);
+            notificationDocument.ref.key = preloadDocument.key;
+            notificationDocument.digests.sha256 = sha256;
+            notificationDocument.title = 'TEST_PDF_'+i;
+
+            notificationRequest.documents[i] = JSON.parse(JSON.stringify(notificationDocument));
+        }
+    }
+
 
     let withGroup = `${__ENV.WITH_GROUP}`;
 
@@ -129,9 +157,6 @@ export default function sendNotification(userTaxId) {
     notificationRequest.senderTaxId = paTaxId;
 
     notificationRequest.paProtocolNumber = ("2023" + new Date().getTime().toString().padStart(14, '0'));
-
-    notificationRequest.documents[0].ref.key = resultPreload.key;
-    notificationRequest.documents[0].digests.sha256 = sha256;
 
     console.log('paprotocol: '+notificationRequest.paProtocolNumber);
     let payload = JSON.stringify(notificationRequest);
