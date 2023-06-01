@@ -168,9 +168,13 @@ export default function sendNotification(userTaxId) {
     console.log(`Status ${r.status}`);
 
     check(r, {
-        'status is 202': (r) => r.status === 202,
+        'status is 409': (r) => r.status === 409,
     });
 
+    check(r, {
+        'status is 202': (r) => r.status === 202,
+    });
+    
     console.log('REQUEST-ID-LOG: '+r.body)
 
     if (r.status === 403) {
