@@ -27,6 +27,8 @@ import base64
 import sys
 import json
 import time
+from dateutil.parser import parse
+from dateutil.parser import ParserError
 
 import boto3
 
@@ -93,7 +95,11 @@ def get_timelines(iuns: list[str]) -> list:
                 "iun": items[0]['iun']['S'],
                 "isNotRefused": False,
                 "isRefined": False,
-                "lastElementTimestamp": "",
+                "lastElementTimestamp": None,
+                "validationTime": None,
+                "notificationSentAt": None,
+                "validationTimeStamp": None,
+                "isMaxValidationTime": False,
                 "timeline": []
             }
 
@@ -102,11 +108,25 @@ def get_timelines(iuns: list[str]) -> list:
                 timeline_element_id = item['timelineElementId']['S']
                 category = item['category']['S']
                 timestamp = item['timestamp']['S']
+                notificationSentAt = item['notificationSentAt']['S']
+
 
                 if category == 'REFINEMENT':
                     new_element["isRefined"] = True
                 elif category == 'REQUEST_ACCEPTED':
                     new_element["isNotRefused"] = True
+
+                if category == 'REQUEST_ACCEPTED' or category == 'REQUEST_REFUSED':
+                    # new_element["validationTime"] is the time between the notification being sent 
+                    # (equal for each element of that timeline) and the request being accepted/refused,
+                    # in seconds
+                    try:
+                        new_element["validationTime"] = int(parse(timestamp).timestamp()) - int(parse(notificationSentAt).timestamp())
+                        new_element["validationTimeStamp"] = timestamp
+                    except ParserError:
+                        pass
+
+                new_element["notificationSentAt"] = notificationSentAt # we could perform this assignment only once, but it's not a big deal
 
                 new_element["timeline"].append({
                     "timelineElementId": timeline_element_id,
@@ -132,12 +152,16 @@ def get_timelines(iuns: list[str]) -> list:
             "iun": iun,
             "isNotRefused": False,
             "isRefined": False,
-            "lastElementTimestamp": "",
+            "lastElementTimestamp": None,
+            "validationTime": None,
+            "notificationSentAt": None,
+            "validationTimeStamp": None,
+            "isMaxValidationTime": False,
             "timeline": []
         }
         not_processed.append(new_element)
 
-    # order processed by timestamp on the last element in each timeline
+    # order processed by timestamp on the last element in each timeline (it is the REFINEMENT timestamp, for successful timelines)
     print('Ordering timelines based on the timestamp of the last element...')
     processed.sort(key=lambda x: x["timeline"][-1]["timestamp"])
 
