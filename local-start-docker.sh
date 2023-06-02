@@ -22,6 +22,10 @@ execution_or_download=$3
 if ( [ "$execution_or_download" == "run" ] ) then
   mkdir -p $(pwd)/outputs/$output_subfolder
 
+  echo "======= Rebuild Image"
+  docker build --rm -t k6 .
+  
+  echo "======= Run K6"
   docker run --rm -ti --env-file $credentials_files \
     -v $(pwd)/outputs/$output_subfolder:/outputs/ \
     k6 run \
@@ -31,7 +35,12 @@ if ( [ "$execution_or_download" == "run" ] ) then
     --http-debug \
     --console-output=/outputs/console-output.txt \
     --log-output=file=/outputs/http-output.json
+
 elif ( [ "$execution_or_download" == "download" ] ) then
+  echo "======= Rebuild Image"
+  docker build --rm -t k6 .
+  
+  echo "======= Download statistics"
   docker run --rm -ti \
     -v $(pwd)/outputs/$output_subfolder:/outputs/ \
     -v "${LOCAL_HOME}/.aws":/root/.aws \

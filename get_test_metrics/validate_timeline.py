@@ -25,6 +25,7 @@ import base64
 import sys
 import json
 import time
+import traceback
 from dateutil.parser import parse
 from dateutil.parser import ParserError
 
@@ -97,6 +98,7 @@ def get_timelines(iuns: list[str]) -> list:
             )
         except:
             print(f'Problem querying DynamoDB table {timelines_table_name} for iun {iun}')
+            traceback.print_exception( sys.exc_info() )
             sys.exit(1)
 
         items = response.get('Items', [])

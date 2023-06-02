@@ -154,7 +154,10 @@ grep notificationRequestId /outputs/console-output.txt \
   | sed -E 's/\",\"paProtocolNumber.*//g' > /outputs/notification-request-ids.txt
 
 echo "process the timelines from the iuns obtained from the notificationRequestId"
-python3 ${SCRIPT_DIR}/validate_timeline.py /outputs/notification-request-ids.txt /outputs/processed-timelines.json --profile $aws_confinfo
+python3 ${SCRIPT_DIR}/validate_timeline.py \
+        /outputs/notification-request-ids.txt \
+        /outputs/processed-timelines.json \
+        --profile $aws_profile
 
 echo "create directory for k6 test"
 dir=${folder}/monitoring_$(date '+%Y-%m-%d-%s')
