@@ -44,7 +44,7 @@ pd = pd[["validationTime", "validationHourMinutes"]]
 print(pd.head())
 
 # group by "validationHourMinutes" and average "validationTime"
-pd = pd.groupby("validationHourMinutes").mean()
+pd = pd.groupby("validationHourMinutes").count()
 # order by "validationHourMinutes"
 pd = pd.sort_values(by="validationHourMinutes")
 # add a key column
