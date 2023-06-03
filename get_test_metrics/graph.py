@@ -46,6 +46,8 @@ print(pd.head())
 
 # group by "validationHourMinutes" and average "validationTime"
 pd = pd.groupby("validationHourMinutes").count()
+# rename "validationTime" to "validationCount"
+pd = pd.rename(columns={"validationTime": "validationCount"})
 # order by "validationHourMinutes"
 pd = pd.sort_values(by="validationHourMinutes")
 # add a key column
@@ -55,6 +57,6 @@ print(pd.dtypes)
 #pd.to_csv("outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/validation-time.csv", index=False)
 
 # plot the graph, using matplotlib, to file, with "validationHourMinutes" on the x and "validationTime" on the y
-pd.plot(x="validationHourMinutes", y="validationTime", kind="line", title="Validation time")
+pd.plot(x="validationHourMinutes", y="validationCount", kind="line", title="Validation time")
 #plt.show()
 plt.savefig(graph_filename)
