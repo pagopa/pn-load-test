@@ -1,2 +1,4 @@
 outputs/*
 credentials/*
+venv/*
+requirements.txt
