@@ -2,7 +2,7 @@
 
 # install pandas matplotlib
 
-# python3 ./get_test_metrics/graph.py outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/processed-timelines.json graph.png
+# python3 ./get_test_metrics/graph.py outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/processed-timelines.json outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/graph.png
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,13 +15,14 @@ if len(sys.argv) != 3:
     print('Usage: python3 ./graph.py <source_filename> <graph_filename>')
     sys.exit(1)
 
-filename = sys.argv[1]
+source_filename = sys.argv[1]
+graph_filename = sys.argv[2]
 
 # load filename into a pandas dataframe
 try:
-    pd = pd.read_json(filename, orient="records")
+    pd = pd.read_json(source_filename, orient="records")
 except FileNotFoundError:
-    print(f'File {filename} not found')
+    print(f'File {source_filename} not found')
     sys.exit(1)
 
 # select all columns except "timeline" and "futureActions", in the same pd
@@ -56,4 +57,4 @@ print(pd.dtypes)
 # plot the graph, using matplotlib, to file, with "validationHourMinutes" on the x and "validationTime" on the y
 pd.plot(x="validationHourMinutes", y="validationTime", kind="line", title="Validation time")
 #plt.show()
-plt.savefig("outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/validation-time.png")
+plt.savefig(graph_filename)
