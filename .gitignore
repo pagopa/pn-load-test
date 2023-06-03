@@ -147,6 +147,9 @@ dist
 # k6
 k6
 
+# Python
+venv
+
 #################
 ### Terraform ###
 #################
@@ -191,3 +194,5 @@ override.tf.json
 terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform
+
+
