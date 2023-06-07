@@ -5,6 +5,8 @@
 # usage: ./get_test_metrics/extract-notification-request-ids.sh outputs/console-output.txt outputs/notification-request-ids.txt
 #
 # ./get_test_metrics/extract-notification-request-ids.sh outputs/test/console-output.txt outputs/test/notification-request-ids.txt
+#
+# ./get_test_metrics/extract-notification-request-ids.sh outputs/2023-06-06_17-35__W6_04iter_30min_0606-1735/console-output.txt outputs/2023-06-06_17-35__W6_04iter_30min_0606-1735/notification-request-ids.txt
 
 # ensure we passed <source> <destination>
 if [ $# -ne 2 ]; then

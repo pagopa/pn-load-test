@@ -2,7 +2,7 @@
 
 # install pandas matplotlib
 
-# python3 ./get_test_metrics/graph.py outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/processed-timelines.json outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/graph.png
+# python3 ./get_test_metrics/graph.py outputs/2023-06-06_17-35__W6_04iter_30min_0606-1735/processed-timelines.json outputs/2023-06-06_17-35__W6_04iter_30min_0606-1735/graph.png
 
 import pandas as pd
 import matplotlib.pyplot as plt
