@@ -254,13 +254,15 @@ if __name__ == '__main__':
         "totalTimelines": len(processed),
         #"timelinesNotEmpty": len([element for element in processed if len(element["timeline"]) > 0]),
         "totalTimelinesNotRefused": len([element for element in processed if element["isNotRefused"] == True]),
-        "totalTimeLinesRefused": len([element for element in processed if element["isNotRefused"] == False]),
+        "totalTimeLinesRefusedOrNotValidated": len([element for element in processed if element["isNotRefused"] == False]),
         "totalTimelinesRefined": len([element for element in processed if element["isRefined"] == True]),
         "totalTimeLinesNotRefined": len([element for element in processed if element["isRefined"] == False]),
         "iunWithLastElementTimestamp": [element["iun"] for element in processed if element["lastElementTimestamp"] is not None][0],
         "lastElementTimestamp": processed[-1]["lastElementTimestamp"],
         "iunWithMaxValidationTime": [element["iun"] for element in processed if element["isMaxValidationTime"] == True][0],
         "maxValidationTimeSeconds": max([element["validationTime"] for element in processed if element["validationTime"] is not None]),
+        "iunsOfRefusedOrNotValidatedTimelines": [element["iun"] for element in processed if element["isNotRefused"] == False],
+        "iunsOfNotRefinedTimelinesExcludingRefused": [element["iun"] for element in processed if element["isRefined"] == False and element["isNotRefused"] == True],
     }
     # write stats to json file
     try:
