@@ -251,8 +251,8 @@ if __name__ == '__main__':
     # write stats to dictionary
     stats = {
         "totalUniqueIuns": len(iuns),
-        "totalTimelines": len(processed),
-        #"timelinesNotEmpty": len([element for element in processed if len(element["timeline"]) > 0]),
+        #"totalTimelines": len(processed),
+        "timelinesNotEmpty": len([element for element in processed if len(element["timeline"]) > 0]),
         "totalTimelinesNotRefused": len([element for element in processed if element["isNotRefused"] == True]),
         "totalTimeLinesRefusedOrNotValidated": len([element for element in processed if element["isNotRefused"] == False]),
         "totalTimelinesRefined": len([element for element in processed if element["isRefined"] == True]),
