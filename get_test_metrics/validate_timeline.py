@@ -11,7 +11,7 @@
 # pip install boto3
 #
 #
-# python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json --profile sso_pn-core-dev
+# python3 ./get_test_metrics/validate_timeline.py outputs/notification-request-ids.txt outputs/processed-timelines.json outputs/stats.json --profile sso_pn-core-dev
 #
 # tested with Python 3.11
 
@@ -38,13 +38,14 @@ futureaction_table_name = 'pn-FutureAction'
 
 
 # get filename from the command-line argument
-if len(sys.argv) != 5 or sys.argv[3].strip() != '--profile':
-    print('Usage: python3 ./validate_timeline.py <source_filename> <destination_filename> --profile <profile_name>')
+if len(sys.argv) != 6 or sys.argv[4].strip() != '--profile':
+    print('Usage: python3 ./validate_timeline.py <source_filename> <destination_filename> <destination_stats_filename> --profile <profile_name>')
     sys.exit(1)
 
 source_filename = sys.argv[1]
 destination_filename = sys.argv[2]
-profile_name = sys.argv[4]
+destination_stats_filename = sys.argv[3]
+profile_name = sys.argv[5]
 
 session = boto3.Session(profile_name=profile_name)
 dynamodb = session.client('dynamodb')
@@ -98,7 +99,6 @@ def get_timelines(iuns: list[str]) -> list:
             )
         except:
             print(f'Problem querying DynamoDB table {timelines_table_name} for iun {iun}')
-            traceback.print_exception( sys.exc_info() )
             sys.exit(1)
 
         items = response.get('Items', [])
@@ -245,3 +245,26 @@ if __name__ == '__main__':
 
     end = time.time()
     print(f'Finished in {end - start} seconds')
+
+    # write stats to dictionary
+    stats = {
+        "totalUniqueIuns": len(iuns),
+        "totalTimelines": len(processed),
+        #"timelinesNotEmpty": len([element for element in processed if len(element["timeline"]) > 0]),
+        "totalTimelinesNotRefused": len([element for element in processed if element["isNotRefused"] == True]),
+        "totalTimeLinesRefused": len([element for element in processed if element["isNotRefused"] == False]),
+        "totalTimelinesRefined": len([element for element in processed if element["isRefined"] == True]),
+        "totalTimeLinesNotRefined": len([element for element in processed if element["isRefined"] == False]),
+        "iunWithLastElementTimestamp": [element["iun"] for element in processed if element["lastElementTimestamp"] is not None][0],
+        "lastElementTimestamp": processed[-1]["lastElementTimestamp"],
+        "iunWithMaxValidationTime": [element["iun"] for element in processed if element["isMaxValidationTime"] == True][0],
+        "maxValidationTimeSeconds": max([element["validationTime"] for element in processed if element["validationTime"] is not None]),
+    }
+    # write stats to json file
+    try:
+        with open(destination_stats_filename, 'w') as f:
+            json.dump(stats, f, indent=4)
+    except:
+        print(f'Problem writing to {destination_stats_filename}')
+        sys.exit(1)
+    

@@ -157,6 +157,7 @@ echo "process the timelines from the iuns obtained from the notificationRequestI
 python3 ${SCRIPT_DIR}/validate_timeline.py \
         /outputs/notification-request-ids.txt \
         /outputs/processed-timelines.json \
+        /outputs/stats.json \
         --profile $aws_profile
 
 echo "create directory for k6 test"
