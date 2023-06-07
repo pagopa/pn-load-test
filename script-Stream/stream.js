@@ -58,11 +58,12 @@ const processStream = async (basePath, internalApikey, streamId, fileName) => {
     console.log("streamId "+streamId);
     console.log("fileName "+fileName);
     let firstWrite = true;
+    let lastEventId = null;
     while (true) {
-      let lastEventId = null;
       let events;
       let retryAfter;
-
+      console.log('SONO NEL THREAD ('+streamId+') NEL WHILE CON LAST-EVENT-ID: '+lastEventId);
+      
       await getStreamEvents(basePath, internalApikey, streamId, lastEventId).then((response) => {
         console.log(response.data)
         console.log("retry-after "+response.headers['retry-after'])
