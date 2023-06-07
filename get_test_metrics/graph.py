@@ -60,3 +60,8 @@ print(pd.dtypes)
 pd.plot(x="validationHourMinutes", y="validationCount", kind="line", title="Validation time")
 #plt.show()
 plt.savefig(graph_filename)
+
+# print max validationCount
+print(f'\nMax validationCount: {pd["validationCount"].max()}')
+# print average validationCount
+print(f'Average validationCount: {pd["validationCount"].mean()}')
