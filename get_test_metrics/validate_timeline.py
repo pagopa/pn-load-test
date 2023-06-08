@@ -15,7 +15,7 @@
 #
 # tested with Python 3.11
 #
-# python3 ./get_test_metrics/validate_timeline.py outputs/2023-06-07_12-02__W6_05iter_30min_0706-1202/notification-request-ids.txt outputs/2023-06-07_12-02__W6_05iter_30min_0706-1202/processed-timelines.json outputs/2023-06-07_12-02__W6_05iter_30min_0706-1202/stats.json --profile sso_pn-core-dev
+# python3 ./get_test_metrics/validate_timeline.py outputs/2023-06-08_15-43__W6_09iter_30min_0806-1543/notification-request-ids.txt outputs/2023-06-08_15-43__W6_09iter_30min_0806-1543/processed-timelines.json outputs/2023-06-08_15-43__W6_09iter_30min_0806-1543/stats.json --profile sso_pn-core-dev
 
 # starting from a list of base64 encoded ids from file, get the corresponding timelines from DynamoDB, ordering each timeline by the timestamp of the last element,
 # and ordering the timeline so that the first element is the one with the oldest timestamp of the last element, and write the processed timelines to a file
@@ -250,17 +250,17 @@ if __name__ == '__main__':
     # write stats to dictionary
     stats = {
         "totalUniqueIuns": len(iuns),
-        #"totalTimelines": len(processed),
-        "timelinesNotEmpty": len([element for element in processed if len(element["timeline"]) > 0]),
+        "notEmptytimelines": len([element for element in processed if len(element["timeline"]) > 0]),
+        "emptyTimelines": len([element for element in processed if len(element["timeline"]) == 0]),
         "totalTimelinesNotRefused": len([element for element in processed if element["isNotRefused"] == True]),
-        "totalTimeLinesRefusedOrNotValidated": len([element for element in processed if element["isNotRefused"] == False]),
+        "totalTimeLinesRefusedOrEmptyTimelines": len([element for element in processed if element["isNotRefused"] == False]),
         "totalTimelinesRefined": len([element for element in processed if element["isRefined"] == True]),
         "totalTimeLinesNotRefined": len([element for element in processed if element["isRefined"] == False]),
         "iunWithLastElementTimestamp": [element["iun"] for element in processed if element["lastElementTimestamp"] is not None][0],
         "lastElementTimestamp": processed[-1]["lastElementTimestamp"],
         "iunWithMaxValidationTime": [element["iun"] for element in processed if element["isMaxValidationTime"] == True][0],
         "maxValidationTimeSeconds": max([element["validationTime"] for element in processed if element["validationTime"] is not None]),
-        "iunsOfRefusedOrNotValidatedTimelines": [element["iun"] for element in processed if element["isNotRefused"] == False],
+        "iunsOfRefusedOrEmptyTimelines": [element["iun"] for element in processed if element["isNotRefused"] == False],
         "iunsOfNotRefinedTimelinesExcludingRefused": [element["iun"] for element in processed if element["isRefined"] == False and element["isNotRefused"] == True],
     }
     # write stats to json file

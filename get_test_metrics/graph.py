@@ -2,7 +2,7 @@
 
 # install pandas matplotlib
 
-# python3 ./get_test_metrics/graph.py outputs/2023-06-07_12-02__W6_05iter_30min_0706-1202/processed-timelines.json outputs/2023-06-07_12-02__W6_05iter_30min_0706-1202/graph.png
+# python3 ./get_test_metrics/graph.py outputs/2023-06-08_15-43__W6_09iter_30min_0806-1543/processed-timelines.json outputs/2023-06-08_15-43__W6_09iter_30min_0806-1543/graph.png
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -65,3 +65,5 @@ plt.savefig(graph_filename)
 print(f'\nMax validationCount: {pd["validationCount"].max()}')
 # print average validationCount
 print(f'Average validationCount: {pd["validationCount"].mean()}')
+# print median validationCount
+print(f'Median validationCount: {pd["validationCount"].median()}')
