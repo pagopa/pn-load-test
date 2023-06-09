@@ -13,13 +13,13 @@ processing test:
 - login ad aws nell'ambiente desiderato:
     aws sso login --profile sso_pn-core-dev
 
-- estrazione iuns (due percorsi da aggiornare):
+- estrazione iuns (due percorsi da aggiornare), dalla root folder:
     ./get_test_metrics/extract-notification-request-ids.sh outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/console-output.txt outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/notification-request-ids.txt
 
-- processing timeline (tre percorsi da aggiornare):
+- processing timeline (tre percorsi da aggiornare), dalla root folder:
     python3 ./get_test_metrics/validate_timeline.py outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/notification-request-ids.txt outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/processed-timelines.json outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/stats.json --profile sso_pn-core-dev
 
-- grafico e note grafico (due percorsi da aggiornare):
+- grafico e note grafico (due percorsi da aggiornare), dalla root folder:
     python3 ./get_test_metrics/graph.py outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/processed-timelines.json outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/graph.png
 
     prelevare anche le ultime righe stampate in output, con le statistiche:
