@@ -139,10 +139,10 @@ def get_timelines(iuns: list[str]) -> list:
                     "timestamp": timestamp
                 });
             
-                # sort new_element["timeline"] by timestamp
-                new_element["timeline"].sort(key=lambda x: x["timestamp"])
+            # sort new_element["timeline"] by timestamp
+            new_element["timeline"].sort(key=lambda x: x["timestamp"])
 
-                new_element["lastElementTimestamp"] = new_element["timeline"][-1]["timestamp"]
+            new_element["lastElementTimestamp"] = new_element["timeline"][-1]["timestamp"]
     
             processed.append(new_element)
 
