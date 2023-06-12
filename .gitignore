@@ -3,6 +3,9 @@
 
 outputs/*
 credentials/*
+script-Stream/*.zip
+script-Stream/*.txt
+script-Stream/test/*
 
 ### Node ###
 # Logs

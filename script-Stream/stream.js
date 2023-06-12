@@ -8,7 +8,7 @@ const baseUrl = process.argv[3];
 const fileName = process.argv[4];
 const appendOrCreate = process.argv[5]; // 'append' or 'create'
 const numOfStream = process.argv[6];
-
+const typeOfStream = process.argv[7]; //STATUS TIMELINE
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,7 +28,7 @@ function createStream () {
   const url = `https://${baseUrl}/delivery-progresses/streams`;
   const body = {
     title: 'stream-test',
-    eventType: 'STATUS',
+    eventType: typeOfStream,
     filterValues: [],
   };
 
@@ -63,7 +63,7 @@ const processStream = async (basePath, internalApikey, streamId, fileName) => {
       let events;
       let retryAfter;
       console.log('SONO NEL THREAD ('+streamId+') NEL WHILE CON LAST-EVENT-ID: '+lastEventId);
-      
+
       await getStreamEvents(basePath, internalApikey, streamId, lastEventId).then((response) => {
         console.log(response.data)
         console.log("retry-after "+response.headers['retry-after'])

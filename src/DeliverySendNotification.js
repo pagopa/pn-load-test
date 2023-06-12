@@ -139,7 +139,7 @@ export default function sendNotification(userTaxId) {
 
     if(withPayment && withPayment !== 'undefined') {
         let paymentAttachPreload = preloadFile();
-        paymentRequest.noticeCode = ("302" + (((exec.scenario.iterationInTest +''+(Math.floor(Math.random() * 99999))).substring(0,5) +''+ new Date().getTime().toString().substring(3,13)).padStart(15, '0').substring(0, 15)));
+        paymentRequest.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
         paymentRequest.pagoPaForm.digests.sha256 = sha256;
         paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
         notificationRequest.recipients[0].payment = paymentRequest;
@@ -156,7 +156,7 @@ export default function sendNotification(userTaxId) {
 
     notificationRequest.senderTaxId = paTaxId;
 
-    notificationRequest.paProtocolNumber = ("2023" + new Date().getTime().toString().padStart(14, '0'));
+    notificationRequest.paProtocolNumber = ("2023" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(0,13)).padStart(20, '0').substring(0, 20)));
 
     console.log('paprotocol: '+notificationRequest.paProtocolNumber);
     let payload = JSON.stringify(notificationRequest);
