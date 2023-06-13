@@ -10,7 +10,7 @@ import sys
 
 
 
-# read filename from command-line argument
+# read filenames from command-line argument
 if len(sys.argv) != 3:
     print('Usage: python3 ./graph.py <source_filename> <graph_filename>')
     sys.exit(1)
@@ -35,7 +35,7 @@ print(pd.dtypes)
 pd = pd[pd["validationTime"].notnull()]
 print(pd.head())
 
-# derive a new colume "validationHourMinutes" from "validationTimeStamp" column removing the part before "T"
+# derive a new column "validationHourMinutes" from "validationTimeStamp" column removing the part before "T"
 # and truncating the time to the minute
 pd["validationHourMinutes"] = pd["validationTimeStamp"].str.split("T").str[1].str[:5]
 print(pd.head())
