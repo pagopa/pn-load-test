@@ -1,14 +1,14 @@
 {
-    "correlationId": "VALIDATE_NORMALIZE_ADDRESSES_REQUEST_IUN_PZRK-JLXU-LUHZ-202305-Y-1",
+    "correlationId": "VALIDATE_NORMALIZE_ADDRESSES_REQUEST_IUN_",
     "requestItems": [
       {
-        "id": "0",
+        "id": "",
         "address": {
-          "addressRow": "VIA BENEDETTO CROCE",
+          "addressRow": "",
           "addressRow2": "",
-          "cap": "87100",
-          "city": "Cosenza",
-          "city2": "Cosenza",
+          "cap": "",
+          "city": "Milano",
+          "city2": "Milano",
           "pr": "CS",
           "country": "ITALIA"
         }
