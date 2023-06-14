@@ -6,7 +6,7 @@
 #
 # ./get_test_metrics/extract-notification-request-ids.sh outputs/test/console-output.txt outputs/test/notification-request-ids.txt
 #
-# ./get_test_metrics/extract-notification-request-ids.sh outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/console-output.txt outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/notification-request-ids.txt
+# ./get_test_metrics/extract-notification-request-ids.sh outputs/2023-06-12_23-21__W6_30iter_30min_test_1206-2321/console-output.txt outputs/2023-06-12_23-21__W6_30iter_30min_test_1206-2321/notification-request-ids.txt
 
 # ensure we passed <source> <destination>
 if [ $# -ne 2 ]; then

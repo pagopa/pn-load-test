@@ -16,7 +16,7 @@
 #
 # tested with Python 3.11
 #
-# python3 ./get_test_metrics/validate_timeline.py outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/notification-request-ids.txt outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/processed-timelines.json outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/stats.json --profile sso_pn-core-dev
+# python3 ./get_test_metrics/validate_timeline.py outputs/2023-06-12_23-21__W6_30iter_30min_test_1206-2321/notification-request-ids.txt outputs/2023-06-12_23-21__W6_30iter_30min_test_1206-2321/processed-timelines.json outputs/2023-06-12_23-21__W6_30iter_30min_test_1206-2321/stats.json --profile sso_pn-core-dev
 
 # starting from a list of base64 encoded ids from file, get the corresponding timelines from DynamoDB, ordering each timeline by the timestamp of the last element,
 # and ordering the timeline so that the first element is the one with the oldest timestamp of the last element, and write the processed timelines to a file
