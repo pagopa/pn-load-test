@@ -1,3 +1,5 @@
+import { sleep } from 'k6';
+
 import sendNotification from './DeliverySendNotification.js';
 import recipientSearch from './ReceiverSearch.js';
 import recipientReadAndDownload from './notificationReceivedAndDownload.js';
