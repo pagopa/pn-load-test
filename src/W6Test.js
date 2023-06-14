@@ -1,4 +1,4 @@
-import { sleep } from 'k6';
+import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
 import { SharedArray } from 'k6/data';
 import exec from 'k6/execution';
@@ -71,11 +71,9 @@ export function internalRecipientSearch() {
 
     console.log(`Notifications Received search Status: ${r.status}`);
     
-    /*
     check(r, {
       'status search is 200': (r) => r.status === 200,
     });
-    */
 
     console.log(JSON.parse(r.body))
 
@@ -115,11 +113,9 @@ export function internlRecipientReadAndDownload() {
 
     console.log(`Notifications Received Iun Status: ${r.status}`);
     
-    /*
     check(r, {
       'status received-get is 200': (r) => r.status === 200,
     });
-    */
 
 
     let result = JSON.parse(r.body);
@@ -130,11 +126,9 @@ export function internlRecipientReadAndDownload() {
         console.log('URL download: '+url);
 
         let downloadRes = http.get(url, params);
-        /*
         check(downloadRes, {
             'status received-download-document is 200': (r) => downloadRes.status === 200,
           });
-          */
 
           let paramsDownloadS3 = {
             headers: {
@@ -150,11 +144,9 @@ export function internlRecipientReadAndDownload() {
           console.log("S3 URL: "+downloadRes.body.url);
           let downloadS3 = http.get(JSON.parse(downloadRes.body).url,paramsDownloadS3);
           
-          /*
           check(downloadS3, {
             'status download-s3-document is 200': (r) => downloadS3.status === 200,
           });
-          */
      });
 
     
@@ -165,11 +157,9 @@ export function internlRecipientReadAndDownload() {
     
         let paymentdownloadRes = http.get(urlPaymentDownload, params);
     
-        /*
         check(paymentdownloadRes, {
             'status received-download-attach is 200': (r) => paymentdownloadRes.status === 200,
         });    
-        */
 
 
         console.log('PAYMENT DOWNLOAD RES '+JSON.stringify(paymentdownloadRes.body));
@@ -185,11 +175,9 @@ export function internlRecipientReadAndDownload() {
 
           let downloadS3 = http.get(JSON.parse(paymentdownloadRes.body).url,paramsDownloadS3);
 
-          /*
           check(downloadS3, {
             'status download-S3-attach is 200': (r) => downloadS3.status === 200,
           });
-          */
     }
     
 }
@@ -230,7 +218,6 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     
     console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
-    /*
     check(preloadResponse, {
         'status preload is 200': (preloadResponse) => preloadResponse.status === 200,
     });
@@ -238,7 +225,6 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     check(preloadResponse, {
         'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
-    */
     
     /*
     "secret": "...",
@@ -261,7 +247,6 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         
         let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile.buffer, paramsSafeStorage);
     
-        /*
         check(safeStorageUploadResponde, {
             'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
         });
@@ -269,7 +254,6 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         check(safeStorageUploadResponde, {
             'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
-        */
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
         return resultPreload;   
@@ -339,7 +323,6 @@ export function internalSendNotification() {
 
     console.log(`Status ${r.status}`);
 
-    /*
     check(r, {
         'status is 409': (r) => r.status === 409,
     });
@@ -347,7 +330,6 @@ export function internalSendNotification() {
     check(r, {
         'status is 202': (r) => r.status === 202,
     });
-    */
     
     console.log('REQUEST-ID-LOG: '+r.body)
 
