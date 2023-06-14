@@ -337,7 +337,7 @@ export function internalSendNotification() {
         throttling.add(1);
      }
 
-    sleep(0.5);
+    
 
     return r;
   
@@ -352,8 +352,11 @@ export function internalSendNotification() {
  * The K6 memory leak is partially caused by the use of external modules
 */
 export default function w6TestOptimized() {
+    sleep(2);
+    
     internalRecipientSearch();
     internlRecipientReadAndDownload();
     internalSendNotification();
-    
+
+    sleep(7);
 }
