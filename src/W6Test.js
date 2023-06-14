@@ -106,7 +106,8 @@ export function internlRecipientReadAndDownload() {
       'Content-Type': 'application/json',
       'Accept': 'application/json, text/plain, */*',
       'Authorization': token
-      }
+      },
+      tags: { name: 'getNotificationIun' },
     };
 
     let r = http.get(url, params);
@@ -137,6 +138,7 @@ export function internlRecipientReadAndDownload() {
             'Host': 'pn-safestorage-eu-south-1-089813480515.s3.eu-south-1.amazonaws.com'
             },
             responseType: 'none',
+            tags: { name: 'getNotificationDownload' },
           };
 
           console.log('DOWNLOAD RES '+JSON.stringify(downloadRes.body));
@@ -169,6 +171,7 @@ export function internlRecipientReadAndDownload() {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             },
             responseType: 'none',
+            tags: { name: 'getNotificationDownloads' },
           };
 
           console.log("S3 URL: "+JSON.parse(paymentdownloadRes.body).url);
@@ -241,6 +244,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
                 'x-amz-meta-secret': resultPreload.secret,
             },
             responseType: 'none',
+            tags: { name: 'getSafeStorageUrl' },
         };
     
         let urlSafeStorage = resultPreload.url;

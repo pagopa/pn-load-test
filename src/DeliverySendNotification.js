@@ -86,6 +86,7 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
                 'x-amz-meta-secret': resultPreload.secret,
             },
             responseType: 'none',
+            tags: { name: 'getSafeStorageUrl' },
         };
     
         let urlSafeStorage = resultPreload.url;
