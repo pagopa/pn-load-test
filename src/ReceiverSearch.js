@@ -20,7 +20,7 @@ export default function recipientSearch() {
 */
 
     //let url = encodeURI(`https://${basePath}/delivery/notifications/received?startDate=${startDate}&endDate=${endDate}&size=10`);
-    let url = 'https://webapi.dev.notifichedigitali.it/delivery/notifications/received?startDate=2023-05-29T00%3A00%3A00.000Z&endDate=2023-06-01T00%3A00%3A00.000Z&size=10';
+    let url = `https://${basePath}/delivery/notifications/received?startDate=2023-05-29T00%3A00%3A00.000Z&endDate=2023-06-01T00%3A00%3A00.000Z&size=10`;
     
     let token = 'Bearer ' + bearerToken;
 
@@ -30,7 +30,8 @@ export default function recipientSearch() {
       headers: {
       'Content-Type': 'application/json',
       'Authorization': token
-      }
+      },
+      responseType: 'none',
     };
 
     let r = http.get(url, params);

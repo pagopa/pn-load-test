@@ -1,5 +1,6 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
+import { SharedArray } from 'k6/data';
 import exec from 'k6/execution';
 import http from 'k6/http';
 
@@ -8,6 +9,18 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let apiKey = `${__ENV.API_KEY}`
 let basePath = `${__ENV.BASE_PATH}`
 let sha256;
+let pdfNumber = 3;
+
+const fileArray = new SharedArray('bin file sharedArray', function () {
+    const dataArray = [];
+    dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
+    for(let i = 0; i< pdfNumber; i++){
+        dataArray.push(open('./resources/PDF_'+(i+1)+'.pdf', 'b'));
+    }
+    return dataArray; // must be an array
+});
+
+/*
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
 
 let anotherBinFile = [];
@@ -15,6 +28,7 @@ let pdfNumber = 3;
 for(let i = 0; i< pdfNumber; i++){
     anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
 }
+*/
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
@@ -23,9 +37,9 @@ let paymentRequest = JSON.parse(open('./model/payment.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
 export function preloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = binFile;
+    let currBinFile = fileArray[0];
     if(otherFile){
-        currBinFile = anotherBinFile[otherFile%pdfNumber]
+        currBinFile = fileArray[otherFile%pdfNumber]
     }
     
     console.log(currBinFile);
@@ -71,11 +85,12 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
                 'x-amz-checksum-sha256': sha256,
                 'x-amz-meta-secret': resultPreload.secret,
             },
+            responseType: 'none',
         };
     
         let urlSafeStorage = resultPreload.url;
         
-        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
+        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile.buffer, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
             'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
