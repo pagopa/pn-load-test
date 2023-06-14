@@ -11,4 +11,6 @@ export default function w6Test() {
     recipientSearch();
     recipientReadAndDownload();
     sendNotification();
+    
+    sleep(2);
 }
