@@ -2,7 +2,7 @@
 
 # install pandas matplotlib
 
-# python3 ./get_test_metrics/graph.py outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/processed-timelines.json outputs/2023-06-08_22-41__W6_13iter_30min_0806-2241/graph.png
+# python3 ./get_test_metrics/graph.py outputs/2023-06-08_18-47__W6_11iter_30min_0806-1847/processed-timelines.json outputs/2023-06-08_18-47__W6_11iter_30min_0806-1847/graph.png
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -37,8 +37,17 @@ print(pd.head())
 
 # derive a new column "validationHourMinutes" from "validationTimeStamp" column removing the part before "T"
 # and truncating the time to the minute
-pd["validationHourMinutes"] = pd["validationTimeStamp"].str.split("T").str[1].str[:5]
+#pd["validationHourMinutes"] = pd["validationTimeStamp"].str.split("T").str[1].str[:5]
+#print(pd.head())
+
+# derive a new column "validationHourMinutes" from "validationTimeStamp" column, truncating the time to the minute,
+# and replacing "T" with a space
+pd["validationHourMinutes"] = pd["validationTimeStamp"].str[:16].replace("T", " ")
+pd["validationHourMinutes"] = pd["validationHourMinutes"].str.replace("T", " ")
+# obtain "validationHourMinutesLegend" from "validationHourMinutes" column, keeping only the time
+#pd["validationHourMinutesLegend"] = pd["validationHourMinutes"].str[11:]
 print(pd.head())
+
 
 # only keep "validationTime", "validationHourMinutes" columns
 pd = pd[["validationTime", "validationHourMinutes"]]
@@ -56,8 +65,9 @@ print(pd)
 print(pd.dtypes)
 #pd.to_csv("outputs/2023-06-01_19-00__5req20min_SearchGetDownloadSend-0106-1900/validation-time.csv", index=False)
 
-# plot the graph, using matplotlib, to file, with "validationHourMinutes" on the x and "validationTime" on the y
-pd.plot(x="validationHourMinutes", y="validationCount", kind="line", title="Validation time")
+# plot the graph, using matplotlib, to file, with "validationHourMinutes" on the x and "validationTime" on the y,
+# with big dimentions
+pd.plot(x="validationHourMinutes", y="validationCount", kind="line", title="Validation time", figsize=(20, 10))
 #plt.show()
 plt.savefig(graph_filename)
 
