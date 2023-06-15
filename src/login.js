@@ -6,7 +6,7 @@ let username = `${__ENV.USERNAME}`
 let password = `${__ENV.PASSWORD}`
 export default async function () {
     // const browser = chromium.launch({ headless: false });
-    const browser = chromium.launch({ headless: false });
+    const browser = chromium.launch({ headless: true });
     const page = browser.newPage();
 
     try {
