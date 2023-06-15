@@ -1,5 +1,5 @@
 #FROM golang:1.18-alpine as builder
-FROM accetto/ubuntu-vnc-xfce-chromium-g3:22.04 as builder
+FROM ubuntu:22.04 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 #WORKDIR $GOPATH/src/go.k6.io/k6
