@@ -1,5 +1,5 @@
 #FROM golang:1.18-alpine as builder
-FROM ubuntu:22.04 as builder
+FROM accetto/ubuntu-vnc-xfce-chromium-g3:22.04 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 #WORKDIR $GOPATH/src/go.k6.io/k6
@@ -31,9 +31,6 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
 
 #install chromium
 #RUN apt-get install chromium-browser -y
-RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
-RUN rm google-chrome-stable_current_amd64.deb 
 
 FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
