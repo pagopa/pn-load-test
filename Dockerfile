@@ -7,6 +7,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y; 
 RUN apt-get install wget -y
 
+#install chromium
+RUN apt-get install --assume-yes chromium-browser
+
 # Install golang
 RUN wget https://go.dev/dl/go1.18.2.linux-amd64.tar.gz
 RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz; rm go1.18.2.linux-amd64.tar.gz
