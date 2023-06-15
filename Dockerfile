@@ -7,8 +7,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y; 
 RUN apt-get install wget -y
 
-#install chromium
-RUN apt-get install --assume-yes chromium-browser
 
 # Install golang
 RUN wget https://go.dev/dl/go1.18.2.linux-amd64.tar.gz
@@ -36,6 +34,9 @@ FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
 
 RUN pip install boto3
+
+#install chromium
+RUN apt-get install chromium-browser -y
 
 COPY --from=builder /root/go/bin/k6 /usr/bin/k6
 
