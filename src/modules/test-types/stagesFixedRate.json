@@ -1,0 +1,29 @@
+{
+    "setupTimeout": "240s",
+    "maxRedirects": 0,
+    "scenarios": {
+        "contacts": {
+          "executor": "ramping-arrival-rate",
+          "timeUnit": "1s",
+          "startRate": 5, 
+          "preAllocatedVUs": 200, 
+          "maxVUs": 9000,
+
+          "stages": [
+            { "target": 5, "duration": "10s" },
+
+            { "target": 10, "duration": "0s" },
+            { "target": 10, "duration": "10s" },
+
+            { "target": 5, "duration": "0s" },
+            { "target": 5, "duration": "10s" }
+          ]
+        }
+      },
+    "thresholds": {
+        "http_req_failed": [
+            "rate<0.05"
+          ]
+      }
+
+}
