@@ -29,14 +29,14 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
     dpkg -i -E amazon-cloudwatch-agent.deb && \
     rm -rf /tmp/*
 
+#install chromium
+RUN apt-get install chromium-browser -y
 
 FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
 
 RUN pip install boto3
 
-#install chromium
-RUN apt-get install chromium-browser -y
 
 COPY --from=builder /root/go/bin/k6 /usr/bin/k6
 
