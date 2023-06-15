@@ -30,7 +30,10 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
     rm -rf /tmp/*
 
 #install chromium
-RUN apt-get install chromium-browser -y
+#RUN apt-get install chromium-browser -y
+RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN rm google-chrome-stable_current_amd64.deb 
 
 FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
