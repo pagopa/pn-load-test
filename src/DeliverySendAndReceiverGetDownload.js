@@ -1,3 +1,5 @@
+import { sleep } from 'k6';
+
 import sendNotification from './DeliverySendNotification.js';
 import recipientSearch from './ReceiverSearch.js';
 import recipientReadAndDownload from './notificationReceivedAndDownload.js';
@@ -6,9 +8,11 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 
 
-export default function getAndSendNotification(iun) {
+export default function w6Test() {
     
     recipientSearch();
     recipientReadAndDownload();
     sendNotification();
+    
+    sleep(2);
 }
