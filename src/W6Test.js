@@ -151,6 +151,60 @@ export function internlRecipientReadAndDownload() {
           });
      });
 
+     
+     result.timeline.forEach(timelineArray => {
+        timelineArray.legalFactsIds.forEach(timelineElem =>{
+          
+          let key = timelineElem.key;
+          let keySearch;
+          if (key.includes("PN_LEGAL_FACTS")) {
+            keySearch = key.substring(key.indexOf("PN_LEGAL_FACTS"));
+          } else if (key.includes("PN_NOTIFICATION_ATTACHMENTS")) {
+            keySearch = key.substring(key.indexOf("PN_NOTIFICATION_ATTACHMENTS"));
+          } else if (key.includes("PN_EXTERNAL_LEGAL_FACTS")) {
+            keySearch = key.substring(key.indexOf("PN_EXTERNAL_LEGAL_FACTS"));
+          }
+          console.log(keySearch);
+  
+          let url = `https://${webBasePath}/delivery-push/${currentIun}/legal-facts/${timelineElem.category}/${keySearch}`
+          //console.log('URL download atto opponibile: '+url);
+    
+          let paramsLegalFact = {
+            headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/plain, */*',
+            'Authorization': token
+            },
+            tags: { name: 'getLegalFact' },
+          };
+  
+          let downloadLegalFact = http.get(url, paramsLegalFact);
+  
+          check(downloadLegalFact, {
+              'status received-download-LegalFact is 200': (r) => downloadLegalFact.status === 200,
+            });
+    
+            let paramsDownloadS3LegalFact = {
+              headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+              'Accept-Encoding': 'gzip, deflate, br',
+              'Host': 'pn-safestorage-eu-south-1-089813480515.s3.eu-south-1.amazonaws.com'
+              },
+              responseType: 'none',
+              tags: { name: 'getLegalFactDownload' },
+            };
+    
+            //console.log('DOWNLOAD LEGAL FACT RES '+JSON.stringify(downloadLegalFact.body));
+    
+            //console.log("S3 URL: "+downloadLegalFact.body.url);
+            let downloadLegalFactS3 = http.get(JSON.parse(downloadLegalFact.body).url,paramsDownloadS3LegalFact);
+            
+            check(downloadLegalFactS3, {
+              'status download-s3-LegalFact is 200': (r) => downloadLegalFactS3.status === 200,
+            });
+        })
+     });
+     
     
     if(result.recipients[0].payment && result.recipients[0].payment.pagoPaForm){
 
