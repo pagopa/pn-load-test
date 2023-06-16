@@ -18,9 +18,8 @@ RUN /usr/local/go/bin/go install go.k6.io/xk6/cmd/xk6@latest
 
 ## build k6 with faker extension
 ## install faker
-#RUN /root/go/bin/xk6 build v0.2.0 --output /root/go/bin/k6 --with github.com/szkiba/xk6-faker
-RUN /root/go/bin/xk6 build v0.44.0 --output /root/go/bin/k6
-
+#RUN /root/go/bin/xk6 build v0.2.0 --output /root/go/bin/k6 --with github.com/szkiba/xk6-faker --with github.com/grafana/xk6-browser
+RUN /root/go/bin/xk6 build v0.44.0 --output /root/go/bin/k6 
 RUN apt-get update &&  \
     apt-get install -y ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
@@ -28,9 +27,6 @@ RUN apt-get update &&  \
 RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb && \
     dpkg -i -E amazon-cloudwatch-agent.deb && \
     rm -rf /tmp/*
-
-#install chromium
-#RUN apt-get install chromium-browser -y
 
 FROM node:19-alpine
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
