@@ -12,6 +12,7 @@ export default async function () {
     try {
         //01 Vai sulla pagina di login
         await page.goto('https://login.dev.notifichedigitali.it/login');
+        // await page.waitForNavigation({ waitUntil: 'networkidle' });
         // sleep(3);
         page.waitForSelector('button[id="spidButton"]');
         // page.screenshot({ path: '/Users/vincenzoracca/Desktop/prova.jpg' });
