@@ -1,10 +1,25 @@
 import http from 'k6/http';
 import { sleep } from 'k6';
+import exec from 'k6/execution';
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
-let username = `${__ENV.USERNAME}`
 let password = `${__ENV.PASSWORD}`
+
+let usernames = [
+    'ada',
+    'cristoforocolombo',
+    'fieramosca',
+    'MarcoTullioCicerone',
+    'LucioAnneoSeneca',
+    'galileo',
+    'dino',
+    'marcopolo',
+    'cleopatra'
+]
 export default function () {
+
+    const username = usernames[Math.floor(Math.random() * usernames.length)];
+
 
     ///demo/samlsso
     const urlOne = 'https://hub-login.spid.dev.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2';
@@ -31,8 +46,7 @@ export default function () {
     }
     const responseOne = http.get(urlOne, params);
     const responseBody = responseOne.body
-
-    // console.log('PROVA: ', responseBody);
+    // console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
     console.log("SAML: ", samlValue);
 
@@ -58,7 +72,7 @@ export default function () {
     const responseBodyTwo = http.post(urlTwo, bodyUrlTwo, params);
     // console.log("BODYTWO: ", responseBodyTwo.body);
     //////////
-
+    sleep(1);
     const bodyUrlThree = {
         'username': username,
         'password': password,
@@ -73,7 +87,7 @@ export default function () {
         'retry': -1
     };
     const responseBodyThree = http.post(urlThree, bodyUrlThree, params);
-    // console.log("BODYTHREE: ", responseBodyThree);
+    // console.log("BODY WITH SAML RESPONSE: ", responseBodyThree);
     const samlResponseValue = getSamlResponse(responseBodyThree.body);
     console.log("SAMLRESPONSE: ", samlResponseValue);
     ///////////////
@@ -99,25 +113,26 @@ export default function () {
     };
     const responseFour = http.post(urlFour, bodyUrlFour, params);
     console.log("RESPONSEFOUR: ", responseFour);
+    const responseFourHttpStatusResponse = responseFour.status;
 
-    const bodyUrlFive = {
-        'RelayState': '',
-        'SAMLResponse': samlResponseValue
-    };
-    const responseFive = http.post(urlFive, bodyUrlFive, paramsFour);
-    const responseFiveUrl = responseFour.url;
-    console.log("RESPONSEFOUR: ", responseFour.url);
-    if(responseFiveUrl.includes('token')) {
-        const indexToken = responseFiveUrl.indexOf('token=');
-        const token = responseFiveUrl.substring(indexToken + 6);
-        console.log("TOKEN: ", token);
-        const finalResponse = http.get(urlFive + token, paramsFour);
-        console.log("FINAL RESPONSE: ", finalResponse.body);
+    if(responseFourHttpStatusResponse === 200) {
+        const responseFourUrl = responseFour.url;
+        console.log("RESPONSEFOUR-URL: ", responseFour.url);
+        const loginSuccess = responseFourUrl.includes('token');
+        if(loginSuccess) {
+            const indexToken = responseFourUrl.indexOf('token=');
+            const token = responseFourUrl.substring(indexToken + 6);
+            console.log("TOKEN: ", token);
+            const finalResponse = http.get(urlFive + token, paramsFour);
+            console.log("FINAL RESPONSE: ", finalResponse.body);
+        }
+        else {
+            throw 'Error 200 OK but not success login: ' + decodeURI(responseFourUrl) + ' user: ' + username;
+        }
     }
     else {
-        throw 'Error, not success login';
+        throw 'Error login, status code: ' + responseFourHttpStatusResponse + ' user: ' + username;
     }
-
 }
 
 function getSamlValue(responseBody) {
