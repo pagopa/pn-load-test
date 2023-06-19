@@ -1,11 +1,10 @@
 import http from 'k6/http';
 import { sleep } from 'k6';
-import exec from 'k6/execution';
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
-let password = `${__ENV.PASSWORD}`
 
-let usernames = [
+const password = `${__ENV.PASSWORD}`
+const usernames = [
     'ada',
     'cristoforocolombo',
     'fieramosca',
@@ -16,35 +15,51 @@ let usernames = [
     'marcopolo',
     'cleopatra'
 ]
+
+const params = {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-User': '?1',
+        'TE': 'trailers'
+    }
+}
+
+const paramsWithRedirect = {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-User': '?1',
+        'TE': 'trailers'
+    },
+    redirects: 1
+}
+
+///demo/samlsso
+const urlOne = 'https://hub-login.spid.dev.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2';
+
+const urlTwo = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/start';
+
+const urlThree = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/login';
+
+const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
+
+const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
+
 export default function () {
 
     const username = usernames[Math.floor(Math.random() * usernames.length)];
 
-
-    ///demo/samlsso
-    const urlOne = 'https://hub-login.spid.dev.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2';
-
-    const urlTwo = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/start';
-
-    const urlThree = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/login';
-
-    const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
-
-    const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
-
-    const params = {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'same-site',
-            'Sec-Fetch-User': '?1',
-            'TE': 'trailers'
-        }
-    }
-    const responseOne = http.get(urlOne, params);
+    const responseOne = http.get(urlOne, paramsWithRedirect);
+    checkErrorStatus(responseOne);
     const responseBody = responseOne.body
     // console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
@@ -86,9 +101,10 @@ export default function () {
         'params[minAge]': '',
         'retry': -1
     };
-    const responseBodyThree = http.post(urlThree, bodyUrlThree, params);
+    const responseThree = http.post(urlThree, bodyUrlThree, params);
+    checkErrorStatus(responseThree);
     // console.log("BODY WITH SAML RESPONSE: ", responseBodyThree);
-    const samlResponseValue = getSamlResponse(responseBodyThree.body);
+    const samlResponseValue = getSamlResponse(responseThree.body);
     console.log("SAMLRESPONSE: ", samlResponseValue);
     ///////////////
     const paramsFour = {
@@ -111,28 +127,25 @@ export default function () {
         'RelayState': '',
         'SAMLResponse': samlResponseValue
     };
-    const responseFour = http.post(urlFour, bodyUrlFour, params);
-    console.log("RESPONSEFOUR: ", responseFour);
-    const responseFourHttpStatusResponse = responseFour.status;
+    const responseFour = http.post(urlFour, bodyUrlFour, paramsWithRedirect);
+    // console.log("RESPONSEFOUR: ", responseFour);
+    checkErrorStatus(responseFour);
 
-    if(responseFourHttpStatusResponse === 200) {
-        const responseFourUrl = responseFour.url;
-        console.log("RESPONSEFOUR-URL: ", responseFour.url);
-        const loginSuccess = responseFourUrl.includes('token');
-        if(loginSuccess) {
-            const indexToken = responseFourUrl.indexOf('token=');
-            const token = responseFourUrl.substring(indexToken + 6);
-            console.log("TOKEN: ", token);
-            const finalResponse = http.get(urlFive + token, paramsFour);
-            console.log("FINAL RESPONSE: ", finalResponse.body);
-        }
-        else {
-            throw 'Error 200 OK but not success login: ' + decodeURI(responseFourUrl) + ' user: ' + username;
-        }
+    const responseFourUrl = responseFour.url;
+    // console.log("RESPONSEFOUR-URL: ", responseFour.url);
+    const loginSuccess = responseFourUrl.includes('token');
+    if(loginSuccess) {
+        const indexToken = responseFourUrl.indexOf('token=');
+        const token = responseFourUrl.substring(indexToken + 6);
+        console.log("TOKEN: ", token);
+        const finalResponse = http.get(urlFive + token, paramsFour);
+        console.log("FINAL RESPONSE: ", finalResponse.body);
     }
     else {
-        throw 'Error login, status code: ' + responseFourHttpStatusResponse + ' user: ' + username;
+        throw 'Error 200 OK but not success login: ' + decodeURI(responseFourUrl) + ' user: ' + username;
     }
+
+
 }
 
 function getSamlValue(responseBody) {
@@ -181,4 +194,10 @@ function getSamlResponse(responseBody) {
     const indexSamlValue = sub.indexOf(';');
     const subTwo = sub.substring(0, indexSamlValue + 1);
     return subTwo;
+}
+
+function checkErrorStatus(response) {
+    if(response.status  >= 400) {
+        throw 'Error status code ' + response.status + ' for url: ' + response.url;
+    }
 }
