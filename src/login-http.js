@@ -1,19 +1,30 @@
 import http from 'k6/http';
 import { sleep } from 'k6';
+import exec from 'k6/execution';
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const password = `${__ENV.PASSWORD}`
 const usernames = [
+    'cesare',
     'ada',
+    'garibaldi',
+    'lucrezia',
     'cristoforocolombo',
+    'lapulzella',
     'fieramosca',
+    'cleopatra',
+    'marcopolo',
+    'innominato',
+    'Louis',
+    'montessori',
+    'little',
+    'dino',
+    'galileo',
+    'leonardo',
     'MarcoTullioCicerone',
     'LucioAnneoSeneca',
-    'galileo',
-    'dino',
-    'marcopolo',
-    'cleopatra'
+    'MarcoPorcioCatoneSpqr'
 ]
 
 const params = {
@@ -56,10 +67,11 @@ const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
 
 export default function () {
 
-    const username = usernames[Math.floor(Math.random() * usernames.length)];
+    // const username = usernames[Math.floor(Math.random() * usernames.length)];
+    const username = usernames[exec.scenario.iterationInTest % usernames.length];
 
     const responseOne = http.get(urlOne, paramsWithRedirect);
-    checkErrorStatus(responseOne);
+    checkErrorStatus(responseOne, username);
     const responseBody = responseOne.body
     // console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
@@ -99,10 +111,11 @@ export default function () {
         'params[signature]': signatureValue,
         'params[purpose]': '',
         'params[minAge]': '',
+        'params[maxAge]': '',
         'retry': -1
     };
     const responseThree = http.post(urlThree, bodyUrlThree, params);
-    checkErrorStatus(responseThree);
+    checkErrorStatus(responseThree, username);
     // console.log("BODY WITH SAML RESPONSE: ", responseBodyThree);
     const samlResponseValue = getSamlResponse(responseThree.body);
     console.log("SAMLRESPONSE: ", samlResponseValue);
@@ -129,7 +142,7 @@ export default function () {
     };
     const responseFour = http.post(urlFour, bodyUrlFour, paramsWithRedirect);
     // console.log("RESPONSEFOUR: ", responseFour);
-    checkErrorStatus(responseFour);
+    checkErrorStatus(responseFour, username);
 
     const responseFourUrl = responseFour.url;
     // console.log("RESPONSEFOUR-URL: ", responseFour.url);
@@ -196,8 +209,8 @@ function getSamlResponse(responseBody) {
     return subTwo;
 }
 
-function checkErrorStatus(response) {
+function checkErrorStatus(response, username) {
     if(response.status  >= 400) {
-        throw 'Error status code ' + response.status + ' for url: ' + response.url;
+        throw 'Error status code ' + response.status + ' for url: ' + response.url + ' username: ' + username;
     }
 }
