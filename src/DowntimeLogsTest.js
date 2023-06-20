@@ -22,8 +22,8 @@ export default function apiKey(){
     var toTime = new Date().toISOString();
     
     var date = new Date();
-    date.setDate(date.getDate() - 30);
-    date.setMilliseconds(date.getMilliseconds() - (Math.floor(Math.random() * 60000)));
+    date.setMonth(date.getMonth() - 4);
+    date.setMilliseconds(date.getMilliseconds() - (Math.floor(Math.random() * 180000)));
     var fromTime = date.toISOString();
 
 
