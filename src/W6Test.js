@@ -39,24 +39,28 @@ const iunArray = new SharedArray('iun sharedArray', function () {
   }
 });
 
-/*
+
 const fileArray = new SharedArray('bin file sharedArray', function () {
     const dataArray = [];
-    dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
+    var obj = {'fileString': open('./resources/AvvisoPagoPA.pdf')}
+    dataArray.push(obj);
     for(let i = 0; i< pdfNumber; i++){
-        dataArray.push(open('./resources/PDF_'+(i+1)+'.pdf', 'b'));
+      var obj = {'fileString': open('./resources/PDF_'+(i+1)+'.pdf', 'b')}
+        dataArray.push(obj);
     }
     return dataArray; // must be an array
 });
-*/
 
+/*
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+
 
 let anotherBinFile = [];
 //let pdfNumber = 3;
 for(let i = 0; i< pdfNumber; i++){
     anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
 }
+*/
 
 
 /**
@@ -252,17 +256,29 @@ export function internlRecipientReadAndDownload() {
 
 /*************************************************************************************************** */
 
+function stringToArrayBuffer(string) {
+  const length = string.length;
+  const buffer = new ArrayBuffer(length);
+  const view = new Uint8Array(buffer);
+  for (let i = 0; i < length; i++) {
+    view[i] = string.charCodeAt(i) & 0xff;
+  }
+  return buffer;
+}
 
 
 /**
  * DeliverySendNotification.js
 */
 export function internalPreloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = binFile;
+    let currBinFile = stringToArrayBuffer(fileArray[0].fileString);
+    /*
     if(otherFile){
-        currBinFile = anotherBinFile[otherFile%pdfNumber]
+        currBinFile = stringToArrayBuffer(fileArray[otherFile%pdfNumber].fileString);
     }
+    */
     
+    //console.log('BIN FILE: '+currBinFile);
 
     sha256 = crypto.sha256(currBinFile, 'base64');
     console.log('Sha: '+sha256);
@@ -420,8 +436,8 @@ export function internalSendNotification() {
  * The K6 memory leak is partially caused by the use of external modules
 */
 export default function w6TestOptimized() {
-    internalRecipientSearch();
-    internlRecipientReadAndDownload();
+    //internalRecipientSearch();
+    //internlRecipientReadAndDownload();
     internalSendNotification();
 
     sleep(2);
