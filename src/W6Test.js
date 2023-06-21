@@ -1,8 +1,10 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
 import { SharedArray } from 'k6/data';
+import encoding from 'k6/encoding';
 import exec from 'k6/execution';
 import http from 'k6/http';
+
 
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
@@ -42,10 +44,11 @@ const iunArray = new SharedArray('iun sharedArray', function () {
 
 const fileArray = new SharedArray('bin file sharedArray', function () {
     const dataArray = [];
-    var obj = {'fileString': open('./resources/AvvisoPagoPA.pdf')}
+    
+    var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
     dataArray.push(obj);
     for(let i = 0; i< pdfNumber; i++){
-      var obj = {'fileString': open('./resources/PDF_'+(i+1)+'.pdf', 'b')}
+      var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
         dataArray.push(obj);
     }
     return dataArray; // must be an array
@@ -256,27 +259,16 @@ export function internlRecipientReadAndDownload() {
 
 /*************************************************************************************************** */
 
-function stringToArrayBuffer(string) {
-  const length = string.length;
-  const buffer = new ArrayBuffer(length);
-  const view = new Uint8Array(buffer);
-  for (let i = 0; i < length; i++) {
-    view[i] = string.charCodeAt(i) & 0xff;
-  }
-  return buffer;
-}
-
 
 /**
  * DeliverySendNotification.js
 */
 export function internalPreloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = stringToArrayBuffer(fileArray[0].fileString);
-    /*
+    let currBinFile = encoding.b64decode(fileArray[0].fileString);
     if(otherFile){
-        currBinFile = stringToArrayBuffer(fileArray[otherFile%pdfNumber].fileString);
+        currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
     }
-    */
+  
     
     //console.log('BIN FILE: '+currBinFile);
 
@@ -309,6 +301,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
     
+    
     /*
     "secret": "...",
     "httpMethod": "PUT",
@@ -321,6 +314,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
             headers: {
                 'Content-Type': 'application/pdf',
                 'x-amz-checksum-sha256': sha256,
+                'Content-Length' : currBinFile.byteLength,
                 'x-amz-meta-secret': resultPreload.secret,
             },
             responseType: 'none',
@@ -338,6 +332,10 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         check(safeStorageUploadResponde, {
             'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
+
+        check(safeStorageUploadResponde, {
+          'error safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+      });
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
         return resultPreload;   
@@ -436,8 +434,8 @@ export function internalSendNotification() {
  * The K6 memory leak is partially caused by the use of external modules
 */
 export default function w6TestOptimized() {
-    //internalRecipientSearch();
-    //internlRecipientReadAndDownload();
+    internalRecipientSearch();
+    internlRecipientReadAndDownload();
     internalSendNotification();
 
     sleep(2);
