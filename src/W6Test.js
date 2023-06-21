@@ -1,8 +1,10 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
 import { SharedArray } from 'k6/data';
+import encoding from 'k6/encoding';
 import exec from 'k6/execution';
 import http from 'k6/http';
+
 
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
@@ -39,24 +41,29 @@ const iunArray = new SharedArray('iun sharedArray', function () {
   }
 });
 
-/*
+
 const fileArray = new SharedArray('bin file sharedArray', function () {
     const dataArray = [];
-    dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
+    
+    var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
+    dataArray.push(obj);
     for(let i = 0; i< pdfNumber; i++){
-        dataArray.push(open('./resources/PDF_'+(i+1)+'.pdf', 'b'));
+      var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
+        dataArray.push(obj);
     }
     return dataArray; // must be an array
 });
-*/
 
+/*
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+
 
 let anotherBinFile = [];
 //let pdfNumber = 3;
 for(let i = 0; i< pdfNumber; i++){
     anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
 }
+*/
 
 
 /**
@@ -253,16 +260,17 @@ export function internlRecipientReadAndDownload() {
 /*************************************************************************************************** */
 
 
-
 /**
  * DeliverySendNotification.js
 */
 export function internalPreloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = binFile;
+    let currBinFile = encoding.b64decode(fileArray[0].fileString);
     if(otherFile){
-        currBinFile = anotherBinFile[otherFile%pdfNumber]
+        currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
     }
+  
     
+    //console.log('BIN FILE: '+currBinFile);
 
     sha256 = crypto.sha256(currBinFile, 'base64');
     console.log('Sha: '+sha256);
@@ -293,6 +301,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
     
+    
     /*
     "secret": "...",
     "httpMethod": "PUT",
@@ -305,6 +314,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
             headers: {
                 'Content-Type': 'application/pdf',
                 'x-amz-checksum-sha256': sha256,
+                'Content-Length' : currBinFile.byteLength,
                 'x-amz-meta-secret': resultPreload.secret,
             },
             responseType: 'none',
@@ -322,6 +332,10 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         check(safeStorageUploadResponde, {
             'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
+
+        check(safeStorageUploadResponde, {
+          'error safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+      });
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
         return resultPreload;   
