@@ -39,6 +39,7 @@ const iunArray = new SharedArray('iun sharedArray', function () {
   }
 });
 
+/*
 const fileArray = new SharedArray('bin file sharedArray', function () {
     const dataArray = [];
     dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
@@ -47,6 +48,15 @@ const fileArray = new SharedArray('bin file sharedArray', function () {
     }
     return dataArray; // must be an array
 });
+*/
+
+let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
+
+let anotherBinFile = [];
+//let pdfNumber = 3;
+for(let i = 0; i< pdfNumber; i++){
+    anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
+}
 
 
 /**
@@ -248,9 +258,9 @@ export function internlRecipientReadAndDownload() {
  * DeliverySendNotification.js
 */
 export function internalPreloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = fileArray[0];
+    let currBinFile = binFile;
     if(otherFile){
-        currBinFile = fileArray[otherFile%pdfNumber]
+        currBinFile = anotherBinFile[otherFile%pdfNumber]
     }
     
 
@@ -303,7 +313,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     
         let urlSafeStorage = resultPreload.url;
         
-        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile.buffer, paramsSafeStorage);
+        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
             'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,

@@ -1,6 +1,5 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
-import { SharedArray } from 'k6/data';
 import exec from 'k6/execution';
 import http from 'k6/http';
 
@@ -11,6 +10,7 @@ let basePath = `${__ENV.BASE_PATH}`
 let sha256;
 let pdfNumber = 3;
 
+/*
 const fileArray = new SharedArray('bin file sharedArray', function () {
     const dataArray = [];
     dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
@@ -19,16 +19,16 @@ const fileArray = new SharedArray('bin file sharedArray', function () {
     }
     return dataArray; // must be an array
 });
+*/
 
-/*
+
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
 
 let anotherBinFile = [];
-let pdfNumber = 3;
 for(let i = 0; i< pdfNumber; i++){
     anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
 }
-*/
+
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
@@ -37,9 +37,9 @@ let paymentRequest = JSON.parse(open('./model/payment.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
 export function preloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = fileArray[0];
+    let currBinFile = binFile[0];
     if(otherFile){
-        currBinFile = fileArray[otherFile%pdfNumber]
+        currBinFile = anotherBinFile[otherFile%pdfNumber]
     }
     
     console.log(currBinFile);
@@ -91,7 +91,7 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
     
         let urlSafeStorage = resultPreload.url;
         
-        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile.buffer, paramsSafeStorage);
+        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
             'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
