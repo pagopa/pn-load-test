@@ -1,23 +1,23 @@
 {
   "mandateId": null,
   "delegator": {
-    "displayName": "User Uno",
-    "firstName": "User",
-    "lastName": "Uno",
-    "fiscalCode": "FRMTTR76M06B715E",
+    "displayName": "Test Carico",
+    "firstName": "Test",
+    "lastName": "Carico",
+    "fiscalCode": "GLLGLL64B15G702I",
     "person": true
   },
   "delegate": {
-    "displayName": "User Due",
-    "firstName": "User",
-    "lastName": "Due",
+    "displayName": "Delegato del carico",
+    "firstName": "Delegato",
+    "lastName": "del carico",
     "fiscalCode": "CLMCST42R12D969Z",
     "person": true
   },
   "status": "pending",
   "visibilityIds": [],
   "verificationCode": "24411",
-  "datefrom": "2023-03-19",
-  "dateto": "2023-03-21",
+  "datefrom": "",
+  "dateto": "",
   "groups": []
 }
