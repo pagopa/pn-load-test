@@ -19,15 +19,16 @@ export function createMandate() {
   dateTo.setDate(dateTo.getDate() + 1);
   json.dateto = dateTo.toISOString().slice(0, 10);
 
+  json.delegate.fiscalCode = 'CLMCST42R12D969Z';
+
   const payload = JSON.stringify(json);
 
   let url = `https://${basePath}/mandate/api/${apiVersion}/mandate`;
-  let token = 'Bearer ' + bearerToken;
   
   let params = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': token
+      'Authorization': 'Bearer ' + bearerToken,
     },
   };
   

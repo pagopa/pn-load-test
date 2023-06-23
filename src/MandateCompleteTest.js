@@ -1,22 +1,57 @@
 import { check, sleep } from 'k6';
+import { SharedArray } from 'k6/data';
 import exec from 'k6/execution';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 
-export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+import { acceptMandate } from "./modules/acceptMandate.js";
+import { createMandate } from "./modules/createMandate.js";
 
-let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
-let basePath = `${__ENV.WEB_BASE_PATH}`
+
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+let bearerTokenUser2 = `${__ENV.BEARER_TOKEN_USER2}`;
+let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`;
+let basePath = `${__ENV.WEB_BASE_PATH}`;
+
 let mandateRequest = JSON.parse(open('./model/mandateRequest.json'));
 
 const mandateCreated = new Counter('mandate_created');
 const mandateRevoked = new Counter('mandate_revoked');
 
 
+const iunArray = new SharedArray('iun sharedArray', function () {
+  let iunFile = open('./resources/NotificationIUN.txt');
+  if(iunFile){
+    const dataArray =  iunFile.split(';');
+    console.log("IUN_LENGTH: "+ dataArray.length);
+    return dataArray; // must be an array
+  }else{
+    const dataArray = [];
+    return dataArray;
+  }
+});
+
 export function setup() {
   deleteMandate("SETUP");
-}
 
+  let r = createMandate();
+  console.log(r.body);
+  
+  sleep(1);
+
+  if(r.status === 201) {
+    let body = JSON.parse(r.body);
+    console.log(`Mandate Create Status: ${r.status}`);
+    console.log(`Body: ${r.body}`);
+    let mandateId =  body.mandateId
+
+    r = acceptMandate(mandateId);
+    console.log(`Mandate Accept Status: ${r.status}`);
+    console.log(`Body: ${r.body}`);
+    
+    return mandateId
+  }
+}
 
 export function teardown(request) {
   deleteMandate("TEARDOWN");
@@ -68,8 +103,44 @@ const userPFCf = [
   'CTNMCP34B16H501T'
 ]
 
+export default function mandateCompleteTest(mandateId) {
+  delegateReadInternal(mandateId);
+  delegateMaTestinterl();  
+  
+  sleep(1);
+ 
+}
 
-export default function delegateMaTest() {
+
+function delegateReadInternal(mandateId) {
+  
+  let currentIun = iunArray[exec.scenario.iterationInTest % iunArray.length].trim();
+
+  let url = `https://${basePath}/delivery/notifications/received/${currentIun}?mandateId=${mandateId}`;
+  
+  console.log(`Url ${url}`);
+
+  let params = {
+    headers: {
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + bearerTokenUser2,
+    'Accept': 'application/json, text/plain, */*'
+    },
+  };
+
+  let r = http.get(url, params);
+
+  check(r, {
+    'status Delegate read is 200': (r) => r.status === 200,
+  });
+
+  sleep(1);
+  return r;
+
+}
+
+
+export function delegateMaTestinterl() {
 
   const cf = userPFCf[exec.scenario.iterationInTest % userPFCf.length];
   
@@ -125,6 +196,4 @@ export default function delegateMaTest() {
   
  
 }
-
-
 
