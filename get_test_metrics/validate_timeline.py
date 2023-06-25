@@ -28,11 +28,12 @@ import base64
 import sys
 import json
 import time
+import datetime
 from dateutil.parser import parse
 from dateutil.parser import ParserError
+from concurrent.futures import ThreadPoolExecutor
 
 import boto3
-
 
 
 timelines_table_name = 'pn-Timelines'
@@ -73,8 +74,7 @@ def decode_ids(ids: list[str]) -> list[str]:
 # for each passed iun, get from DynamoDB the records from "pn-Timelines" table
 # and process the corresponding timeline
 def get_timelines(iuns: list[str]) -> list:
-    processed = []
-    not_processed = []
+    read_from_db = []
 
     def create_new_element():
         return {
@@ -88,9 +88,11 @@ def get_timelines(iuns: list[str]) -> list:
             "isMaxValidationTime": False,
             "timeline": []
         }
-
-    for iun in iuns:
-        print(f'Processing iun {iun}...')
+    
+    def read_info_for_one_iun_from_db( iun_and_index: dict) -> dict:
+        iun = iun_and_index['iun']
+        idx = iun_and_index['idx']
+        iuns_quantity = iun_and_index['tot']
         try:
             response = dynamodb.query(
                 TableName=timelines_table_name,
@@ -104,11 +106,11 @@ def get_timelines(iuns: list[str]) -> list:
             sys.exit(1)
 
         items = response.get('Items', [])
+        
+        new_element = create_new_element()
+        new_element["iun"] = iun
+
         if len(items) > 0:
-
-            new_element = create_new_element()
-            new_element["iun"] = iun
-
             # for each item in the timeline, add it to the new_element["timeline"] array
             for item in items:
                 timeline_element_id = item['timelineElementId']['S']
@@ -143,35 +145,35 @@ def get_timelines(iuns: list[str]) -> list:
             new_element["timeline"].sort(key=lambda x: x["timestamp"])
 
             new_element["lastElementTimestamp"] = new_element["timeline"][-1]["timestamp"]
-    
-            processed.append(new_element)
+        
+        if idx % 100 == 0:
+            print(f'Analyzed {idx}/{iuns_quantity} timelines at {datetime.datetime.now()}')
+        return new_element
 
-    print(f'Found {len(processed)} timelines')
+    iuns_quantity = len( iuns )
+    iuns_and_index = [{'iun':iun, 'idx':idx, 'tot': iuns_quantity} for idx,iun in enumerate(iuns)]
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        read_from_db_gen = executor.map( read_info_for_one_iun_from_db, iuns_and_index )
+    
+    read_from_db = [ x for x in read_from_db_gen ]
+    print(f'Analyzed {len(read_from_db)} timelines')
 
     # we find in processed the element with the max validationTime and set its isMaxValidationTime to True
-    max_validation_time = max([element["validationTime"] for element in processed if element["validationTime"] is not None])
-    for element in processed:
+    max_validation_time = max([element["validationTime"] for element in read_from_db if element["validationTime"] is not None])
+    for element in read_from_db:
         if element["validationTime"] == max_validation_time:
             element["isMaxValidationTime"] = True
     # there could be in theory more than one with the flag set, but it's unlikely
 
     # we then add all the elements that are in iuns but not in processed
-    elements_not_found = [iun for iun in iuns if iun not in [element["iun"] for element in processed]]
+    elements_not_found = [ element["iun"] for element in read_from_db if len( element["timeline"]) == 0 ]
     print(f'{len(elements_not_found)} elements not found in DynamoDB')
-
-    for iun in elements_not_found:
-        new_element = create_new_element()
-        new_element["iun"] = iun
-        not_processed.append(new_element)
 
     # order processed by timestamp on the last element in each timeline (it is the REFINEMENT timestamp, for successful timelines)
     print('Ordering timelines based on the timestamp of the last element...')
-    processed.sort(key=lambda x: x["timeline"][-1]["timestamp"])
+    read_from_db.sort(key=lambda x: x["timeline"][-1]["timestamp"] if len( x["timeline"] ) > 0 else "1900-01-01T00:00:00.000000000Z" )
 
-    # concatenate processed and not_processed, with not_processed first
-    processed = not_processed + processed
-
-    return processed
+    return read_from_db
 
 # write the processed timelines to a file
 def write_to_file(processed: list, filename: str):

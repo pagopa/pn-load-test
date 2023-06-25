@@ -142,16 +142,20 @@ echo ""
 
 
 echo "Summarize response status with traceId"
-node src/result_parsing_utils/list_request_status_and_traceid.js \
-     /outputs/http-output.json \
-     > /outputs/status-by-request.json
-     
+if ( [ ! -e "/outputs/status-by-request.json" ] ) then
+  node src/result_parsing_utils/list_request_status_and_traceid.js \
+      /outputs/http-output.json \
+       > /outputs/status-by-request.json
+fi
+
 echo "extract notificationRequestId from console-output.txt"
-grep notificationRequestId /outputs/console-output.txt \
-  | jq -r '.msg' \
-  | grep REQUEST-ID-LOG \
-  | sed -E 's/.*notificationRequestId\":\"//g' \
-  | sed -E 's/\",\"paProtocolNumber.*//g' > /outputs/notification-request-ids.txt
+if ( [ ! -e "/outputs/notification-request-ids.txt" ] ) then
+  grep notificationRequestId /outputs/console-output.txt \
+    | jq -r '.msg' \
+    | grep REQUEST-ID-LOG \
+    | sed -E 's/.*notificationRequestId\":\"//g' \
+    | sed -E 's/\",\"paProtocolNumber.*//g' > /outputs/notification-request-ids.txt
+fi
 
 echo "process the timelines from the iuns obtained from the notificationRequestId"
 python3 ${SCRIPT_DIR}/validate_timeline.py \
@@ -159,6 +163,17 @@ python3 ${SCRIPT_DIR}/validate_timeline.py \
         /outputs/processed-timelines.json \
         /outputs/stats.json \
         --profile $aws_profile
+
+echo "Facilitate R checks"
+if ( [ ! -e "/outputs/iteration_time.json" ] ) then
+  cat /outputs/result-timing.json \
+      | jq -r '. | select( .metric == "iteration_duration" and .type == "Point") | { "t": .data.time, "v": .data.value} | tojson' \
+      > /outputs/iteration_time.json
+fi
+
+cat /outputs/processed-timelines.json \
+    | jq -r '.[] | tojson' \
+    > /outputs/processed-timelines_one_per_line.json
 
 echo "create directory for k6 test"
 dir=${folder}/monitoring_$(date '+%Y-%m-%d-%s')
@@ -205,6 +220,7 @@ api_gw_max=(Latency  Count )
 api_gw_sum=(5XXError 4XXError )
 wf_nf=(pn-activeSlaViolations)
 
+exit 0
 echo "==> start export ECS metrics"
 for i in ${awsecs[@]}; do
 for ecsmetrics in  $(aws ${aws_command_base_args} cloudwatch list-metrics --metric-name $i --namespace AWS/ECS  --output text | grep ServiceName | awk '{print $2",Value="$3}') ; do
