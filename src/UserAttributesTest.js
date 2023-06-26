@@ -1,4 +1,3 @@
-import { check, sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
@@ -9,6 +8,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 const throttling = new Counter('throttling');
 const bearerToken = 'Bearer ' + `${__ENV.BEARER_TOKEN_USER1}`
+const recipientId = 'PF-b3ccac31-38ea-44cd-9601-9f2d19e853af';
 
 const params = {
     headers: {
@@ -19,10 +19,15 @@ const params = {
 
 const basePath = `${__ENV.WEB_BASE_PATH}`
 const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/external-channels/verification-code/'
+// const verificationCodeUrl = 'http://localhost:8888/external-channels/verification-code/'
+
 
 const postRecipientLegalAddress = 'https://' + basePath + '/address-book/v1/digital-address/legal/{senderId}/PEC'
 const postRecipientCourtesyAddress = 'https://' + basePath + '/address-book/v1/digital-address/courtesy/{senderId}/EMAIL'
-
+const getLegalAddressBySender = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/' + recipientId + '/{senderId}'
+// const getLegalAddressBySender = 'http://localhost:8888/address-book-private/v1/digital-address/legal/' + recipientId + '/{senderId}'
+const getCourtesyAddressBySender = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/' + recipientId + '/{senderId}'
+// const getCourtesyAddressBySender = 'http://localhost:8888/address-book-private/v1/digital-address/courtesy/' + recipientId + '/{senderId}'
 
 const senderIds = [
     'cc1c6a8e-5967-42c6-9d83-bfb12ba1665a', '7b2fff42-d3c1-44f0-b53a-bf9089a37c73', 'e5e56011-4e4c-4e1c-b4fe-befd2a8ca9ff', 'ef29949d-1167-4af9-86f4-23bcaaf6e41b',
@@ -46,16 +51,24 @@ export default function () {
 
     console.log('Request for creating PEC: ', pec, ' with SenderId: ', senderId);
     callPostRecipientAddress(urlPec, pec, null);
+    console.log('Retrieve verificationCode for PEC: ', pec);
     const verificationCode = getVerificationCode(pec);
     console.log('Confirm for creating PEC: ', pec, verificationCode);
     callPostRecipientAddress(urlPec, pec, verificationCode);
 
     console.log('Request for creating EMAIL: ', email, ' with SenderId: ', senderId);
     callPostRecipientAddress(urlEmail, email, null);
+    console.log('Retrieve verificationCode for EMAIL: ', email);
     const verificationCodeEmail = getVerificationCode(email);
     console.log('Confirm for creating EMAIL: ', email, verificationCodeEmail);
     callPostRecipientAddress(urlEmail, email, verificationCodeEmail);
 
+
+    console.log('Retrieve Legal Addresses for senderId: ', senderId);
+    callGetAddressBySender(senderId, getLegalAddressBySender);
+
+    console.log('Retrieve Courtesy Addresses for senderId: ', senderId);
+    callGetAddressBySender(senderId, getCourtesyAddressBySender);
 
 }
 
@@ -74,15 +87,9 @@ function callPostRecipientAddress(url, pecOrEmail, verificationCode) {
         }
     }
 
-    console.log('Response: ', params);
-    const r = http.post(url, requestBodyPec, params);
+    const r = http.post(url, JSON.stringify(requestBodyPec), params);
     checkErrorStatus(r, pecOrEmail)
 
-
-
-    check(r, {
-        'status is 200': (r) => r.status === 200,
-    });
 
     if (r.status === 403) {
         throttling.add(1);
@@ -92,14 +99,18 @@ function callPostRecipientAddress(url, pecOrEmail, verificationCode) {
 }
 
 function getVerificationCode(pec) {
-    console.log('Retrieve verificationCode for pec: ', pec);
     const res = http.get(verificationCodeUrl + pec);
-    if (res.status !== 200) {
-        throw 'Error in getVerificationCode for pec: ' + pec + ' with status: ' + res.status;
-    }
+    checkErrorStatus(res);
 
     return res.body;
 
+}
+
+function callGetAddressBySender(senderId, url) {
+    const res = http.get(url.replace('{senderId}', senderId));
+    checkErrorStatus(res);
+
+    return res.body;
 }
 
 function checkErrorStatus(response, pecOrEmail) {
