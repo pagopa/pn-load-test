@@ -120,7 +120,7 @@ function checkErrorStatus(response, pecOrEmail) {
     });
 
     if(response.status  >= 400) {
-        console.log('Error status code ', response.status, ' for url: ', response.url, ' pecOrEmail: ', pecOrEmail, ' response: ', + response.body);
+        console.log('Error status code ', response.status, ' for url: ', response.url, ' pecOrEmail: ', pecOrEmail, ' response: ', response.body);
         // throw 'Error status code ' + response.status + ' for url: ' + response.url + ' pecOrEmail: ' + pecOrEmail + ' response: ' + response.body;
     }
 }
