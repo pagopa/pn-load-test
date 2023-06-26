@@ -60,11 +60,11 @@ def main():
                     print("Error: file not found")
                     sys.exit(1)
                 except ValueError:
-                    print("Error: invalid JSON")
+                    print("Error: invalid JSON production")
                     sys.exit(1)
 
             except ValueError:
-                print("Error: invalid JSON")
+                print("Error: invalid JSON parsing")
                 sys.exit(1)
     except FileNotFoundError:
         print("Error: file not found")
