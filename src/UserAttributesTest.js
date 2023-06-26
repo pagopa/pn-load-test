@@ -114,6 +114,6 @@ function callGetAddressBySender(senderId, url) {
 
 function checkErrorStatus(response, pecOrEmail) {
     if(response.status  >= 400) {
-        throw 'Error status code ' + response.status + ' for url: ' + response.url + ' pecOrEmail: ' + pecOrEmail;
+        throw 'Error status code ' + response.status + ' for url: ' + response.url + ' pecOrEmail: ' + pecOrEmail + ' response: ' + response.body;
     }
 }
