@@ -13,15 +13,29 @@ def main():
     # read json file "processed-timelines.json", getting an array of objects
     try:
         source_processed_timelines = sys.argv[2];
+        processed_timelines = sys.argv[4]
 
+        output_ranges = []
         with open(source_processed_timelines, 'r') as f:
             try:
                 timelines = json.load(f)
+
                 # process the array of iun/timelines, getting the relavant intervals, if present
                 for iun in timelines:
                     processed_iun = process_timelines_iun(iun)
-                    # print processed_iun as JSON
-                    print(json.dumps(processed_iun))
+                    output_ranges.append(processed_iun)
+                
+                # write the processed_iun array to a JSON file
+                try:
+                    with open(processed_timelines, 'w') as f:
+                        json.dump(output_ranges, f, indent=4)
+                except FileNotFoundError:
+                    print("Error: file not found")
+                    sys.exit(1)
+                except ValueError:
+                    print("Error: invalid JSON")
+                    sys.exit(1)
+
             except ValueError:
                 print("Error: invalid JSON")
                 sys.exit(1)
