@@ -19,8 +19,8 @@ const params = {
 
 
 const basePath = `${__ENV.WEB_BASE_PATH}`
-const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/external-channels/verification-code/'
-// const verificationCodeUrl = 'http://localhost:8888/external-channels/verification-code/'
+// const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/external-channels/verification-code/'
+const verificationCodeUrl = 'http://localhost:8888/external-channels/verification-code/'
 
 const senderIds = [
     'cc1c6a8e-5967-42c6-9d83-bfb12ba1665a', '7b2fff42-d3c1-44f0-b53a-bf9089a37c73', 'e5e56011-4e4c-4e1c-b4fe-befd2a8ca9ff', 'ef29949d-1167-4af9-86f4-23bcaaf6e41b',
@@ -39,10 +39,10 @@ export default function () {
     const senderId = senderIds[exec.scenario.iterationInTest % senderIds.length];
     const urlPec = `https://${basePath}/address-book/v1/digital-address/legal/${senderId}/PEC`
     const urlEmail = `https://${basePath}/address-book/v1/digital-address/courtesy/${senderId}/EMAIL`
-    const getLegalAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
-    const getCourtesyAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
-    // const getLegalAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
-    // const getCourtesyAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
+    // const getLegalAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
+    // const getCourtesyAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
+    const getLegalAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
+    const getCourtesyAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
     const pec = uuid + '@pec.it';
     const email = uuid + '@mail.it';
 
@@ -51,7 +51,7 @@ export default function () {
     callPostRecipientAddress(urlPec, pec, null);
     console.log('Retrieve verificationCode for PEC: ', pec);
     const verificationCodeResponse = getVerificationCode(pec);
-    if(verificationCodeResponse === 200) {
+    if(verificationCodeResponse.status === 200) {
         console.log('Confirm for creating PEC: ', pec, verificationCodeResponse.body);
         callPostRecipientAddress(urlPec, pec, verificationCodeResponse.body);
     }
@@ -61,7 +61,7 @@ export default function () {
     callPostRecipientAddress(urlEmail, email, null);
     console.log('Retrieve verificationCode for EMAIL: ', email);
     const verificationCodeEmailResponse = getVerificationCode(email);
-    if(verificationCodeEmailResponse === 200) {
+    if(verificationCodeEmailResponse.status === 200) {
         console.log('Confirm for creating EMAIL: ', email, verificationCodeEmailResponse.body);
         callPostRecipientAddress(urlEmail, email, verificationCodeEmailResponse.body);
     }
