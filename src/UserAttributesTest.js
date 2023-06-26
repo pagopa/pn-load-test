@@ -95,7 +95,6 @@ function callPostRecipientAddress(url, pecOrEmail, verificationCode) {
         throttling.add(1);
     }
 
-    sleep(1);
 }
 
 function getVerificationCode(pec) {
