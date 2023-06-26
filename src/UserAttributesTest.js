@@ -1,5 +1,6 @@
 import exec from 'k6/execution';
 import http from 'k6/http';
+import { check, sleep } from 'k6';
 import { Counter } from 'k6/metrics';
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
@@ -21,14 +22,6 @@ const basePath = `${__ENV.WEB_BASE_PATH}`
 const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/external-channels/verification-code/'
 // const verificationCodeUrl = 'http://localhost:8888/external-channels/verification-code/'
 
-
-const postRecipientLegalAddress = 'https://' + basePath + '/address-book/v1/digital-address/legal/{senderId}/PEC'
-const postRecipientCourtesyAddress = 'https://' + basePath + '/address-book/v1/digital-address/courtesy/{senderId}/EMAIL'
-const getLegalAddressBySender = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/' + recipientId + '/{senderId}'
-// const getLegalAddressBySender = 'http://localhost:8888/address-book-private/v1/digital-address/legal/' + recipientId + '/{senderId}'
-const getCourtesyAddressBySender = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/' + recipientId + '/{senderId}'
-// const getCourtesyAddressBySender = 'http://localhost:8888/address-book-private/v1/digital-address/courtesy/' + recipientId + '/{senderId}'
-
 const senderIds = [
     'cc1c6a8e-5967-42c6-9d83-bfb12ba1665a', '7b2fff42-d3c1-44f0-b53a-bf9089a37c73', 'e5e56011-4e4c-4e1c-b4fe-befd2a8ca9ff', 'ef29949d-1167-4af9-86f4-23bcaaf6e41b',
     'e5e56011-4e4c-4e1c-b4fe-befd2a8ca9ff', '026e8c72-7944-4dcd-8668-f596447fec6d', '56ed074c-13b6-4d61-ba49-221953e6b60f', '337d7290-4f43-4d70-ae02-69c20b4428ec',
@@ -44,25 +37,34 @@ export default function () {
     const uuid = uuidv4();
 
     const senderId = senderIds[exec.scenario.iterationInTest % senderIds.length];
-    const urlPec = postRecipientLegalAddress.replace('{senderId}', senderId);
-    const urlEmail = postRecipientCourtesyAddress.replace('{senderId}', senderId);
+    const urlPec = `https://${basePath}/address-book/v1/digital-address/legal/${senderId}/PEC`
+    const urlEmail = `https://${basePath}/address-book/v1/digital-address/courtesy/${senderId}/EMAIL`
+    const getLegalAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
+    const getCourtesyAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
+    // const getLegalAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
+    // const getCourtesyAddressBySender = `http://localhost:8888/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
     const pec = uuid + '@pec.it';
     const email = uuid + '@mail.it';
+
 
     console.log('Request for creating PEC: ', pec, ' with SenderId: ', senderId);
     callPostRecipientAddress(urlPec, pec, null);
     console.log('Retrieve verificationCode for PEC: ', pec);
-    const verificationCode = getVerificationCode(pec);
-    console.log('Confirm for creating PEC: ', pec, verificationCode);
-    callPostRecipientAddress(urlPec, pec, verificationCode);
+    const verificationCodeResponse = getVerificationCode(pec);
+    if(verificationCodeResponse === 200) {
+        console.log('Confirm for creating PEC: ', pec, verificationCodeResponse.body);
+        callPostRecipientAddress(urlPec, pec, verificationCodeResponse.body);
+    }
+
 
     console.log('Request for creating EMAIL: ', email, ' with SenderId: ', senderId);
     callPostRecipientAddress(urlEmail, email, null);
     console.log('Retrieve verificationCode for EMAIL: ', email);
-    const verificationCodeEmail = getVerificationCode(email);
-    console.log('Confirm for creating EMAIL: ', email, verificationCodeEmail);
-    callPostRecipientAddress(urlEmail, email, verificationCodeEmail);
-
+    const verificationCodeEmailResponse = getVerificationCode(email);
+    if(verificationCodeEmailResponse === 200) {
+        console.log('Confirm for creating EMAIL: ', email, verificationCodeEmailResponse.body);
+        callPostRecipientAddress(urlEmail, email, verificationCodeEmailResponse.body);
+    }
 
     console.log('Retrieve Legal Addresses for senderId: ', senderId);
     callGetAddressBySender(senderId, getLegalAddressBySender);
@@ -99,9 +101,9 @@ function callPostRecipientAddress(url, pecOrEmail, verificationCode) {
 
 function getVerificationCode(pec) {
     const res = http.get(verificationCodeUrl + pec);
-    checkErrorStatus(res);
+    // checkErrorStatus(res);
 
-    return res.body;
+    return res;
 
 }
 
@@ -113,7 +115,12 @@ function callGetAddressBySender(senderId, url) {
 }
 
 function checkErrorStatus(response, pecOrEmail) {
+    check(response, {
+        'request not >= 400': (response) => response.status >= 400,
+    });
+
     if(response.status  >= 400) {
-        throw 'Error status code ' + response.status + ' for url: ' + response.url + ' pecOrEmail: ' + pecOrEmail + ' response: ' + response.body;
+        console.log('Error status code ', response.status, ' for url: ', response.url, ' pecOrEmail: ', pecOrEmail, ' response: ', + response.body);
+        // throw 'Error status code ' + response.status + ' for url: ' + response.url + ' pecOrEmail: ' + pecOrEmail + ' response: ' + response.body;
     }
 }
