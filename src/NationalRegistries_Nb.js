@@ -1,5 +1,4 @@
-import { check, sleep } from 'k6';
-import exec from 'k6/execution';
+import { check } from 'k6';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 
@@ -19,14 +18,7 @@ const code_iserror = new Counter('code_iserror');
 const code_serviceunavailable = new Counter('code_serviceunavailable');
 
 
-export function setup() {
-  //nothing to setup
-}
 
-
-export function teardown(request) {
-  //nothing to clear
-}
 
 export default function getDigitalDomicileNbTest() {
 
