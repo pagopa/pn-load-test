@@ -1,0 +1,7 @@
+{
+  "filter": {
+    "taxId": "AAAZZZ00H00T000Z",
+    "referenceRequestDate": "string",
+    "requestReason": "string"
+  }
+}
