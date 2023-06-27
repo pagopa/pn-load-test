@@ -83,6 +83,9 @@ export default function () {
         'error hub-spid login is > 400': (responseOne) => responseOne.status > 400,
     });
 
+    //Try-sleep
+    sleep(1);
+
     let urlRedirect = responseOne.headers['Location'];
     console.log('URL-REDIRECT: ',urlRedirect);
 
@@ -97,9 +100,11 @@ export default function () {
         'error hub-spid login REDIRECT is > 400': (responseOneRedirect) => responseOneRedirect.status > 400,
     });
     
+    //Try-sleep
+    sleep(1);
     
     const responseBody = responseOneRedirect.body
-    // console.log('FIRST RESPONSE: ', responseOne);
+    console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
     //console.log("SAML: ", samlValue);
 
@@ -132,6 +137,9 @@ export default function () {
         'error spid-saml-check-START is > 400': (responseBodyTwo) => responseBodyTwo.status > 400,
     });
 
+    //Try-sleep
+    sleep(1);
+
     const bodyUrlThree = {
         'username': username,
         'password': password,
@@ -157,9 +165,12 @@ export default function () {
         'error spid-saml-check-LOGIN is > 400': (responseThree) => responseThree.status > 400,
     });
 
-    // console.log("BODY WITH SAML RESPONSE: ", responseBodyThree);
+    //Try-sleep
+    sleep(1);
+
+    console.log("BODY WITH SAML RESPONSE: ", responseThree.body);
     const samlResponseValue = getSamlResponse(responseThree.body);
-    //console.log("SAMLRESPONSE: ", samlResponseValue);
+    console.log("SAMLRESPONSE: ", samlResponseValue);
     ///////////////
     const paramsFour = {
         headers: {
@@ -182,7 +193,7 @@ export default function () {
         'SAMLResponse': samlResponseValue
     };
     const responseFour = http.post(urlFour, bodyUrlFour, paramsWithRedirect);
-    // console.log("RESPONSEFOUR: ", responseFour);
+    console.log("RESPONSEFOUR: ", responseFour);
     check(responseFour, {
         'status hub-login.spid-acs is 200': (responseFour) => responseFour.status === 200,
     });
@@ -192,13 +203,16 @@ export default function () {
         'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status > 400,
     });
 
+    //Try-sleep
+    sleep(1);
+
     const responseFourUrl = responseFour.url;
-    // console.log("RESPONSEFOUR-URL: ", responseFour.url);
+    console.log("RESPONSEFOUR-URL: ", responseFour.url);
     const loginSuccess = responseFourUrl.includes('token');
     if(loginSuccess) {
         const indexToken = responseFourUrl.indexOf('token=');
         const token = responseFourUrl.substring(indexToken + 6);
-        //console.log("TOKEN: ", token);
+        console.log("TOKEN: ", token);
         const finalResponse = http.get(urlFive + token, paramsFour);
 
         check(finalResponse, {
