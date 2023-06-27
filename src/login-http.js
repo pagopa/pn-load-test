@@ -83,13 +83,13 @@ export default function () {
     const responseBody = responseOne.body
     // console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
-    console.log("SAML: ", samlValue);
+    //console.log("SAML: ", samlValue);
 
     const signAlgValue = getSigAlgValue(responseBody);
-    console.log("SIGNALG: ", signAlgValue);
+    //console.log("SIGNALG: ", signAlgValue);
 
     const signatureValue = getSignatureValue(responseBody);
-    console.log("SIGNATURE: ", signatureValue);
+    //console.log("SIGNATURE: ", signatureValue);
 
     const relayStateValue = getRelayStateValue(responseBody);
     const bindingValue = getBindingValue(responseBody);
@@ -139,7 +139,7 @@ export default function () {
 
     // console.log("BODY WITH SAML RESPONSE: ", responseBodyThree);
     const samlResponseValue = getSamlResponse(responseThree.body);
-    console.log("SAMLRESPONSE: ", samlResponseValue);
+    //console.log("SAMLRESPONSE: ", samlResponseValue);
     ///////////////
     const paramsFour = {
         headers: {
@@ -177,7 +177,7 @@ export default function () {
     if(loginSuccess) {
         const indexToken = responseFourUrl.indexOf('token=');
         const token = responseFourUrl.substring(indexToken + 6);
-        console.log("TOKEN: ", token);
+        //console.log("TOKEN: ", token);
         const finalResponse = http.get(urlFive + token, paramsFour);
 
         check(finalResponse, {
