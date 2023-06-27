@@ -27,33 +27,7 @@ const usernames = [
     'MarcoPorcioCatoneSpqr'
 ]
 
-const params = {
-    headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-User': '?1',
-        'TE': 'trailers'
-    },
-    redirects: 0
-}
 
-const paramsWithRedirect = {
-    headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-User': '?1',
-        'TE': 'trailers'
-    },
-    redirects: 1
-}
 
 ///demo/samlsso
 const urlOne = 'https://hub-login.spid.dev.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2';
@@ -64,18 +38,43 @@ const urlThree = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/log
 
 const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
 
+//const urlSuccess = 'https://login.dev.notifichedigitali.it/login/success';
+
 const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
 
 export default function () {
 
+     //Try-sleep
+     sleep(1);
+
+    
+    const paramsWithOneRedirect = {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-User': '?1',
+            'TE': 'trailers'
+        },
+        redirects: 100
+    }
+
+
     // const username = usernames[Math.floor(Math.random() * usernames.length)];
     const username = usernames[exec.scenario.iterationInTest % usernames.length];
 
-    //const responseOne = http.get(urlOne, paramsWithRedirect);
-    const responseOne = http.get(urlOne, params);
+    const responseOne = http.get(urlOne, paramsWithOneRedirect);
+    //const responseOne = http.get(urlOne, params);
 
     check(responseOne, {
-        'status hub-spid login is 302': (responseOne) => responseOne.status === 302,
+        'status hub-spid login is 200': (responseOne) => responseOne.status === 200,
+    });
+
+    check(responseOne, {
+        'error hub-spid login is 502': (responseOne) => responseOne.status === 502,
     });
 
     console.log('responseOne.status ',responseOne.status);
@@ -84,13 +83,12 @@ export default function () {
     });
 
     if(responseOne.status >= 400){
-        console.log('responseOne.body',responseOne.body);
         console.log('responseOne',responseOne);
     }
     //Try-sleep
-    sleep(1);
+    //sleep(1);
 
-    let urlRedirect = responseOne.headers['Location'];
+    /*let urlRedirect = responseOne.headers['Location'];
     console.log('URL-REDIRECT: ',urlRedirect);
 
     const responseOneRedirect = http.get(urlRedirect, params);
@@ -110,8 +108,9 @@ export default function () {
     
     //Try-sleep
     sleep(1);
-    
-    const responseBody = responseOneRedirect.body
+    */
+
+    const responseBody = responseOne.body
     console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
     //console.log("SAML: ", samlValue);
@@ -135,7 +134,21 @@ export default function () {
 
     };
 
-    const responseBodyTwo = http.post(urlTwo, bodyUrlTwo, params);
+    const paramsTwo = {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-User': '?1',
+            'TE': 'trailers'
+        },
+    }
+    
+
+    const responseBodyTwo = http.post(urlTwo, bodyUrlTwo, paramsTwo);
     check(responseBodyTwo, {
         'status spid-saml-check-START is 200': (responseBodyTwo) => responseBodyTwo.status === 200,
     });
@@ -152,13 +165,27 @@ export default function () {
     //Try-sleep
     sleep(1);
 
+
+    const paramsThree = {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-User': '?1',
+            'TE': 'trailers'
+        },
+    }
+    
     const bodyUrlThree = {
         'username': username,
         'password': password,
         'params[spidLevel]': 2,
-        'params[organizationDisplayName]': 'Organization+display+name',
+        'params[organizationDisplayName]': 'Organization display name',
         'params[samlRequest]': samlValue,
-        'params[relayState]': relayStateValue,
+        'params[relayState]': '',
         'params[sigAlg]': signAlgValue,
         'params[signature]': signatureValue,
         'params[purpose]': '',
@@ -166,7 +193,7 @@ export default function () {
         'params[maxAge]': '',
         'retry': -1
     };
-    const responseThree = http.post(urlThree, bodyUrlThree, params);
+    const responseThree = http.post(urlThree, bodyUrlThree, paramsThree);
 
     if(responseThree.status >= 400){
         console.log('responseThree.body',responseThree.body);
@@ -182,11 +209,11 @@ export default function () {
     });
 
     //Try-sleep
-    sleep(1);
+    //sleep(1);
 
-    console.log("BODY WITH SAML RESPONSE: ", responseThree.body);
+    //console.log("BODY WITH SAML RESPONSE: ", responseThree.body);
     const samlResponseValue = getSamlResponse(responseThree.body);
-    console.log("SAMLRESPONSE: ", samlResponseValue);
+    //console.log("SAMLRESPONSE: ", samlResponseValue);
     ///////////////
     const paramsFour = {
         headers: {
@@ -201,15 +228,30 @@ export default function () {
             'TE': 'trailers',
             'Origin': 'https://spid-saml-check.spid.dev.notifichedigitali.it',
             'Referer': 'https://spid-saml-check.spid.dev.notifichedigitali.it/'
-        }
+        },
+        redirects: 100
     };
+
+    const paramsFourWithRedirect = {
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-User': '?1',
+            'TE': 'trailers'
+        },
+        redirects: 100
+    }
 
     const bodyUrlFour = {
         'RelayState': '',
         'SAMLResponse': samlResponseValue
     };
-    const responseFour = http.post(urlFour, bodyUrlFour, paramsWithRedirect);
-    console.log("RESPONSEFOUR: ", responseFour);
+    const responseFour = http.post(urlFour, bodyUrlFour, paramsFourWithRedirect);
+    //console.log("RESPONSEFOUR: ", responseFour);
     check(responseFour, {
         'status hub-login.spid-acs is 200': (responseFour) => responseFour.status === 200,
     });
@@ -219,12 +261,22 @@ export default function () {
         'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status >= 400,
     });
 
+    check(responseFour, {
+        'status hub-login.spid-acs is 504': (responseFour) => responseFour.status === 504,
+    });
+    
+
     //Try-sleep
-    sleep(1);
+    //sleep(1);
 
     const responseFourUrl = responseFour.url;
-    console.log("RESPONSEFOUR-URL: ", responseFour.url);
+    //console.log("RESPONSEFOUR-URL: ", responseFour.url);
     const loginSuccess = responseFourUrl.includes('token');
+
+    check(responseFourUrl, {
+        'responseFourUrl.includes(token)': (responseFourUrl) => responseFourUrl.includes('token'),
+    });
+    
     if(loginSuccess) {
         const indexToken = responseFourUrl.indexOf('token=');
         const token = responseFourUrl.substring(indexToken + 6);
@@ -240,8 +292,28 @@ export default function () {
             'error finalResponse is > 400': (finalResponse) => finalResponse.status > 400,
         });
 
-        console.log("FINAL RESPONSE: ", finalResponse.body);
+        //console.log("FINAL RESPONSE: ", finalResponse.body);
     }
+
+
+    /*
+    const paramsSuccess = {
+        headers:{
+            "x-pagopa-safestorage-cx-id": "pn-delivery-push",
+        }
+    }
+
+    const responseSuccess = http.get(urlSuccess, paramsSuccess);
+    console.log("responseSuccess: ", responseSuccess);
+    check(responseSuccess, {
+        'status responseSuccess is 200': (responseSuccess) => responseSuccess.status === 200,
+    });
+
+    console.log('responseSuccess.status ',responseSuccess.status);
+    check(responseSuccess, {
+        'error responseSuccess is > 400': (responseSuccess) => responseSuccess.status >= 400,
+    });
+    */
 
     //Try-sleep
     sleep(1);
