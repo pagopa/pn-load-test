@@ -83,6 +83,10 @@ export default function () {
         'error hub-spid login is > 400': (responseOne) => responseOne.status > 400,
     });
 
+    if(responseOne.status >= 400){
+        console.log('responseOne.body',responseOne.body);
+        console.log('responseOne',responseOne);
+    }
     //Try-sleep
     sleep(1);
 
@@ -99,6 +103,10 @@ export default function () {
     check(responseOneRedirect, {
         'error hub-spid login REDIRECT is > 400': (responseOneRedirect) => responseOneRedirect.status > 400,
     });
+    if(responseOneRedirect.status >= 400){
+        console.log('responseOneRedirect.body',responseOneRedirect.body);
+        console.log('responseOneRedirect',responseOneRedirect);
+    }
     
     //Try-sleep
     sleep(1);
@@ -136,6 +144,10 @@ export default function () {
     check(responseBodyTwo, {
         'error spid-saml-check-START is > 400': (responseBodyTwo) => responseBodyTwo.status > 400,
     });
+    if(responseBodyTwo.status >= 400){
+        console.log('responseBodyTwo.body',responseBodyTwo.body);
+        console.log('responseBodyTwo',responseBodyTwo);
+    }
 
     //Try-sleep
     sleep(1);
@@ -156,13 +168,17 @@ export default function () {
     };
     const responseThree = http.post(urlThree, bodyUrlThree, params);
 
+    if(responseThree.status >= 400){
+        console.log('responseThree.body',responseThree.body);
+        console.log('responseThree',responseThree);
+    }
     check(responseThree, {
         'status spid-saml-check-LOGIN is 200': (responseThree) => responseThree.status === 200,
     });
 
     console.log('responseThree.status ',responseThree.status);
     check(responseThree, {
-        'error spid-saml-check-LOGIN is > 400': (responseThree) => responseThree.status > 400,
+        'error spid-saml-check-LOGIN is > 400': (responseThree) => responseThree.status >= 400,
     });
 
     //Try-sleep
@@ -200,7 +216,7 @@ export default function () {
 
     console.log('responseFour.status ',responseFour.status);
     check(responseFour, {
-        'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status > 400,
+        'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status >= 400,
     });
 
     //Try-sleep
