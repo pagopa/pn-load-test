@@ -86,7 +86,7 @@ export default function () {
         console.log('responseOne',responseOne);
     }
     //Try-sleep
-    //sleep(1);
+    sleep(1);
 
     /*let urlRedirect = responseOne.headers['Location'];
     console.log('URL-REDIRECT: ',urlRedirect);
@@ -209,7 +209,7 @@ export default function () {
     });
 
     //Try-sleep
-    //sleep(1);
+    sleep(1);
 
     //console.log("BODY WITH SAML RESPONSE: ", responseThree.body);
     const samlResponseValue = getSamlResponse(responseThree.body);
