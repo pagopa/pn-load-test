@@ -79,7 +79,6 @@ export default function () {
     check(responseOne, {
         'error hub-spid login is > 400': (responseOne) => responseOne.status > 400,
     });
-
     
     const responseBody = responseOne.body
     // console.log('FIRST RESPONSE: ', responseOne);
@@ -114,7 +113,6 @@ export default function () {
         'error spid-saml-check-START is > 400': (responseBodyTwo) => responseBodyTwo.status > 400,
     });
 
-    sleep(1);
     const bodyUrlThree = {
         'username': username,
         'password': password,
@@ -192,6 +190,9 @@ export default function () {
 
         console.log("FINAL RESPONSE: ", finalResponse.body);
     }
+
+    //Try-sleep
+    sleep(1);
 }
 
 function getSamlValue(responseBody) {
