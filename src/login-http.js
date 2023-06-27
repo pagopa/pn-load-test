@@ -37,7 +37,8 @@ const params = {
         'Sec-Fetch-Site': 'same-site',
         'Sec-Fetch-User': '?1',
         'TE': 'trailers'
-    }
+    },
+    redirects: 0
 }
 
 const paramsWithRedirect = {
@@ -70,17 +71,34 @@ export default function () {
     // const username = usernames[Math.floor(Math.random() * usernames.length)];
     const username = usernames[exec.scenario.iterationInTest % usernames.length];
 
-    const responseOne = http.get(urlOne, paramsWithRedirect);
+    //const responseOne = http.get(urlOne, paramsWithRedirect);
+    const responseOne = http.get(urlOne, params);
 
     check(responseOne, {
-        'status hub-spid login is 200': (responseOne) => responseOne.status === 200,
+        'status hub-spid login is 302': (responseOne) => responseOne.status === 302,
     });
 
+    console.log('responseOne.status ',responseOne.status);
     check(responseOne, {
         'error hub-spid login is > 400': (responseOne) => responseOne.status > 400,
     });
+
+    let urlRedirect = responseOne.headers['Location'];
+    console.log('URL-REDIRECT: ',urlRedirect);
+
+    const responseOneRedirect = http.get(urlRedirect, params);
+
+    check(responseOneRedirect, {
+        'status hub-spid login REDIRECT is 200': (responseOneRedirect) => responseOneRedirect.status === 200,
+    });
+
+    console.log('responseOneRedirect.status ',responseOneRedirect.status);
+    check(responseOneRedirect, {
+        'error hub-spid login REDIRECT is > 400': (responseOneRedirect) => responseOneRedirect.status > 400,
+    });
     
-    const responseBody = responseOne.body
+    
+    const responseBody = responseOneRedirect.body
     // console.log('FIRST RESPONSE: ', responseOne);
     const samlValue = getSamlValue(responseBody);
     //console.log("SAML: ", samlValue);
@@ -109,6 +127,7 @@ export default function () {
         'status spid-saml-check-START is 200': (responseBodyTwo) => responseBodyTwo.status === 200,
     });
 
+    console.log('responseBodyTwo.status ',responseBodyTwo.status);
     check(responseBodyTwo, {
         'error spid-saml-check-START is > 400': (responseBodyTwo) => responseBodyTwo.status > 400,
     });
@@ -133,6 +152,7 @@ export default function () {
         'status spid-saml-check-LOGIN is 200': (responseThree) => responseThree.status === 200,
     });
 
+    console.log('responseThree.status ',responseThree.status);
     check(responseThree, {
         'error spid-saml-check-LOGIN is > 400': (responseThree) => responseThree.status > 400,
     });
@@ -167,6 +187,7 @@ export default function () {
         'status hub-login.spid-acs is 200': (responseFour) => responseFour.status === 200,
     });
 
+    console.log('responseFour.status ',responseFour.status);
     check(responseFour, {
         'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status > 400,
     });
@@ -184,6 +205,7 @@ export default function () {
             'status finalResponse is 200': (finalResponse) => finalResponse.status === 200,
         });
     
+        console.log('finalResponse.status ',finalResponse.status);
         check(finalResponse, {
             'error finalResponse is > 400': (finalResponse) => finalResponse.status > 400,
         });
