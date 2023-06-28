@@ -2,7 +2,7 @@ import { check, sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
 
-// export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const password = `${__ENV.PASSWORD}`
 const usernames = [
