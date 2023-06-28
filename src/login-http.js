@@ -2,7 +2,7 @@ import { check, sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
 
-export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+// export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const password = `${__ENV.PASSWORD}`
 const usernames = [
@@ -77,13 +77,13 @@ export default function () {
         'error hub-spid login is 502': (responseOne) => responseOne.status === 502,
     });
 
-    console.log('responseOne.status ',responseOne.status);
+    console.log(`[${exec.scenario.iterationInTest}] responseOne.status `,responseOne.status);
     check(responseOne, {
         'error hub-spid login is > 400': (responseOne) => responseOne.status > 400,
     });
 
     if(responseOne.status >= 400){
-        console.log('responseOne',responseOne);
+        console.log(`[${exec.scenario.iterationInTest}] responseOne`,responseOne);
     }
     //Try-sleep
     sleep(1);
@@ -111,7 +111,7 @@ export default function () {
     */
 
     const responseBody = responseOne.body
-    console.log('FIRST RESPONSE: ', responseOne);
+    console.log(`[${exec.scenario.iterationInTest}] FIRST RESPONSE: `, responseOne);
     const samlValue = getSamlValue(responseBody);
     //console.log("SAML: ", samlValue);
 
@@ -153,13 +153,13 @@ export default function () {
         'status spid-saml-check-START is 200': (responseBodyTwo) => responseBodyTwo.status === 200,
     });
 
-    console.log('responseBodyTwo.status ',responseBodyTwo.status);
+    console.log(`[${exec.scenario.iterationInTest}] responseBodyTwo.status `,responseBodyTwo.status);
     check(responseBodyTwo, {
         'error spid-saml-check-START is > 400': (responseBodyTwo) => responseBodyTwo.status > 400,
     });
     if(responseBodyTwo.status >= 400){
-        console.log('responseBodyTwo.body',responseBodyTwo.body);
-        console.log('responseBodyTwo',responseBodyTwo);
+        console.log(`[${exec.scenario.iterationInTest}] responseBodyTwo.body`,responseBodyTwo.body);
+        console.log(`[${exec.scenario.iterationInTest}] responseBodyTwo`,responseBodyTwo);
     }
 
     //Try-sleep
@@ -196,14 +196,14 @@ export default function () {
     const responseThree = http.post(urlThree, bodyUrlThree, paramsThree);
 
     if(responseThree.status >= 400){
-        console.log('responseThree.body',responseThree.body);
-        console.log('responseThree',responseThree);
+        console.log(`[${exec.scenario.iterationInTest}] responseThree.body`,responseThree.body);
+        console.log(`[${exec.scenario.iterationInTest}] responseThree`,responseThree);
     }
     check(responseThree, {
         'status spid-saml-check-LOGIN is 200': (responseThree) => responseThree.status === 200,
     });
 
-    console.log('responseThree.status ',responseThree.status);
+    console.log(`[${exec.scenario.iterationInTest}] responseThree.status `,responseThree.status);
     check(responseThree, {
         'error spid-saml-check-LOGIN is > 400': (responseThree) => responseThree.status >= 400,
     });
@@ -256,7 +256,7 @@ export default function () {
         'status hub-login.spid-acs is 200': (responseFour) => responseFour.status === 200,
     });
 
-    console.log('responseFour.status ',responseFour.status);
+    console.log(`[${exec.scenario.iterationInTest}] responseFour.status `,responseFour.status);
     check(responseFour, {
         'error hub-login.spid-acs is > 400': (responseFour) => responseFour.status >= 400,
     });
@@ -287,7 +287,7 @@ export default function () {
             'status finalResponse is 200': (finalResponse) => finalResponse.status === 200,
         });
     
-        console.log('finalResponse.status ',finalResponse.status);
+        console.log(`[${exec.scenario.iterationInTest}] finalResponse.status `,finalResponse.status);
         check(finalResponse, {
             'error finalResponse is > 400': (finalResponse) => finalResponse.status > 400,
         });
