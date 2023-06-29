@@ -38,8 +38,6 @@ const urlThree = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/log
 
 const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
 
-//const urlSuccess = 'https://login.dev.notifichedigitali.it/login/success';
-
 const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
 
 export default function () {
@@ -88,27 +86,6 @@ export default function () {
     //Try-sleep
     sleep(1);
 
-    /*let urlRedirect = responseOne.headers['Location'];
-    console.log('URL-REDIRECT: ',urlRedirect);
-
-    const responseOneRedirect = http.get(urlRedirect, params);
-
-    check(responseOneRedirect, {
-        'status hub-spid login REDIRECT is 200': (responseOneRedirect) => responseOneRedirect.status === 200,
-    });
-
-    console.log('responseOneRedirect.status ',responseOneRedirect.status);
-    check(responseOneRedirect, {
-        'error hub-spid login REDIRECT is > 400': (responseOneRedirect) => responseOneRedirect.status > 400,
-    });
-    if(responseOneRedirect.status >= 400){
-        console.log('responseOneRedirect.body',responseOneRedirect.body);
-        console.log('responseOneRedirect',responseOneRedirect);
-    }
-    
-    //Try-sleep
-    sleep(1);
-    */
 
     const responseBody = responseOne.body
     console.log(`[${exec.scenario.iterationInTest}] FIRST RESPONSE: `, responseOne);
@@ -295,25 +272,6 @@ export default function () {
         //console.log("FINAL RESPONSE: ", finalResponse.body);
     }
 
-
-    /*
-    const paramsSuccess = {
-        headers:{
-            "x-pagopa-safestorage-cx-id": "pn-delivery-push",
-        }
-    }
-
-    const responseSuccess = http.get(urlSuccess, paramsSuccess);
-    console.log("responseSuccess: ", responseSuccess);
-    check(responseSuccess, {
-        'status responseSuccess is 200': (responseSuccess) => responseSuccess.status === 200,
-    });
-
-    console.log('responseSuccess.status ',responseSuccess.status);
-    check(responseSuccess, {
-        'error responseSuccess is > 400': (responseSuccess) => responseSuccess.status >= 400,
-    });
-    */
 
     //Try-sleep
     sleep(1);
