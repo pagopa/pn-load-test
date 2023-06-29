@@ -142,7 +142,8 @@ function delegateReadInternal(mandateId) {
 
 export function delegateMaTestinterl() {
 
-  const cf = userPFCf[exec.scenario.iterationInTest % userPFCf.length];
+  //const cf = userPFCf[exec.scenario.iterationInTest % userPFCf.length];
+  const cf = generateCF(exec.scenario.iterationInTest);
   
   mandateRequest.delegate.fiscalCode = cf;
 
