@@ -90,7 +90,7 @@ def get_timelines(iuns: list[str]) -> list:
         }
     
     def read_info_for_one_iun_from_db( iun_and_index: dict) -> dict:
-        iun = iun_and_index['iun']
+        iun = iun_and_index['iun'].strip() # for removing spaces or newlines at ends
         idx = iun_and_index['idx']
         iuns_quantity = iun_and_index['tot']
         try:
@@ -159,10 +159,12 @@ def get_timelines(iuns: list[str]) -> list:
     print(f'Analyzed {len(read_from_db)} timelines')
 
     # we find in processed the element with the max validationTime and set its isMaxValidationTime to True
-    max_validation_time = max([element["validationTime"] for element in read_from_db if element["validationTime"] is not None])
-    for element in read_from_db:
-        if element["validationTime"] == max_validation_time:
-            element["isMaxValidationTime"] = True
+    timelines_validation_times = [element["validationTime"] for element in read_from_db if element["validationTime"] is not None]
+    if (len(timelines_validation_times) > 0): # only if the list is not empty
+        max_validation_time = max(timelines_validation_times)
+        for element in read_from_db:
+            if element["validationTime"] == max_validation_time:
+                element["isMaxValidationTime"] = True
     # there could be in theory more than one with the flag set, but it's unlikely
 
     # we then add all the elements that are in iuns but not in processed
@@ -259,13 +261,29 @@ if __name__ == '__main__':
         "totalTimeLinesRefusedOrEmptyTimelines": len([element for element in processed if element["isNotRefused"] == False]),
         "totalTimelinesRefined": len([element for element in processed if element["isRefined"] == True]),
         "totalTimeLinesNotRefined": len([element for element in processed if element["isRefined"] == False]),
-        "iunWithLastElementTimestamp": [element["iun"] for element in processed if element["lastElementTimestamp"] is not None][0],
         "lastElementTimestamp": processed[-1]["lastElementTimestamp"],
-        "iunWithMaxValidationTime": [element["iun"] for element in processed if element["isMaxValidationTime"] == True][0],
-        "maxValidationTimeSeconds": max([element["validationTime"] for element in processed if element["validationTime"] is not None]),
+        #"maxValidationTimeSeconds": max([element["validationTime"] for element in processed if element["validationTime"] is not None]),
         "iunsOfRefusedOrEmptyTimelines": [element["iun"] for element in processed if element["isNotRefused"] == False],
         "iunsOfNotRefinedTimelinesExcludingRefused": [element["iun"] for element in processed if element["isRefined"] == False and element["isNotRefused"] == True],
     }
+    
+    last_element_timestamp_list = [element["iun"] for element in processed if element["lastElementTimestamp"] is not None]
+    if len(last_element_timestamp_list) > 0:
+        stats["iunWithLastElementTimestamp"] = last_element_timestamp_list[0]
+    else:
+        stats["iunWithLastElementTimestamp"] = None
+
+    max_validation_time_list = [element["iun"] for element in processed if element["isMaxValidationTime"] == True]
+    if len(max_validation_time_list) > 0:
+        stats["iunWithMaxValidationTime"] = max_validation_time_list[0]
+    else:
+        stats["iunWithMaxValidationTime"] = None
+
+    validation_times_list = [element["validationTime"] for element in processed if element["validationTime"] is not None]
+    if len(validation_times_list) > 0:
+        stats["maxValidationTimeSeconds"] = max(validation_times_list)
+    
+
     # write stats to json file
     try:
         with open(destination_stats_filename, 'w') as f:
