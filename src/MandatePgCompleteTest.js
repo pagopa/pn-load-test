@@ -11,7 +11,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let bearerTokenPg1 = `${__ENV.BEARER_TOKEN_USER_PG1}`;
 let cfPg1 = `${__ENV.CF_USER_PG1}`;
 let basePath = `${__ENV.WEB_BASE_PATH}`;
-let lambdaUrl = `${__ENV.LAMBDA_BASE_PATH}`;
+let lambdaBasePath = `${__ENV.LAMBDA_BASE_PATH}`;
 let lambdaApiKey = `${__ENV.LAMBDA_API_KEY}`;
 
 let mandateRequest = JSON.parse(open('./model/mandateRequest.json'));
@@ -67,8 +67,9 @@ export default function mandatePgCompleteTest() {
         },
       };
 
-    let lambdacompleteUrl = `https://${lambdaUrl}/unique/generate `;
-    let tokenRequest = http.post(lambdacompleteUrl, JSON.stringify(body), paramsLambda);
+    let lambdaurl = `https://${lambdaBasePath}/unique/generate`;
+    console.log('URL LAMBDA: '+lambdaurl);
+    let tokenRequest = http.post(lambdaurl, JSON.stringify(body), paramsLambda);
     check(tokenRequest, {
         'status token creation is 200': (tokenRequest) => tokenRequest.status === 200,
       });
