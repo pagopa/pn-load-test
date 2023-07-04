@@ -67,7 +67,8 @@ export default function mandatePgCompleteTest() {
         },
       };
 
-    let tokenRequest = http.post(lambdaUrl, JSON.stringify(body), paramsLambda);
+    let lambdacompleteUrl = `https://${lambdaUrl}/unique/generate `;
+    let tokenRequest = http.post(lambdacompleteUrl, JSON.stringify(body), paramsLambda);
     check(tokenRequest, {
         'status token creation is 200': (tokenRequest) => tokenRequest.status === 200,
       });
