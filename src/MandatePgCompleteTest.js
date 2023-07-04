@@ -22,6 +22,12 @@ const mandateAccepted = new Counter('mandate_accepted');
 
 
 export function setup() {
+    console.log('TOKEN-PG: ',bearerTokenPg1);
+    console.log('CF-PG: ',cfPg1);
+    console.log('WEB-BASE-PATH: ',basePath);
+    console.log('mandateRequest: ',mandateRequest);
+    console.log('acceptMandateReq: ',acceptMandateReq);
+
     let params = {
         headers: {
           'Content-Type': 'application/json',
@@ -50,6 +56,7 @@ export function setup() {
 
 
 export default function mandatePgCompleteTest() {
+    
     let cf;
     if(exec.scenario.iterationInTest === 1){
         cf = 'GLLGLL64B15G702I';
