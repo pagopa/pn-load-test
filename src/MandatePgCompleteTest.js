@@ -1,3 +1,4 @@
+import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check, sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
@@ -22,34 +23,50 @@ const mandateAccepted = new Counter('mandate_accepted');
 
 
 export function setup() {
-    console.log('TOKEN-PG: ',bearerTokenPg1);
-    console.log('CF-PG: ',cfPg1);
-    console.log('WEB-BASE-PATH: ',basePath);
-    console.log('mandateRequest: ',mandateRequest);
-    console.log('acceptMandateReq: ',acceptMandateReq);
-
+    //ATTENZIONE: Nel caso di esecuzione in seguito a test di carico massimo il tempo di setup va alzato di molto
     let params = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + bearerTokenPg1,
         },
       };
-      let urlGetMadate = `https://${basePath}/mandate/api/v1/mandates-by-delegate`;
-    
-      let mandates = http.get(urlGetMadate,params);
-    
-      let mandateArray = JSON.parse(mandates.body);
-      console.log("** SETUP FUNCTION** MANDATE FOUND: "+mandateArray.length);
       let removedMandate = 0;
-      for(let i = 0; i < mandateArray.length; i++){
-        let urlRevoke = `https://${basePath}/mandate/api/v1/mandate/${mandateArray[i].mandateId}/reject`;
-        
-        let mandateRevoke = http.patch(urlRevoke, null, params);
-        if(mandateRevoke.status === 204){
-          removedMandate++;
+      let mandateFound = 0;
+      let moreResult = false;
+      let nextPagesKey = '';
+      do{
+        let urlGetMadate = new URL(`https://${basePath}/mandate/api/v1/mandates-by-delegate`);
+        urlGetMadate.searchParams.append('size', '10');
+
+        if(nextPagesKey){
+            urlGetMadate.searchParams.append('nextPageKey', nextPagesKey);
         }
-      }
-      console.log("** SETUP FUNCTION** MANDATE DELETED: "+removedMandate+" (MANDATE FOUND: "+mandateArray.length+")");
+  
+        let obj = {}
+        let mandates = http.post(urlGetMadate.toString(),JSON.stringify(obj),params);
+        console.log('mandates: ',mandates);
+        console.log('status: ',mandates.status);
+        console.log('body: ',mandates.body);
+        
+        moreResult = JSON.parse(mandates.body).moreResult;
+        nextPagesKey = JSON.parse(mandates.body).nextPagesKey[0];
+
+        let mandateArray = JSON.parse(mandates.body).resultsPage;
+        console.log("** SETUP FUNCTION** MANDATE FOUND: "+mandateArray.length);
+        mandateFound += mandateArray.length;
+        
+        for(let i = 0; i < mandateArray.length; i++){
+          let urlRevoke = `https://${basePath}/mandate/api/v1/mandate/${mandateArray[i].mandateId}/reject`;
+          
+          let mandateRevoke = http.patch(urlRevoke, null, params);
+          if(mandateRevoke.status === 204){
+            removedMandate++;
+          }
+        }
+        
+      }while(moreResult);
+
+      console.log("** SETUP FUNCTION** MANDATE DELETED: "+removedMandate+" (MANDATE FOUND: "+mandateFound+")");
 }
 
 
@@ -147,7 +164,7 @@ export default function mandatePgCompleteTest() {
   
   
   sleep(1);
- 
+
 }
 
 
