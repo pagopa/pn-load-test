@@ -344,7 +344,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
    
 }
 
-let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@OK-Giacenza-gt10-23L_890','Via@OK_890','Via@OK_AR'];
+let address = ['Via@OK-Retry_890_1MIN','Via@OK-Giacenza-lte10_890_1MIN','Via@OK-Giacenza-gt10-23L_890_1MIN','Via@OK_890_1MIN','Via@OK_AR_1MIN'];
 
 export function internalSendNotification() {
 
