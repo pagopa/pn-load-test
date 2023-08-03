@@ -1,5 +1,6 @@
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { check, sleep } from 'k6';
+import { SharedArray } from 'k6/data';
 import exec from 'k6/execution';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
@@ -12,8 +13,8 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let bearerTokenPg1 = `${__ENV.BEARER_TOKEN_USER_PG1}`;
 let cfPg1 = `${__ENV.CF_USER_PG1}`;
 let basePath = `${__ENV.WEB_BASE_PATH}`;
-let lambdaBasePath = `${__ENV.LAMBDA_BASE_PATH}`;
-let lambdaApiKey = `${__ENV.LAMBDA_API_KEY}`;
+//let lambdaBasePath = `${__ENV.LAMBDA_BASE_PATH}`;
+//let lambdaApiKey = `${__ENV.LAMBDA_API_KEY}`;
 
 let mandateRequest = JSON.parse(open('./model/mandateRequest.json'));
 let acceptMandateReq = JSON.parse(open('./model/acceptMandate.json'));
@@ -69,7 +70,16 @@ export function setup() {
       console.log("** SETUP FUNCTION** MANDATE DELETED: "+removedMandate+" (MANDATE FOUND: "+mandateFound+")");
 }
 
-
+const userArray = new SharedArray('iun sharedArray', function () {
+  let userFile = open('./resources/token.json');
+  if(userFile){
+    const dataArray = JSON.parse(userFile).slice();
+    return dataArray; // must be an array
+  }else{
+    const dataArray = [];
+    return dataArray;
+  }
+});
 
 
 export default function mandatePgCompleteTest() {
@@ -78,10 +88,11 @@ export default function mandatePgCompleteTest() {
     if(exec.scenario.iterationInTest === 1){
         cf = 'GLLGLL64B15G702I';
     }else{
-        cf = generateCF(exec.scenario.iterationInTest);
+      cf =  userArray[exec.scenario.iterationInTest % userArray.length].taxiId;
+        //cf = generateCF(exec.scenario.iterationInTest);
     }
      
-
+  /* 
     var body = { entries: [{taxId:cf, tokenType:'PF'}]}
 
     let paramsLambda = {
@@ -97,8 +108,9 @@ export default function mandatePgCompleteTest() {
     check(tokenRequest, {
         'status token creation is 200': (tokenRequest) => tokenRequest.status === 200,
       });
+  */
     
-    let bearerToken = JSON.parse(tokenRequest.body)[0].token;
+    let bearerToken = userArray[exec.scenario.iterationInTest % userArray.length].token;
   
     mandateRequest.delegator.fiscalCode = cf;
     mandateRequest.delegate.fiscalCode = cfPg1;

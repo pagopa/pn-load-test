@@ -7,6 +7,8 @@ script-Stream/*.zip
 script-Stream/*.txt
 script-Stream/test/*
 
+token.json
+
 ### Node ###
 # Logs
 logs
