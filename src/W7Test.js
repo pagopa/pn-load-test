@@ -89,7 +89,7 @@ export function internalRecipientSearch() {
     console.log(`Notifications Received search Status: ${r.status}`);
     
     check(r, {
-      'status search is 200': (r) => r.status === 200,
+      'status W7 search is 200': (r) => r.status === 200,
     });
 
     console.log(JSON.parse(r.body))
@@ -132,7 +132,7 @@ export function internlRecipientReadAndDownload() {
     console.log(`Notifications Received Iun Status: ${r.status}`);
     
     check(r, {
-      'status received-get is 200': (r) => r.status === 200,
+      'status W7 received-get is 200': (r) => r.status === 200,
     });
 
 
@@ -145,7 +145,7 @@ export function internlRecipientReadAndDownload() {
 
         let downloadRes = http.get(url, params);
         check(downloadRes, {
-            'status received-download-document is 200': (r) => downloadRes.status === 200,
+            'status W7 received-download-document is 200': (r) => downloadRes.status === 200,
           });
 
           let paramsDownloadS3 = {
@@ -164,7 +164,7 @@ export function internlRecipientReadAndDownload() {
           let downloadS3 = http.get(JSON.parse(downloadRes.body).url,paramsDownloadS3);
           
           check(downloadS3, {
-            'status download-s3-document is 200': (r) => downloadS3.status === 200,
+            'status W7 download-s3-document is 200': (r) => downloadS3.status === 200,
           });
      });
 
@@ -198,7 +198,7 @@ export function internlRecipientReadAndDownload() {
           let downloadLegalFact = http.get(url, paramsLegalFact);
   
           check(downloadLegalFact, {
-              'status received-download-LegalFact is 200': (r) => downloadLegalFact.status === 200,
+              'status W7 received-download-LegalFact is 200': (r) => downloadLegalFact.status === 200,
             });
     
             let paramsDownloadS3LegalFact = {
@@ -217,7 +217,7 @@ export function internlRecipientReadAndDownload() {
             let downloadLegalFactS3 = http.get(JSON.parse(downloadLegalFact.body).url,paramsDownloadS3LegalFact);
             
             check(downloadLegalFactS3, {
-              'status download-s3-LegalFact is 200': (r) => downloadLegalFactS3.status === 200,
+              'status W7 download-s3-LegalFact is 200': (r) => downloadLegalFactS3.status === 200,
             });
         })
      });
@@ -231,7 +231,7 @@ export function internlRecipientReadAndDownload() {
         let paymentdownloadRes = http.get(urlPaymentDownload, params);
     
         check(paymentdownloadRes, {
-            'status received-download-attach is 200': (r) => paymentdownloadRes.status === 200,
+            'status W7 received-download-attach is 200': (r) => paymentdownloadRes.status === 200,
         });    
 
 
@@ -250,7 +250,7 @@ export function internlRecipientReadAndDownload() {
           let downloadS3 = http.get(JSON.parse(paymentdownloadRes.body).url,paramsDownloadS3);
 
           check(downloadS3, {
-            'status download-S3-attach is 200': (r) => downloadS3.status === 200,
+            'status W7 download-S3-attach is 200': (r) => downloadS3.status === 200,
           });
     }
     
@@ -295,11 +295,11 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
     check(preloadResponse, {
-        'status preload is 200': (preloadResponse) => preloadResponse.status === 200,
+        'status W7 preload is 200': (preloadResponse) => preloadResponse.status === 200,
     });
 
     check(preloadResponse, {
-        'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+        'error W7 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
     
     
@@ -327,15 +327,15 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
         let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
-            'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+            'status W7 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
         });
     
         check(safeStorageUploadResponde, {
-            'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+            'error W7 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
 
         check(safeStorageUploadResponde, {
-          'error safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+          'error W7 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
       });
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
@@ -415,11 +415,11 @@ export function internalSendNotification() {
     console.log(`Status ${r.status}`);
 
     check(r, {
-        'status is 409': (r) => r.status === 409,
+        'status W7 is 409': (r) => r.status === 409,
     });
 
     check(r, {
-        'status is 202': (r) => r.status === 202,
+        'status W7 is 202': (r) => r.status === 202,
     });
     
     console.log('REQUEST-ID-LOG: '+r.body)
@@ -442,7 +442,7 @@ export function internalSendNotification() {
  * 
  * The K6 memory leak is partially caused by the use of external modules
 */
-export default function w6TestOptimized() {
+export default function w7TestOptimized() {
     internalRecipientSearch();
     internlRecipientReadAndDownload();
     internalSendNotification();

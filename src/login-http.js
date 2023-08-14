@@ -40,7 +40,7 @@ const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
 
 const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
 
-export default function () {
+export default function loginTest() {
 
      //Try-sleep
      sleep(1);

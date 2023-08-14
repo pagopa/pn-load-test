@@ -19,8 +19,9 @@ let basePath = `${__ENV.WEB_BASE_PATH}`;
 let mandateRequest = JSON.parse(open('./model/mandateRequest.json'));
 let acceptMandateReq = JSON.parse(open('./model/acceptMandate.json'));
 
-const mandateCreated = new Counter('mandate_created');
-const mandateAccepted = new Counter('mandate_accepted');
+const mandateCreated = new Counter('mandate_pg_created');
+const mandateAccepted = new Counter('mandate_pg_accepted');
+const mandateReject = new Counter('mandate_pg_reject');
 
 
 export function setup() {
@@ -148,7 +149,7 @@ export default function mandatePgCompleteTest() {
     }//retry if conflict
   
     check(mandateCreate, {
-      'status mandate create is 201': (mandateCreate) => mandateCreate.status === 201,
+      'status mandate pg create is 201': (mandateCreate) => mandateCreate.status === 201,
     });
     if(mandateCreate.status === 201){
       mandateCreated.add(1);
@@ -168,13 +169,30 @@ export default function mandatePgCompleteTest() {
     let acceptMandateResp = http.patch(urlAcceptMandate,JSON.stringify(acceptMandateReq),paramsPg);
   
     check(acceptMandateResp, {
-      'status mandate accept is 204': (acceptMandateResp) => acceptMandateResp.status === 204,
+      'status mandate pg accept is 204': (acceptMandateResp) => acceptMandateResp.status === 204,
     });
     if(acceptMandateResp.status === 204){
       mandateAccepted.add(1);
     }
   
-  
+    if(exec.scenario.iterationInTest !== 1){
+      sleep(20);
+      
+      let urlReject = `https://${basePath}/mandate/api/v1/mandate/${mandateJson.mandateId}/reject`;
+          
+      let mandateRevoke = http.patch(urlReject, null, paramsPg);
+
+      check(mandateRevoke, {
+        'status mandate pg reject is 204': (mandateRevoke) => mandateRevoke.status === 204,
+      });
+      if(mandateRevoke.status === 204){
+        mandateReject.add(1);
+      }
+
+    }
+
+    
+
   sleep(1);
 
 }

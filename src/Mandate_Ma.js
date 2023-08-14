@@ -9,8 +9,8 @@ let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`
 let basePath = `${__ENV.WEB_BASE_PATH}`
 let mandateRequest = JSON.parse(open('./model/mandateRequest.json'));
 
-const mandateCreated = new Counter('mandate_created');
-const mandateRevoked = new Counter('mandate_revoked');
+const mandateCreated = new Counter('mandate_pf_created');
+const mandateRevoked = new Counter('mandate_pf_revoked');
 
 
 export function setup() {
@@ -105,7 +105,7 @@ export default function delegateMaTest() {
   }//retry if conflict
 
   check(mandateCreate, {
-    'status mandate create is 201': (mandateCreate) => mandateCreate.status === 201,
+    'status mandate pf create is 201': (mandateCreate) => mandateCreate.status === 201,
   });
   if(mandateCreate.status === 201){
     mandateCreated.add(1);
@@ -117,7 +117,7 @@ export default function delegateMaTest() {
   let mandateRevoke = http.patch(urlRevoke, null, params);
 
   check(mandateRevoke, {
-    'status mandate revoke is 204': (mandateRevoke) => mandateRevoke.status === 204,
+    'status mandate pf revoke is 204': (mandateRevoke) => mandateRevoke.status === 204,
   });
   if(mandateRevoke.status === 204){
     mandateRevoked.add(1);

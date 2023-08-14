@@ -7,7 +7,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let bearerToken = `${__ENV.BEARER_TOKEN_PA}`
 let webBasePath = `${__ENV.WEB_BASE_PATH}`
 
-export default function apiKey(){
+export default function downtimeLogsTest(){
 
     let params = {
         headers: {
