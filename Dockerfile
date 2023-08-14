@@ -14,7 +14,7 @@ RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz; 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Install xk6
-RUN /usr/local/go/bin/go install go.k6.io/xk6/cmd/xk6@latest
+RUN /usr/local/go/bin/go install go.k6.io/xk6/cmd/xk6@v0.9.2
 
 ## build k6 with faker extension
 ## install faker
