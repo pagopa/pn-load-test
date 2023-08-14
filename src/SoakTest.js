@@ -33,8 +33,8 @@ export const options = {
           { target: 5, duration: '0s' },
           { target: 5, duration: '10m' }
         ],
-        tags: { test_type: 'w7SoakTest' }, 
-        exec: 'w7SoakTest', 
+        tags: { test_type: 'analogicSoakTest' }, 
+        exec: 'analogicSoakTest', 
       },
       w6_test: {
         executor: 'ramping-arrival-rate',
@@ -52,8 +52,8 @@ export const options = {
           { target: 1, duration: '0s' },
           { target: 1, duration: '20m' }
         ],
-        tags: { test_type: 'w6SoakTest' }, 
-        exec: 'w6SoakTest', 
+        tags: { test_type: 'digitalSoakTest' }, 
+        exec: 'digitalSoakTest', 
       },
       downtime_test: {
         executor: 'ramping-arrival-rate',
@@ -222,12 +222,12 @@ function deleteMandatePG(){
       console.log("** SETUP FUNCTION** MANDATE DELETED: "+removedMandate+" (MANDATE FOUND: "+mandateFound+")");
 }
 
-export function w7SoakTest() {
+export function analogicSoakTest() {
     w7TestOptimized();
     w7Iteration.add(1);
 }
 
-export function w6SoakTest() {
+export function digitalSoakTest() {
     w6TestOptimized();
     w6Iteration.add(1);
 }
