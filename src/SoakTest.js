@@ -27,13 +27,13 @@ export const options = {
         maxVUs: 9000,
 
         stages: [
-          { target: 5, duration: '10m' },
+          { target: 5, duration: '20m' },
 
           { target: 50, duration: '0s' },
-          { target: 50, duration: '10m' },
+          { target: 50, duration: '80m' },
 
           { target: 5, duration: '0s' },
-          { target: 5, duration: '10m' }
+          { target: 5, duration: '260m' }
         ],
         tags: { test_type: 'analogicSoakTest' }, 
         exec: 'analogicSoakTest', 
@@ -46,13 +46,13 @@ export const options = {
         maxVUs: 9000,
 
         stages: [
-          { target: 1, duration: '10m' },
+          { target: 1, duration: '20m' },
 
           { target: 10, duration: '0s' },
-          { target: 10, duration: '10m' },
+          { target: 10, duration: '80m' },
 
           { target: 1, duration: '0s' },
-          { target: 1, duration: '10m' }
+          { target: 1, duration: '260m' }
         ],
         tags: { test_type: 'digitalSoakTest' }, 
         exec: 'digitalSoakTest', 
@@ -60,18 +60,18 @@ export const options = {
       downtime_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        startRate: 5, 
+        startRate: 2, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
 
         stages: [
-          { target: 2, duration: '5m' },
+          { target: 2, duration: '20m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '10m' },
+          { target: 15, duration: '320m' },
 
           { target: 2, duration: '0s' },
-          { target: 2, duration: '10m' }
+          { target: 2, duration: '20m' }
         ],
         tags: { test_type: 'downtimeSoakTest' }, 
         exec: 'downtimeSoakTest', 
@@ -79,18 +79,18 @@ export const options = {
       mandate_pf_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        startRate: 5, 
+        startRate: 1, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
 
         stages: [
-          { target: 2, duration: '10m' },
+          { target: 1, duration: '20m' },
 
-          { target: 15, duration: '0s' },
-          { target: 15, duration: '10m' },
+          { target: 7, duration: '0s' },
+          { target: 7, duration: '320m' },
 
-          { target: 2, duration: '0s' },
-          { target: 2, duration: '10m' }
+          { target: 1, duration: '0s' },
+          { target: 1, duration: '20m' }
         ],
         tags: { test_type: 'mandatePfSoakTest' }, 
         exec: 'mandatePfSoakTest', 
@@ -98,18 +98,18 @@ export const options = {
       mandate_pg_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        startRate: 5, 
+        startRate: 1, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
 
         stages: [
-          { target: 2, duration: '5m' },
+          { target: 1, duration: '20m' },
 
-          { target: 15, duration: '0s' },
-          { target: 15, duration: '10m' },
+          { target: 7, duration: '0s' },
+          { target: 7, duration: '320m' },
 
-          { target: 2, duration: '0s' },
-          { target: 2, duration: '10m' }
+          { target: 1, duration: '0s' },
+          { target: 1, duration: '20m' }
         ],
         tags: { test_type: 'mandatePgSoakTest' }, 
         exec: 'mandatePgSoakTest', 
@@ -117,18 +117,18 @@ export const options = {
       login_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
-        startRate: 5, 
+        startRate: 1, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
 
         stages: [
-          { target: 2, duration: '2m' },
+          { target: 1, duration: '20m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '10m' },
+          { target: 15, duration: '320m' },
 
-          { target: 2, duration: '0s' },
-          { target: 2, duration: '10m' }
+          { target: 1, duration: '0s' },
+          { target: 1, duration: '20m' }
         ],
         tags: { test_type: 'loginSoakTest' }, 
         exec: 'loginSoakTest', 
