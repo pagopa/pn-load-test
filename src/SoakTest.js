@@ -17,6 +17,7 @@ const loginIteration = new Counter('loginIteration');
 
 
 export const options = {
+    setupTimeout: '2400s',
     scenarios: {
       w7_test: {
         executor: 'ramping-arrival-rate',
