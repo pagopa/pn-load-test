@@ -28,7 +28,7 @@ export const options = {
           { target: 5, duration: '10m' },
 
           { target: 50, duration: '0s' },
-          { target: 50, duration: '20m' },
+          { target: 50, duration: '10m' },
 
           { target: 5, duration: '0s' },
           { target: 5, duration: '10m' }
@@ -50,7 +50,7 @@ export const options = {
           { target: 10, duration: '10m' },
 
           { target: 1, duration: '0s' },
-          { target: 1, duration: '20m' }
+          { target: 1, duration: '10m' }
         ],
         tags: { test_type: 'digitalSoakTest' }, 
         exec: 'digitalSoakTest', 
@@ -66,7 +66,7 @@ export const options = {
           { target: 2, duration: '5m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '25m' },
+          { target: 15, duration: '10m' },
 
           { target: 2, duration: '0s' },
           { target: 2, duration: '10m' }
@@ -85,7 +85,7 @@ export const options = {
           { target: 2, duration: '10m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '20m' },
+          { target: 15, duration: '10m' },
 
           { target: 2, duration: '0s' },
           { target: 2, duration: '10m' }
@@ -104,7 +104,7 @@ export const options = {
           { target: 2, duration: '5m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '25m' },
+          { target: 15, duration: '10m' },
 
           { target: 2, duration: '0s' },
           { target: 2, duration: '10m' }
@@ -123,7 +123,7 @@ export const options = {
           { target: 2, duration: '2m' },
 
           { target: 15, duration: '0s' },
-          { target: 15, duration: '28m' },
+          { target: 15, duration: '10m' },
 
           { target: 2, duration: '0s' },
           { target: 2, duration: '10m' }

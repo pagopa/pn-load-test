@@ -86,7 +86,7 @@ export function internalRecipientSearch() {
 
     let r = http.get(url, params);
 
-    console.log(`Notifications Received search Status: ${r.status}`);
+    console.log(`Notifications W6 Received search Status: ${r.status}`);
     
     check(r, {
       'status W6 search is 200': (r) => r.status === 200,
@@ -129,7 +129,7 @@ export function internlRecipientReadAndDownload() {
 
     let r = http.get(url, params);
 
-    console.log(`Notifications Received Iun Status: ${r.status}`);
+    console.log(`Notifications W6 Received Iun Status: ${r.status}`);
     
     check(r, {
       'status W6 received-get is 200': (r) => r.status === 200,
