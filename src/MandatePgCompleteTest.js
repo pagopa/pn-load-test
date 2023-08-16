@@ -71,7 +71,7 @@ export function setup() {
       console.log("** SETUP FUNCTION** MANDATE DELETED: "+removedMandate+" (MANDATE FOUND: "+mandateFound+")");
 }
 
-const userArray = new SharedArray('iun sharedArray', function () {
+const userArray = new SharedArray('iun sharedArray mandatePG', function () {
   let userFile = open('./resources/token.json');
   if(userFile){
     const dataArray = JSON.parse(userFile).slice();

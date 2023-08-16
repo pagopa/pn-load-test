@@ -29,7 +29,7 @@ let moreAttach = `${__ENV.MORE_ATTACH}`;
 let sha256;
 let pdfNumber = 3;
 
-let iunArray = new SharedArray('iun sharedArray', function () {
+let iunArray = new SharedArray('iun sharedArray w6', function () {
   let iunFile = open('./resources/NotificationIUN.txt');
   if(iunFile){
     const dataArray =  iunFile.split(';');
@@ -42,7 +42,7 @@ let iunArray = new SharedArray('iun sharedArray', function () {
 });
 
 
-const fileArray = new SharedArray('bin file sharedArray', function () {
+const fileArray = new SharedArray('bin file sharedArray w6', function () {
     const dataArray = [];
     
     var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
@@ -433,10 +433,8 @@ export function internalSendNotification() {
  * 
  * The K6 memory leak is partially caused by the use of external modules
 */
-export default function w6TestOptimized(arrayIun) {
-  if(arrayIun){
-    iunArray = arrayIun;
-  }
+export default function w6TestOptimized(externalIun) {
+
   internalRecipientSearch();
   internlRecipientReadAndDownload();
   internalSendNotification();
