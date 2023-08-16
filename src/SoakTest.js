@@ -1,3 +1,4 @@
+import { SharedArray } from 'k6/data';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 import downtimeLogsTest from "./DowntimeLogsTest.js";
@@ -7,13 +8,25 @@ import w6TestOptimized from "./W6Test.js";
 import w7TestOptimized from "./W7Test.js";
 import loginTest from "./login-http.js";
 
-
 const w7Iteration = new Counter('w7Iteration');
 const w6Iteration = new Counter('w6Iteration');
 const downtimeIteration = new Counter('downtimeIteration');
 const mandatePFIteration = new Counter('mandatePFIteration');
 const mandatePGIteration = new Counter('mandatePGIteration');
 const loginIteration = new Counter('loginIteration');
+
+
+let iunArrayExternal = new SharedArray('iun sharedArray', function () {
+  let iunFile = open('./resources/NotificationIUN.txt');
+  if(iunFile){
+    const dataArray =  iunFile.split(';');
+    console.log("IUN_LENGTH: "+ dataArray.length);
+    return dataArray; // must be an array
+  }else{
+    const dataArray = [];
+    return dataArray;
+  }
+});
 
 export const options = {
     scenarios: {
@@ -223,12 +236,12 @@ function deleteMandatePG(){
 }
 
 export function analogicSoakTest() {
-    w7TestOptimized();
+    w7TestOptimized(iunArrayExternal);
     w7Iteration.add(1);
 }
 
 export function digitalSoakTest() {
-    w6TestOptimized();
+    w6TestOptimized(iunArrayExternal);
     w6Iteration.add(1);
 }
 

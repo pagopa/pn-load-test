@@ -29,7 +29,7 @@ let moreAttach = `${__ENV.MORE_ATTACH}`;
 let sha256;
 let pdfNumber = 3;
 
-const iunArray = new SharedArray('iun sharedArray', function () {
+let iunArray = new SharedArray('iun sharedArray', function () {
   let iunFile = open('./resources/NotificationIUN.txt');
   if(iunFile){
     const dataArray =  iunFile.split(';');
@@ -433,10 +433,13 @@ export function internalSendNotification() {
  * 
  * The K6 memory leak is partially caused by the use of external modules
 */
-export default function w6TestOptimized() {
-    internalRecipientSearch();
-    internlRecipientReadAndDownload();
-    internalSendNotification();
+export default function w6TestOptimized(arrayIun) {
+  if(arrayIun){
+    iunArray = arrayIun;
+  }
+  internalRecipientSearch();
+  internlRecipientReadAndDownload();
+  internalSendNotification();
 
-    sleep(2);
+  sleep(2);
 }
