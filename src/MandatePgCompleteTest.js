@@ -176,7 +176,7 @@ export default function mandatePgCompleteTest() {
     }
   
     if(exec.scenario.iterationInTest !== 1){
-      sleep(20);
+      sleep(2);
       
       let urlReject = `https://${basePath}/mandate/api/v1/mandate/${mandateJson.mandateId}/reject`;
           

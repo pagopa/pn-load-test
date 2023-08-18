@@ -19,7 +19,7 @@ const params = {
 
 
 const basePath = `${__ENV.WEB_BASE_PATH}`
-const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/external-channels/verification-code/'
+const verificationCodeUrl = 'http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com:8080/external-channels/verification-code/'
 //const verificationCodeUrl = 'http://host.docker.internal:8888/external-channels/verification-code/'
 
 const senderIds = [
@@ -39,8 +39,8 @@ export default function () {
     const senderId = senderIds[exec.scenario.iterationInTest % senderIds.length];
     const urlPec = `https://${basePath}/address-book/v1/digital-address/legal/${senderId}/PEC`
     const urlEmail = `https://${basePath}/address-book/v1/digital-address/courtesy/${senderId}/EMAIL`
-    const getLegalAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
-    const getCourtesyAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
+    const getLegalAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com:8080/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
+    const getCourtesyAddressBySender = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com:8080/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
     //const getLegalAddressBySender = `http://host.docker.internal:8888/address-book-private/v1/digital-address/legal/${recipientId}/${senderId}`
     //const getCourtesyAddressBySender = `http://host.docker.internal:8888/address-book-private/v1/digital-address/courtesy/${recipientId}/${senderId}`
     const pec = uuid + '@pec.it';
