@@ -7,10 +7,10 @@
         "recipientType": "PF",
         "taxId": "GLLGLL64B15G702I",
         "physicalAddress": {
-          "at": "Presso",
-          "address": "Via delle vie 100",
+          "at": "Corso Sempione",
+          "address": "Corso Sempione 51",
           "addressDetails": "",
-          "zip": "88060",
+          "zip": "20145",
           "municipality": "Milano",
           "municipalityDetails": "Milano",
           "province": "MI",
