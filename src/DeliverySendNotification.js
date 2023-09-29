@@ -1,7 +1,10 @@
 import { check, sleep } from 'k6';
 import crypto from 'k6/crypto';
+import { SharedArray } from 'k6/data';
+import encoding from 'k6/encoding';
 import exec from 'k6/execution';
 import http from 'k6/http';
+
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
@@ -10,24 +13,19 @@ let basePath = `${__ENV.BASE_PATH}`
 let sha256;
 let pdfNumber = 3;
 
-/*
-const fileArray = new SharedArray('bin file sharedArray', function () {
+
+
+const fileArray = new SharedArray('bin file sharedArray w6', function () {
     const dataArray = [];
-    dataArray.push(open('./resources/AvvisoPagoPA.pdf', 'b'));
+    
+    var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
+    dataArray.push(obj);
     for(let i = 0; i< pdfNumber; i++){
-        dataArray.push(open('./resources/PDF_'+(i+1)+'.pdf', 'b'));
+      var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
+        dataArray.push(obj);
     }
     return dataArray; // must be an array
 });
-*/
-
-
-let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
-
-let anotherBinFile = [];
-for(let i = 0; i< pdfNumber; i++){
-    anotherBinFile[i] = open('./resources/PDF_'+(i+1)+'.pdf', 'b');
-}
 
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
@@ -37,15 +35,17 @@ let paymentRequest = JSON.parse(open('./model/payment.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
 export function preloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = binFile[0];
+    let currBinFile = encoding.b64decode(fileArray[0].fileString);
     if(otherFile){
-        currBinFile = anotherBinFile[otherFile%pdfNumber]
+        currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
     }
-    
-    console.log(currBinFile);
+  
+    //console.log('BIN FILE: '+currBinFile);
 
     sha256 = crypto.sha256(currBinFile, 'base64');
     console.log('Sha: '+sha256);
+
+    console.log('Apikey: '+apiKey);
 
     let url = `https://${basePath}/delivery/attachments/preload`;
 
@@ -64,12 +64,13 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
     console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
     check(preloadResponse, {
-        'status preload is 200': (preloadResponse) => preloadResponse.status === 200,
+        'status W6 preload is 200': (preloadResponse) => preloadResponse.status === 200,
     });
 
     check(preloadResponse, {
-        'error delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+        'error W6 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
+    
     
     /*
     "secret": "...",
@@ -83,6 +84,7 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
             headers: {
                 'Content-Type': 'application/pdf',
                 'x-amz-checksum-sha256': sha256,
+                'Content-Length' : currBinFile.byteLength,
                 'x-amz-meta-secret': resultPreload.secret,
             },
             responseType: 'none',
@@ -94,12 +96,16 @@ export function preloadFile(onlyPreloadUrl, otherFile) {
         let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
-            'status safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+            'status W6 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
         });
     
         check(safeStorageUploadResponde, {
-            'error safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+            'error W6 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
+
+        check(safeStorageUploadResponde, {
+          'error W6 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+      });
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
         return resultPreload;   
@@ -148,7 +154,7 @@ export default function sendNotification(userTaxId) {
     if(withGroup && withGroup !== 'undefined') {
         let gruopUrl = `https://${basePath}/ext-registry-b2b/pa/v1/groups?metadataOnly=true`;
         let groupList = JSON.parse((http.get(gruopUrl, params)).body);
-        console.log(JSON.stringify(groupList));
+        console.log('GROUP: '+JSON.stringify(groupList));
         let group = groupList.find((elem) => elem.status === 'ACTIVE');
         notificationRequest.group = group.id;
     }
