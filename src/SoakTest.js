@@ -1,3 +1,4 @@
+import { sleep } from 'k6';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 import downtimeLogsTest from "./DowntimeLogsTest.js";
@@ -227,29 +228,35 @@ function deleteMandatePG(){
 export function analogicSoakTest() {
     w7TestOptimized();
     w7Iteration.add(1);
+    sleep(2);
 }
 
 export function digitalSoakTest() {
     w6TestOptimized();
     w6Iteration.add(1);
+    sleep(2);
 }
 
 export function downtimeSoakTest() {
     downtimeLogsTest();
     downtimeIteration.add(1);
+    sleep(2);
 }
 
 export function mandatePfSoakTest() {
     delegateMaTest();
     mandatePFIteration.add(1);
+    sleep(2);
 }
 
 export function mandatePgSoakTest() {
     mandatePgCompleteTest();
     mandatePGIteration.add(1);
+    sleep(2);
 }
 
 export function loginSoakTest() {
     loginTest();
     loginIteration.add(1);
+    sleep(2);
 }
