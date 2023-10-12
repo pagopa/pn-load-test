@@ -5,6 +5,8 @@ import http from 'k6/http';
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 const password = `${__ENV.PASSWORD}`
+let env = `${__ENV.LOGIN_ENV}`
+
 const usernames = [
     'cesare',
     'ada',
@@ -30,15 +32,15 @@ const usernames = [
 
 
 ///demo/samlsso
-const urlOne = 'https://hub-login.spid.dev.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2';
+const urlOne = `https://hub-login.spid.${env}.notifichedigitali.it/login?entityID=xx_testenv2&authLevel=SpidL2`;
 
-const urlTwo = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/start';
+const urlTwo = `https://spid-saml-check.spid.${env}.notifichedigitali.it/demo/start`;
 
-const urlThree = 'https://spid-saml-check.spid.dev.notifichedigitali.it/demo/login';
+const urlThree = `https://spid-saml-check.spid.${env}.notifichedigitali.it/demo/login`;
 
-const urlFour = 'https://hub-login.spid.dev.notifichedigitali.it/acs';
+const urlFour = `https://hub-login.spid.${env}.notifichedigitali.it/acs`;
 
-const urlFive = 'https://cittadini.dev.notifichedigitali.it/#token=';
+const urlFive = `https://cittadini.${env}.notifichedigitali.it/#token=`;
 
 export default function loginTest() {
 
@@ -203,8 +205,8 @@ export default function loginTest() {
             'Sec-Fetch-Site': 'same-site',
             'Sec-Fetch-User': '?1',
             'TE': 'trailers',
-            'Origin': 'https://spid-saml-check.spid.dev.notifichedigitali.it',
-            'Referer': 'https://spid-saml-check.spid.dev.notifichedigitali.it/'
+            'Origin': `https://spid-saml-check.spid.${env}.notifichedigitali.it`,
+            'Referer': `https://spid-saml-check.spid.${env}.notifichedigitali.it/`
         },
         redirects: 100
     };
