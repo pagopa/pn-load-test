@@ -160,7 +160,7 @@ export function internlRecipientReadAndDownload() {
 
           console.log('DOWNLOAD RES '+JSON.stringify(downloadRes.body));
 
-          console.log("S3 URL: "+downloadRes.body.url);
+          console.log("S3 URL: "+JSON.parse(downloadRes.body).url);
           let downloadS3 = http.get(JSON.parse(downloadRes.body).url,paramsDownloadS3);
           
           check(downloadS3, {
