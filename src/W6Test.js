@@ -183,14 +183,14 @@ export function internlRecipientReadAndDownload() {
           }
           console.log(keySearch);
   
-          let url = `https://${webBasePath}/delivery-push/${currentIun}/legal-facts/${timelineElem.category}/${keySearch}`
+          let url = `https://${basePath}/delivery-push/${currentIun}/legal-facts/${timelineElem.category}/${keySearch}`
           //console.log('URL download atto opponibile: '+url);
     
           let paramsLegalFact = {
             headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json, text/plain, */*',
-            'Authorization': token
+            'x-api-key': apiKey
             },
             tags: { name: 'getLegalFact' },
           };
@@ -213,7 +213,7 @@ export function internlRecipientReadAndDownload() {
     
             //console.log('DOWNLOAD LEGAL FACT RES '+JSON.stringify(downloadLegalFact.body));
     
-            //console.log("S3 URL: "+downloadLegalFact.body.url);
+            console.log("S3 URL: "+JSON.parse(downloadLegalFact.body).url);
             let downloadLegalFactS3 = http.get(JSON.parse(downloadLegalFact.body).url,paramsDownloadS3LegalFact);
             
             check(downloadLegalFactS3, {
