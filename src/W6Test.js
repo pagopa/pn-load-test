@@ -435,9 +435,24 @@ export function internalSendNotification() {
 */
 export default function w6TestOptimized(externalIun) {
 
-  internalRecipientSearch();
-  internlRecipientReadAndDownload();
-  internalSendNotification();
+  try{
+    internalRecipientSearch();
+  }catch(error){
+    console.log('internalRecipientSearch error: ',error)
+  }
+
+  try{
+    internlRecipientReadAndDownload();
+  }catch(error){
+    console.log('internlRecipientReadAndDownload error: ',error)
+  }
+
+  try{
+    internalSendNotification();
+  }catch(error){
+    console.log('internalSendNotification error: ',error)
+  }
+  
 
   sleep(2);
 }
