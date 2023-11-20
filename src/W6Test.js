@@ -25,6 +25,7 @@ let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
 let withPayment = `${__ENV.WITH_PAYMENT}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
 let moreAttach = `${__ENV.MORE_ATTACH}`;
+let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
 
 let sha256;
 let pdfNumber = 3;
@@ -361,6 +362,23 @@ export function internalSendNotification() {
         }
     }
 
+    let number;
+    if(randomAddress && randomAddress !== 'undefined'){
+        number = exec.scenario.iterationInTest % 3000;
+        if(number == 0){
+            number = 1;
+        }
+    }else{
+        number = 310;
+    }
+
+    notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
+    console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
+    notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
+    notificationRequest.recipients[0].physicalAddress.zip = '00100';
+    notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
+    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
+    notificationRequest.recipients[0].physicalAddress.province = 'RM';
 
     
     let url = `https://${basePath}/delivery/requests`;
