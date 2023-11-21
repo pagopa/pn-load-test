@@ -71,7 +71,7 @@ for(let i = 0; i< pdfNumber; i++){
  * ReceiverSearch.js
  */
 export function internalRecipientSearch() {
-    let url = `https://${webBasePath}/delivery/notifications/received?startDate=2023-05-29T00%3A00%3A00.000Z&endDate=2023-06-01T00%3A00%3A00.000Z&size=10`;
+    let url = `https://${webBasePath}/delivery/notifications/received?startDate=2023-09-29T00%3A00%3A00.000Z&endDate=2023-11-20T00%3A00%3A00.000Z&size=10`;
     
     let token = 'Bearer ' + bearerToken;
 
@@ -114,7 +114,7 @@ export function internlRecipientReadAndDownload() {
       currentIun = iunArray[exec.scenario.iterationInTest % iunArray.length].trim();
     }
      
-    let url = `https://${webBasePath}/delivery/notifications/received/${currentIun}`;
+    let url = `https://${webBasePath}/delivery/notifications/received?startDate=2013-11-01T00%3A00%3A00.000Z&endDate=2023-11-22T00%3A00%3A00.000Z&size=10&iunMatch=${currentIun}`;
     let token = 'Bearer ' + bearerToken;
 
     console.log(`Url ${url}`);
@@ -461,10 +461,25 @@ export function internalSendNotification() {
  * The K6 memory leak is partially caused by the use of external modules
 */
 export default function w7TestOptimized(externalIun) {
- 
-  internalRecipientSearch();
-  internlRecipientReadAndDownload();
-  internalSendNotification();
+
+  try{
+    internalRecipientSearch();
+  }catch(error){
+    console.log('internalRecipientSearch error: ',error)
+  }
+
+  try{
+    internlRecipientReadAndDownload();
+  }catch(error){
+    console.log('internlRecipientReadAndDownload error: ',error)
+  }
+
+  try{
+    internalSendNotification();
+  }catch(error){
+    console.log('internalSendNotification error: ',error)
+  }
+  
 
   sleep(2);
 }
