@@ -113,8 +113,8 @@ export function internlRecipientReadAndDownload() {
     if(useIunFile && useIunFile !== 'undefined') {
       currentIun = iunArray[exec.scenario.iterationInTest % iunArray.length].trim();
     }
-     
-    let url = `https://${webBasePath}/delivery/notifications/received?startDate=2013-11-01T00%3A00%3A00.000Z&endDate=2023-11-22T00%3A00%3A00.000Z&size=10&iunMatch=${currentIun}`;
+    
+    let url = `https://${webBasePath}/delivery/v2.1/notifications/received/${currentIun}`;
     let token = 'Bearer ' + bearerToken;
 
     console.log(`Url ${url}`);
@@ -226,7 +226,7 @@ export function internlRecipientReadAndDownload() {
     
     if(result.recipients[0].payment && result.recipients[0].payment.pagoPaForm){
 
-        let urlPaymentDownload = `https://${webBasePath}/delivery/notifications/received/${currentIun}/attachments/payment/PAGOPA`;
+        let urlPaymentDownload = `https://${webBasePath}/delivery/notifications/received/${currentIun}/attachments/payment/PAGOPA?attachmentIdx=0`;
         console.log('URL download-payment: '+urlPaymentDownload);
     
         let paymentdownloadRes = http.get(urlPaymentDownload, params);
