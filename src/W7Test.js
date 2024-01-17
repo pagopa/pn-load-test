@@ -382,10 +382,15 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
     console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
     notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
-    notificationRequest.recipients[0].physicalAddress.zip = '00100';
+    /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
     notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
     notificationRequest.recipients[0].physicalAddress.province = 'RM';
+    */
+    notificationRequest.recipients[0].physicalAddress.zip = '87100';
+    notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
+    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
+    notificationRequest.recipients[0].physicalAddress.province = 'CS';
 
     
     let url = `https://${basePath}/delivery/requests`;
