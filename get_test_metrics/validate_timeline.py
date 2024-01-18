@@ -199,14 +199,24 @@ def get_future_actions() -> list:
         sys.exit(1)
 
     items = response.get('Items', [])
+    # filter out elements starting with "check_attachment_retention"
+    items = [item for item in items if not str(item['actionId']).startswith('check_attachment_retention')]
 
     while 'LastEvaluatedKey' in response:
-        response = dynamodb.scan(
-            TableName=futureaction_table_name,
-            FilterExpression='attribute_exists(iun)',
-            ExclusiveStartKey=response['LastEvaluatedKey']
-        )
-        items.extend(response.get('Items', []))
+        try: 
+            response = dynamodb.scan(
+                TableName=futureaction_table_name,
+                FilterExpression='attribute_exists(iun)',
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            iter_items = response.get('Items', [])
+            iter_items = [item for item in iter_items if not str(item['actionId']).startswith('check_attachment_retention')]
+            items.extend(iter_items)
+        except:
+            print(f'Problem scanning DynamoDB table {futureaction_table_name}')
+            sys.exit(1)
+
+    print(f'Filtered out {len(items)} future actions')
 
     return items
 
