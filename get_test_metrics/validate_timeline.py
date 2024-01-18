@@ -200,7 +200,7 @@ def get_future_actions() -> list:
 
     items = response.get('Items', [])
     # filter out elements starting with "check_attachment_retention"
-    items = [item for item in items if not str(item['actionId']).strip().startswith('check_attachment_retention')]
+    items = [item for item in items if not item['actionId']['S'].strip().startswith('check_attachment_retention')]
 
     while 'LastEvaluatedKey' in response:
         try: 
@@ -210,7 +210,7 @@ def get_future_actions() -> list:
                 ExclusiveStartKey=response['LastEvaluatedKey']
             )
             iter_items = response.get('Items', [])
-            iter_items = [item for item in iter_items if not str(item['actionId']).strip().startswith('check_attachment_retention')]
+            iter_items = [item for item in iter_items if not item['actionId']['S'].strip().startswith('check_attachment_retention')]
             items.extend(iter_items)
         except:
             print(f'Problem scanning DynamoDB table {futureaction_table_name}')
