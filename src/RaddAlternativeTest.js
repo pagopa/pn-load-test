@@ -213,6 +213,25 @@ function aor(){
         'error aorStartResponse is 5xx': (aorStartResponse) => aorStartResponse.status >= 500,
     });
 
+    let aorFrontespizioUrl = `https://${basePath}/radd-net/api/v1/download/AOR/${operationId}`;
+
+    let paramsAorFrontespizio = {
+        headers: {
+            'Authorization': bearerToken,
+        },
+    };
+    console.log("aorFrontespizioUrl: "+aorFrontespizioUrl+" paramsAorFrontespizio: "+JSON.stringify(paramsAorFrontespizio));
+
+    let aorFrontespizioResponse = http.get(aorFrontespizioUrl, paramsAorFrontespizio);
+
+    check(aorFrontespizioResponse, {
+        'status aorFrontespizioResponse is 200': (aorFrontespizioResponse) => aorFrontespizioResponse.status === 200,
+    });
+
+    check(aorFrontespizioResponse, {
+        'error aorFrontespizioResponse is 5xx': (aorFrontespizioResponse) => aorFrontespizioResponse.status >= 500,
+    });
+
 
     let aorCompletetUrl = `https://${basePath}/radd-net/api/v1/aor/transaction/complete`;
     
@@ -232,6 +251,7 @@ function aor(){
     check(aorCompleteResponse, {
         'error aorCompleteResponse is 5xx': (aorCompleteResponse) => aorCompleteResponse.status >= 500,
     });
+
 }
 
 function act(){
@@ -307,7 +327,7 @@ function act(){
     });
 
     check(actStartResponse, {
-        'error aorStartResponse is 5xx': (actStartResponse) => actStartResponse.status >= 500,
+        'error actStartResponse is 5xx': (actStartResponse) => actStartResponse.status >= 500,
     });
 
 
@@ -329,20 +349,46 @@ function act(){
     check(actFrontespizioResponse, {
         'error actFrontespizioResponse is 5xx': (actFrontespizioResponse) => actFrontespizioResponse.status >= 500,
     });
+
+
+    let actAbortUrl = `https://${basePath}/radd-net/api/v1/aor/transaction/complete`;
+    
+    let actAbortBody = {
+        "operationId": operationId,
+        "reason": "TEST-DI-CARICO",
+        "operationDate": currentDate
+    };
+
+    console.log("actAbortUrl: "+actAbortUrl+" paramsActAbort: "+JSON.stringify(paramsAct)+"actAbortBody"+JSON.stringify(actAbortBody));
+    
+    let actAbortResponse = http.post(actAbortUrl, JSON.stringify(actAbortBody) ,paramsAct);
+   
+    check(actAbortResponse, {
+        'status actAbortResponse is 200': (actAbortResponse) => actAbortResponse.status === 200,
+    });
+
+    check(actAbortResponse, {
+        'error actAbortResponse is 5xx': (actAbortResponse) => actAbortResponse.status >= 500,
+    });
 }
 
 export default function raddPerformanceTest() {
     //console.log(bearerToken);
     //console.log(basePath);
-    act();
+    //act();
+    //aor();
     
-    /*
     try{
         aor();
       }catch(error){
         console.log('aor error: ',error)
       }
-      */
+    
+      try{
+        act();
+      }catch(error){
+        console.log('aor error: ',error)
+      }
     
   
 }
