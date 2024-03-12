@@ -8,7 +8,7 @@ import exec from 'k6/execution';
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
 
-//export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 let bearerToken = `${__ENV.BEARER_TOKEN_RADD1}`;
 let basePath = `${__ENV.RADD_BASE_PATH}`;
