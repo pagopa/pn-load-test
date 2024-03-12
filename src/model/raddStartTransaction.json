@@ -1,0 +1,10 @@
+{
+    "versionToken": "string",
+    "operationId": "string",
+    "recipientTaxId": "TNTGTR76E21H751S",
+    "recipientType": "PF",
+    "delegateTaxId": "",
+    "fileKey": "XXXXX",
+    "checksum": "YTlkZGRkNzgyZWM0NzkyODdjNmQ0NGE5ZDM2YTg4ZjQ5OTE1ZGM2NjliYjgzNzViMTZhMmE5ZmE3NmE4ZDQzNwo=",
+    "operationDate": "2022-06-21T11:44:28Z"
+}

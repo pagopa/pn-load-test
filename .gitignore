@@ -152,6 +152,9 @@ dist
 # k6
 k6
 
+### MAC ###
+**/.DS_Store
+
 # Python
 venv
 
