@@ -90,7 +90,7 @@ function insertAction(iun){
     });
 }
 
-export default function raddPerformanceTest() {
+export default function pocDeliveryPushTest() {
     console.log("basePath: "+basePath);
     console.log("apikey: "+apikey);
     console.log("Action for iun: "+actionForIun);
