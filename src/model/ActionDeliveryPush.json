@@ -1,0 +1,9 @@
+{
+    "actionId":"test2",
+    "iun":"iun1",
+    "notBefore":"2024-03-18T14:20:42.399Z",
+    "type":"type1", 
+    "recipientIndex":"recipientIndex1",
+    "timeslot":"2024-03-18T14:20", 
+    "timelineId":"timelineId1"
+}
