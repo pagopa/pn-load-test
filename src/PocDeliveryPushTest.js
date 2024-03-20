@@ -57,7 +57,7 @@ function generateFakeIUN() {
 }
 
 
-function insertAction(iun){
+function insertAction(iun, isFutureAction){
 
     let insertActionBasePath = `https://${basePath}/unique`;
 
@@ -76,18 +76,39 @@ function insertAction(iun){
     actionDeliveryPushRequest.timeslot = (currentDate.toISOString()+'').slice(0,16);
 
     //console.log("actionDeliveryPushRequest: "+JSON.stringify(actionDeliveryPushRequest));
-
-    console.log(" params: "+JSON.stringify(params)+" actionDeliveryPushRequest "+JSON.stringify(actionDeliveryPushRequest));
     
-    let insertActionResponse = http.post(insertActionBasePath, JSON.stringify(actionDeliveryPushRequest) ,params);
+    if(isFutureAction){
+        console.log(" params: "+JSON.stringify(params)+" actionDeliveryPushRequest "+JSON.stringify(actionDeliveryPushRequest));
+        let insertActionResponse = http.post(insertActionBasePath, JSON.stringify(actionDeliveryPushRequest) ,params);
    
-    check(insertActionResponse, {
-        'status insertActionResponse is 200': (insertActionResponse) => insertActionResponse.status === 200,
-    });
+        check(insertActionResponse, {
+            'status insertActionResponse is 200': (insertActionResponse) => insertActionResponse.status === 200,
+        });
+    
+        check(insertActionResponse, {
+            'error insertActionResponse is 5xx': (insertActionResponse) => insertActionResponse.status >= 500,
+        });
+    }else{
+        let currentDate = (new Date());
+        currentDate.setDate(currentDate.getDate() + 1);
+        currentDate.setMinutes(currentDate.getMinutes() + (exec.vu.idInTest%60));
+        //console.log("DEBUG CURRENTE DATE: "+currentDate.toISOString());
+        actionDeliveryPushRequest.notBefore = currentDate.toISOString();
+        actionDeliveryPushRequest.timeslot = (currentDate.toISOString()+'').slice(0,16);
 
-    check(insertActionResponse, {
-        'error insertActionResponse is 5xx': (insertActionResponse) => insertActionResponse.status >= 500,
-    });
+        console.log(" params: "+JSON.stringify(params)+" FutureActionDeliveryPushRequest "+JSON.stringify(actionDeliveryPushRequest));
+        let insertFutureActionResponse = http.post(insertActionBasePath, JSON.stringify(actionDeliveryPushRequest) ,params);
+   
+        check(insertFutureActionResponse, {
+            'status insertFutureActionResponse is 200': (insertFutureActionResponse) => insertFutureActionResponse.status === 200,
+        });
+    
+        check(insertFutureActionResponse, {
+            'error insertFutureActionResponse is 5xx': (insertFutureActionResponse) => insertFutureActionResponse.status >= 500,
+        });
+
+    }
+   
 }
 
 export default function pocDeliveryPushTest() {
@@ -96,9 +117,15 @@ export default function pocDeliveryPushTest() {
     console.log("Action for iun: "+actionForIun);
 
     let currentIun= generateFakeIUN();
+
     for(let i = 0; i < actionForIun; i++){
         try{
-            insertAction(currentIun);
+            if(exec.vu.idInTest % 2 == 0){
+                insertAction(currentIun,false);
+            }else {
+                //insertAction(currentIun,true);
+            }
+           
           }catch(error){
             console.log('aor error: ',error)
           }
