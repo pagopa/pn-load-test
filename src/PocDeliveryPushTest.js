@@ -1,7 +1,7 @@
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
 import { check, sleep } from 'k6';
-import encoding from 'k6/encoding';
+import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 import exec from 'k6/execution';
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
@@ -68,7 +68,7 @@ function insertAction(iun){
         },
     };
     
-    actionDeliveryPushRequest.actionId = "Test_"+generateUid(false);
+    actionDeliveryPushRequest.actionId = "Test_"+generateUid(false)+"_"+iun+"_"+uuidv4();
     actionDeliveryPushRequest.iun = iun;
     let currentDate = (new Date());
     currentDate.setMinutes(currentDate.getMinutes() - 1);
