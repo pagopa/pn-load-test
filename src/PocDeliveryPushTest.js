@@ -123,7 +123,7 @@ export default function pocDeliveryPushTest() {
             if(exec.vu.idInTest % 2 == 0){
                 insertAction(currentIun,false);
             }else {
-                //insertAction(currentIun,true);
+                insertAction(currentIun,true);
             }
            
           }catch(error){
