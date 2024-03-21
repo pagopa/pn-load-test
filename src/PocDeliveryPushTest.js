@@ -11,6 +11,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 let apikey = `${__ENV.LAMBDA_API_KEY}`;
 let basePath = `${__ENV.LAMBDA_BASE_PATH}`;
 let actionForIun = `${__ENV.ACTION_FOR_IUN}`;
+let testMode = `${__ENV.TEST_MODE}`; //0 only action 1 only futureAction 2 action and futureAction (50/50)
 
 let actionDeliveryPushRequest = JSON.parse(open('./model/ActionDeliveryPush.json'));
 
@@ -120,12 +121,17 @@ export default function pocDeliveryPushTest() {
 
     for(let i = 0; i < actionForIun; i++){
         try{
-            if(exec.vu.idInTest % 2 == 0){
+            if(testMode == 0){
+                insertAction(currentIun,true);
+            }else if(testMode == 1){
                 insertAction(currentIun,false);
-            }else {
-                //insertAction(currentIun,true);
+            }else{
+                if(exec.vu.idInTest % 2 == 0){
+                    insertAction(currentIun,false);
+                }else {
+                    insertAction(currentIun,true);
+                }
             }
-           
           }catch(error){
             console.log('aor error: ',error)
           }
