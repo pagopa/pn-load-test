@@ -57,7 +57,7 @@ function generateFakeIUN() {
 }
 
 
-function insertAction(iun, isFutureAction){
+function insertAction(iun, isCurrentAction){
 
     let insertActionBasePath = `https://${basePath}/unique`;
 
@@ -77,7 +77,7 @@ function insertAction(iun, isFutureAction){
 
     //console.log("actionDeliveryPushRequest: "+JSON.stringify(actionDeliveryPushRequest));
     
-    if(isFutureAction){
+    if(isCurrentAction){
         console.log(" params: "+JSON.stringify(params)+" actionDeliveryPushRequest "+JSON.stringify(actionDeliveryPushRequest));
         let insertActionResponse = http.post(insertActionBasePath, JSON.stringify(actionDeliveryPushRequest) ,params);
    
@@ -90,8 +90,8 @@ function insertAction(iun, isFutureAction){
         });
     }else{
         let currentDate = (new Date());
-        currentDate.setDate(currentDate.getDate() + 1);
-        currentDate.setMinutes(currentDate.getMinutes() + (exec.vu.idInTest%60));
+        //currentDate.setDate(currentDate.getDate() + 1);
+        currentDate.setMinutes(currentDate.getMinutes() + (5 + (exec.vu.idInTest%5)));
         //console.log("DEBUG CURRENTE DATE: "+currentDate.toISOString());
         actionDeliveryPushRequest.notBefore = currentDate.toISOString();
         actionDeliveryPushRequest.timeslot = (currentDate.toISOString()+'').slice(0,16);
@@ -123,7 +123,7 @@ export default function pocDeliveryPushTest() {
             if(exec.vu.idInTest % 2 == 0){
                 insertAction(currentIun,false);
             }else {
-                insertAction(currentIun,true);
+                //insertAction(currentIun,true);
             }
            
           }catch(error){
