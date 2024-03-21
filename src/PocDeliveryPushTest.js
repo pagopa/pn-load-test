@@ -118,7 +118,6 @@ export default function pocDeliveryPushTest() {
     console.log("Action for iun: "+actionForIun);
 
     let currentIun= generateFakeIUN();
-
     for(let i = 0; i < actionForIun; i++){
         try{
             if(testMode == 0){
