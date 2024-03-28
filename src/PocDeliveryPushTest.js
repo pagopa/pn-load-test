@@ -12,6 +12,7 @@ let apikey = `${__ENV.LAMBDA_API_KEY}`;
 let basePath = `${__ENV.LAMBDA_BASE_PATH}`;
 let actionForIun = `${__ENV.ACTION_FOR_IUN}`;
 let testMode = `${__ENV.TEST_MODE}`; //0 only action 1 only futureAction 2 action and futureAction (50/50)
+let numberOfCurrentAction = `${__ENV.NUMBER_OF_CURRENT_ACTION}`; //immediate action number only for TEST_MODE 2
 
 let actionDeliveryPushRequest = JSON.parse(open('./model/ActionDeliveryPush.json'));
 
@@ -125,10 +126,10 @@ export default function pocDeliveryPushTest() {
             }else if(testMode == 1){
                 insertAction(currentIun,false);
             }else{
-                if(exec.vu.idInTest % 2 == 0){
-                    insertAction(currentIun,false);
-                }else {
+                if(i < numberOfCurrentAction){
                     insertAction(currentIun,true);
+                }else {
+                    insertAction(currentIun,false);
                 }
             }
           }catch(error){
