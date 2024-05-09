@@ -9,28 +9,41 @@ const w6Iteration = new Counter('w6Iteration');
 
 
 
+
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
       w7_test: {
-        executor: "constant-arrival-rate",
-        rate: 52,
-        timeUnit: "1s", 
-        duration: "60m",
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
+        startRate: 5, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
-  
+
+        stages: [
+          { target: 5, duration: '10s' },
+          { target: 50, duration: '170s' },
+          { target: 50, duration: '60m' },
+          { target: 5, duration: '0s' },
+          { target: 5, duration: '10s' }
+        ],
         tags: { test_type: 'analogicSoakTest' }, 
         exec: 'analogicSoakTest', 
       },
       w6_test: {
-        executor: "constant-arrival-rate",
-        rate: 18,
-        timeUnit: "1s", 
-        duration: "60m",
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
+        startRate: 1, 
         preAllocatedVUs: 200, 
         maxVUs: 9000,
 
+        stages: [
+          { target: 5, duration: '10s' },
+          { target: 10, duration: '170s' },
+          { target: 10, duration: '60m' },
+          { target: 5, duration: '0s' },
+          { target: 5, duration: '10s' }
+        ],
         tags: { test_type: 'digitalSoakTest' }, 
         exec: 'digitalSoakTest', 
       },
