@@ -54,11 +54,7 @@ export function sendConsolidatore() {
     };
 
     if(withGroup && withGroup !== 'undefined') {
-        let gruopUrl = `https://${basePath}/ext-registry-b2b/pa/v1/groups?metadataOnly=true`;
-        let groupList = JSON.parse((http.get(gruopUrl, params)).body);
-        console.log(JSON.stringify(groupList));
-        let group = groupList.find((elem) => elem.status === 'ACTIVE');
-        notificationRequest.group = group.id;
+        notificationRequest.group = "6467344676f10c7617353c90";
     }
 
 
