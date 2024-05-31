@@ -33,7 +33,7 @@
     ],
     "paFee": 100,
     "pagoPaIntMode": "NONE",
-    "physicalCommunicationType": "REGISTERED_LETTER_890",
+    "physicalCommunicationType": "AR_REGISTERED_LETTER",
     "taxonomyCode": "010202N",
     "notificationFeePolicy": "FLAT_RATE",
     "senderDenomination": "Comune di Palermo",
