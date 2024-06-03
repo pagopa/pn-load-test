@@ -44,7 +44,7 @@ export function sendConsolidatore() {
     notificationRequest.recipients[0].physicalAddress.province = 'NA';
 
     
-    let url = `https://${basePath}/delivery/requests`;
+    let url = `https://${basePath}/delivery/v2.3/requests`;
 
      let params = {
         headers: {
