@@ -1,0 +1,42 @@
+{
+    "iun": null,
+    "requestId": "",
+    "requestPaId": "00207190257",
+    "clientRequestTimeStamp": "2023-05-12T09:16:13.021Z",
+    "productType": "",
+    "attachments": [
+        {
+            "uri": "safestorage://PN_AAR-100016ec3f0b4a69b126dea59589004d.pdf",
+            "order": 0,
+            "documentType": "AAR",
+            "sha256": "SpJKcsY+7/EGUWhpYriKf15RgEJCOGuWZNE5T9MNFWk="
+        },
+        {
+            "uri": "safestorage://PN_NOTIFICATION_ATTACHMENTS-8c0b7e80907844e7b3a0c5d3c955c99d.pdf",
+            "order": 1,
+            "documentType": "ATTO",
+            "sha256": "V8et70pSHZNQ+UtTnK6NiYEDHjLKbD53SSG+h/zxr4s="
+        }
+    ],
+    "printType": "BN_FRONTE_RETRO",
+    "receiverName": "Leonardo Martini",
+    "receiverNameRow2": null,
+    "receiverAddress": "VIA_PN_2_CONS",
+    "receiverAddressRow2": null,
+    "receiverCap": "",
+    "receiverCity": "",
+    "receiverCity2": null,
+    "receiverPr": "",
+    "receiverCountry": "",
+    "receiverFiscalCode": "MRTLSN74T13H294C",
+    "senderName": "PagoPA S.p.A.",
+    "senderAddress": "Via Sardegna n. 38",
+    "senderCity": "Roma",
+    "senderPr": "Roma",
+    "senderDigitalAddress": null,
+    "arName": "PagoPA S.p.A.",
+    "arAddress": "Via Sardegna n. 38",
+    "arCap": "00187",
+    "arCity": "Roma",
+    "vas": null
+}
