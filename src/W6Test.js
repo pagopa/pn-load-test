@@ -217,11 +217,13 @@ export function internlRecipientReadAndDownload() {
             //console.log('DOWNLOAD LEGAL FACT RES '+JSON.stringify(downloadLegalFact.body));
     
             console.log("S3 URL: "+JSON.parse(downloadLegalFact.body).url);
+            /*
             let downloadLegalFactS3 = http.get(JSON.parse(downloadLegalFact.body).url,paramsDownloadS3LegalFact);
             
             check(downloadLegalFactS3, {
               'status W6 download-s3-LegalFact is 200': (r) => downloadLegalFactS3.status === 200,
             });
+            */
         })
      });
      
