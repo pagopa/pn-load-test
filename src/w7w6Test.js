@@ -53,13 +53,13 @@ export const options = {
 
 
 export function analogicSoakTest() {
-    w7TestOptimized();
+    w7TestOptimized(true);
     w7Iteration.add(1);
     sleep(2);
 }
 
 export function digitalSoakTest() {
-    w6TestOptimized();
+    w6TestOptimized(true);
     w6Iteration.add(1);
     sleep(2);
 }

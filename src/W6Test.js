@@ -455,19 +455,22 @@ export function internalSendNotification() {
  * 
  * The K6 memory leak is partially caused by the use of external modules
 */
-export default function w6TestOptimized(externalIun) {
+export default function w6TestOptimized(onlySend,externalIun) {
 
-  try{
-    internalRecipientSearch();
-  }catch(error){
-    console.log('internalRecipientSearch error: ',error)
+  if(!onlySend){
+    try{
+      internalRecipientSearch();
+    }catch(error){
+      console.log('internalRecipientSearch error: ',error)
+    }
+  
+    try{
+      internlRecipientReadAndDownload();
+    }catch(error){
+      console.log('internlRecipientReadAndDownload error: ',error)
+    }
   }
-
-  try{
-    internlRecipientReadAndDownload();
-  }catch(error){
-    console.log('internlRecipientReadAndDownload error: ',error)
-  }
+  
 
   try{
     internalSendNotification();
