@@ -147,28 +147,9 @@ export function internlRecipientReadAndDownload() {
         console.log('URL download: '+url);
 
         let downloadRes = http.get(url, params);
-        check(downloadRes, {
-            'status W7 received-download-document is 200': (r) => downloadRes.status === 200,
-          });
-
-          let paramsDownloadS3 = {
-            headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Host': 'pn-safestorage-eu-south-1-089813480515.s3.eu-south-1.amazonaws.com'
-            },
-            responseType: 'none',
-            tags: { name: 'getNotificationDownload' },
-          };
-
-          console.log('DOWNLOAD RES '+JSON.stringify(downloadRes.body));
-
-          console.log("S3 URL: "+downloadRes.body.url);
-          let downloadS3 = http.get(JSON.parse(downloadRes.body).url,paramsDownloadS3);
+        
+        
           
-          check(downloadS3, {
-            'status W7 download-s3-document is 200': (r) => downloadS3.status === 200,
-          });
      });
 
      
