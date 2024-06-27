@@ -71,7 +71,7 @@ for(let i = 0; i< pdfNumber; i++){
  * ReceiverSearch.js
  */
 export function internalRecipientSearch() {
-    let url = `https://${webBasePath}/delivery/notifications/received?startDate=2023-09-29T00%3A00%3A00.000Z&endDate=2023-11-20T00%3A00%3A00.000Z&size=10`;
+    let url = `https://${webBasePath}/bff/v1/notifications/sent?startDate=2023-05-29T00%3A00%3A00.000Z&endDate=2023-06-01T00%3A00%3A00.000Z&size=1`;
     
     let token = 'Bearer ' + bearerToken;
 
@@ -114,7 +114,7 @@ export function internlRecipientReadAndDownload() {
       currentIun = iunArray[exec.scenario.iterationInTest % iunArray.length].trim();
     }
     
-    let url = `https://${webBasePath}/delivery/v2.1/notifications/received/${currentIun}`;
+    let url = `https://${webBasePath}/bff/v1/notifications/sent/${currentIun}`;
     let token = 'Bearer ' + bearerToken;
 
     console.log(`Url ${url}`);
@@ -141,7 +141,7 @@ export function internlRecipientReadAndDownload() {
     console.log(JSON.stringify(result));
 
     result.documents.forEach(document => {
-        let url = `https://${webBasePath}/delivery/notifications/received/${currentIun}/attachments/documents/${document.docIdx}`;
+        let url = `https://${webBasePath}/bff/v1/notifications/sent/${currentIun}/documents/${document.docIdx}`;
         console.log('URL download: '+url);
 
         let downloadRes = http.get(url, params);
