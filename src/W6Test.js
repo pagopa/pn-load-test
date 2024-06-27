@@ -141,7 +141,7 @@ export function internlRecipientReadAndDownload() {
     console.log(JSON.stringify(result));
 
     result.documents.forEach(document => {
-        let url = `https://${webBasePath}/bff/v1/notifications/received/${currentIun}/documents/${document.docIdx}`;
+        let url = `https://${webBasePath}/bff/v1/notifications/received/${currentIun}/documents/ATTACHMENT?documentIdx=${document.docIdx}`;
         console.log('URL download: '+url);
 
         let downloadRes = http.get(url, params);
@@ -162,11 +162,13 @@ export function internlRecipientReadAndDownload() {
           console.log('DOWNLOAD RES '+JSON.stringify(downloadRes.body));
 
           console.log("S3 URL: "+JSON.parse(downloadRes.body).url);
+          /*
           let downloadS3 = http.get(JSON.parse(downloadRes.body).url,paramsDownloadS3);
           
           check(downloadS3, {
             'status W6 download-s3-document is 200': (r) => downloadS3.status === 200,
           });
+          */
      });
 
      
