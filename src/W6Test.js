@@ -437,10 +437,6 @@ export function internalSendNotification() {
     
     console.log('REQUEST-ID-LOG: '+r.body)
 
-    if (r.status === 403) {
-        throttling.add(1);
-     }
-
     
 
     return r;

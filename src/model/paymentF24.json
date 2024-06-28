@@ -1,0 +1,16 @@
+[{
+    "f24" : {
+    "title": "F24_STANDARD_GLLGLL64B15G702I",
+    "applyCost": true,
+    "metadataAttachment": {
+        "digests": {
+            "sha256": "wj7eHj/4V7UpzVhh0dEojav2wJfjZaenjc3g4e3xUQE="
+        },
+        "contentType": "application/json",
+        "ref": {
+            "key": "PN_F24_META-19c6655b76fa4321a767bd3e62b5400b.json",
+            "versionToken": "v1"
+        }
+    }
+}
+}]
