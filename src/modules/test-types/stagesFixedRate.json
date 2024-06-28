@@ -10,10 +10,10 @@
           "maxVUs": 9000,
 
           "stages": [
-            { "target": 25, "duration": "7m" },
+            { "target": 60, "duration": "7m" },
 
-            { "target": 25, "duration": "0s" },
-            { "target": 25, "duration": "30m" }
+            { "target": 60, "duration": "0s" },
+            { "target": 60, "duration": "30m" }
           ]
         }
       },
