@@ -52,8 +52,8 @@ const fileArray = new SharedArray('bin file sharedArray F24', function () {
       var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
         dataArray.push(obj);
     }
-    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json','b'))}
-    dataArray.push(obj);
+    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json'))}
+    dataArray.push(obj2);
     return dataArray; // must be an array
 });
 

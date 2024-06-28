@@ -7,10 +7,10 @@
 				"personalData": {
 					"surname": "GALILEI",
 					"name": "GALILEO",
-					"birthDate": "01-01-1980",
+					"birthDate": "15-02-1964",
 					"sex": "M",
-					"birthPlace": "MILANO",
-					"birthProvince": "MI"
+					"birthPlace": "PISA",
+					"birthProvince": "PI"
 				},
 				"taxAddress": {
 					"municipality": "MILANO",
@@ -18,7 +18,7 @@
 					"address": "VIA LARGA 21"
 				}
 			},
-			"relativePersonTaxCode": "",
+			"relativePersonTaxCode": "TDITLC46H54C619Q",
 			"id": "9W"
 		},
 		"treasury": {
@@ -36,7 +36,7 @@
 					"taxType": "B9AD",
 					"installment": "88MP",
 					"year": "2617",
-					"debit": "409",
+					"debit": "7309",
 					"credit": "0"
 				},
 				{
@@ -44,7 +44,7 @@
 					"taxType": "B9AD",
 					"installment": "88MP",
 					"year": "2617",
-					"debit": "2000",
+					"debit": "7309",
 					"credit": "0"
 				},
 				{
@@ -52,7 +52,7 @@
 					"taxType": "B9AD",
 					"installment": "88MP",
 					"year": "2617",
-					"debit": "1222",
+					"debit": "7309",
 					"credit": "0"
 				},
 				{
@@ -60,7 +60,31 @@
 					"taxType": "B9AD",
 					"installment": "88MP",
 					"year": "2617",
-					"debit": "7600",
+					"debit": "7309",
+					"credit": "0"
+				},
+				{
+					"applyCost": false,
+					"taxType": "B9AD",
+					"installment": "88MP",
+					"year": "2617",
+					"debit": "7309",
+					"credit": "0"
+				},
+				{
+					"applyCost": false,
+					"taxType": "B9AD",
+					"installment": "88MP",
+					"year": "2617",
+					"debit": "7309",
+					"credit": "0"
+				},
+				{
+					"applyCost": false,
+					"taxType": "B9AD",
+					"installment": "88MP",
+					"year": "2617",
+					"debit": "7309",
 					"credit": "0"
 				}
 			],
@@ -79,7 +103,7 @@
 						"endDate": "084198"
 					},
 					"debit": "840",
-					"credit": "100"
+					"credit": "0"
 				},
 				{
 					"applyCost": false,
@@ -90,8 +114,8 @@
 						"startDate": "403120",
 						"endDate": "084198"
 					},
-					"debit": "260",
-					"credit": "100"
+					"debit": "840",
+					"credit": "0"
 				},
 				{
 					"applyCost": false,
@@ -102,8 +126,8 @@
 						"startDate": "403120",
 						"endDate": "084198"
 					},
-					"debit": "330",
-					"credit": "100"
+					"debit": "840",
+					"credit": "0"
 				},
 				{
 					"applyCost": false,
@@ -114,8 +138,20 @@
 						"startDate": "403120",
 						"endDate": "084198"
 					},
-					"debit": "170",
-					"credit": "100"
+					"debit": "840",
+					"credit": "0"
+				},
+				{
+					"applyCost": false,
+					"office": "5670",
+					"reason": "HHW",
+					"inps": "32W95Mf",
+					"period": {
+						"startDate": "403120",
+						"endDate": "084198"
+					},
+					"debit": "840",
+					"credit": "0"
 				}
 			]
 		},
@@ -128,7 +164,7 @@
 					"installment": "A",
 					"year": "2306",
 					"debit": "901492",
-					"credit": "100"
+					"credit": "0"
 				}
 			]
 		},
@@ -147,7 +183,7 @@
 					"installment": "43CV",
 					"year": "2432",
 					"debit": "6002916",
-					"credit": "100"
+					"credit": "0"
 				}
 			],
 			"deduction": "97091877"
@@ -162,12 +198,13 @@
 					"refNumber": "792244",
 					"reason": "B",
 					"debit": "600",
-					"credit": "100"
+					"credit": "0"
 				}
 			],
 			"socSecRecords": [
 				{
 					"applyCost": false,
+					"institution": "1234",
 					"office": "B6COP",
 					"reason": "G1D",
 					"position": "693850961",
@@ -176,7 +213,7 @@
 						"endDate": "671726"
 					},
 					"debit": "360",
-					"credit": "100"
+					"credit": "0"
 				}
 			]
 		}
