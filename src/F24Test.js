@@ -11,36 +11,18 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
-let notificationDocument = JSON.parse(open('./model/notificationDocument.json'));
 let paymentRequestf24 = JSON.parse(open('./model/paymentF24.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
 let apiKey = `${__ENV.API_KEY}`;
-let bearerToken = `${__ENV.BEARER_TOKEN_USER1}`;
-let webBasePath = `${__ENV.WEB_BASE_PATH}`;
 let basePath = `${__ENV.BASE_PATH}`;
-let useIunFile = `${__ENV.USE_IUN_FILE}`;
 let withGroup = `${__ENV.WITH_GROUP}`;
 let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
-let withPayment = `${__ENV.WITH_PAYMENT}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
-let moreAttach = `${__ENV.MORE_ATTACH}`;
-let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
+
 
 let sha256;
 let pdfNumber = 3;
-
-let iunArray = new SharedArray('iun sharedArray F24', function () {
-  let iunFile = open('./resources/NotificationIUN.txt');
-  if(iunFile){
-    const dataArray =  iunFile.split(';');
-    console.log("IUN_LENGTH: "+ dataArray.length);
-    return dataArray; // must be an array
-  }else{
-    const dataArray = [];
-    return dataArray;
-  }
-});
 
 
 const fileArray = new SharedArray('bin file sharedArray F24', function () {
@@ -54,6 +36,7 @@ const fileArray = new SharedArray('bin file sharedArray F24', function () {
     }
     var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json'))}
     dataArray.push(obj2);
+    
     return dataArray; // must be an array
 });
 
@@ -66,14 +49,10 @@ const fileArray = new SharedArray('bin file sharedArray F24', function () {
 /**
  * DeliverySendNotification.js
 */
-export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
+export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     let currBinFile = encoding.b64decode(fileArray[0].fileString);
     if(otherFile){
         currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
-    }
-    if(f24){
-        console.log('sono nel meta')
-        currBinFile = encoding.b64decode(fileArray[fileArray.length-1].fileString);
     }
     
     //console.log('BIN FILE: '+currBinFile);
@@ -93,9 +72,6 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
     };
 
     preloadFileRequest[0].sha256 = sha256;
-    if(f24){
-        preloadFileRequest[0].contentType = 'application/json'
-    }
     let payload = JSON.stringify(preloadFileRequest);
     console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
@@ -103,11 +79,11 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
     console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
     check(preloadResponse, {
-        'status F24 preload is 200': (preloadResponse) => preloadResponse.status === 200,
+        'status attach-F24 preload is 200': (preloadResponse) => preloadResponse.status === 200,
     });
 
     check(preloadResponse, {
-        'error F24 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+        'error attach-F24 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
     });
     
     
@@ -121,7 +97,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
         let resultPreload = JSON.parse(preloadResponse.body)[0];
         let paramsSafeStorage = {
             headers: {
-                'Content-Type': f24? 'application/json': 'application/pdf',
+                'Content-Type': 'application/pdf',
                 'x-amz-checksum-sha256': sha256,
                 'Content-Length' : currBinFile.byteLength,
                 'x-amz-meta-secret': resultPreload.secret,
@@ -135,15 +111,15 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
         let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
-            'status F24 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+            'status attach-F24 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
         });
     
         check(safeStorageUploadResponde, {
-            'error F24 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+            'error attach-F24 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
         });
 
         check(safeStorageUploadResponde, {
-          'error F24 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+          'error attach-F24 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
       });
         
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
@@ -154,9 +130,82 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile, f24) {
 
 
 
-export function internalSendNotification() {
+export function preloadF24() {
+    
+    let currBinFile = encoding.b64decode(fileArray[fileArray.length-1].fileString);
+    sha256 = crypto.sha256(currBinFile, 'base64');
+    console.log('Sha: '+sha256);
+
+    console.log('Apikey: '+apiKey);
+
+    let url = `https://${basePath}/delivery/attachments/preload`;
+
+    let paramsDeliveryPreload = {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey
+        },
+    };
+
+    preloadFileRequest[0].sha256 = sha256;
+    preloadFileRequest[0].contentType = 'application/json'
+    
+    let payload = JSON.stringify(preloadFileRequest);
+    //console.log('body: '+payload);
+    let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
+    
+    //console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+
+    check(preloadResponse, {
+        'status F24 preload is 200': (preloadResponse) => preloadResponse.status === 200,
+    });
+
+    check(preloadResponse, {
+        'error F24 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+    });
+    
+   //console.log('\n'+'RESULT PRELOAD:'+JSON.stringify(preloadResponse.body)+'\n');
+    let resultPreload = JSON.parse(preloadResponse.body)[0];
+    let paramsSafeStorage = {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-amz-checksum-sha256': sha256,
+            'Content-Length' : currBinFile.byteLength,
+            'x-amz-meta-secret': resultPreload.secret,
+        },
+        responseType: 'none',
+        tags: { name: 'getSafeStorageUrl2' },
+    };
+    
+    //console.log('SAFE-STORAGE-PARAMS: '+JSON.stringify(paramsSafeStorage));
     
 
+    let urlSafeStorage = resultPreload.url;
+
+    //console.log('SAFE-STORAGE-urlSafeStorage: '+urlSafeStorage);
+        
+    let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
+    
+    check(safeStorageUploadResponde, {
+        'status F24 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
+    });
+    
+    check(safeStorageUploadResponde, {
+        'error F24 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+    });
+
+    check(safeStorageUploadResponde, {
+        'error F24 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+    });
+        
+    console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
+    return resultPreload;   
+   
+}
+
+
+export function internalSendNotification() {
+  
     let resultPreload = internalPreloadFile();
 
     notificationRequest.documents[0].ref.key = resultPreload.key;
@@ -188,10 +237,8 @@ export function internalSendNotification() {
         notificationRequest.group = group.id;
     }
 
-   /***
-    * 
-    */
-    let paymentAttachPreload = internalPreloadFile(false,false,true);
+   
+    let paymentAttachPreload = preloadF24();
     //console.log('paymentF24'+JSON.stringify(paymentRequestf24));
     paymentRequestf24[0].f24.metadataAttachment.digests.sha256 = sha256;
     paymentRequestf24[0].f24.metadataAttachment.ref.key = paymentAttachPreload.key;
