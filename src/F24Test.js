@@ -25,7 +25,7 @@ let sha256;
 let pdfNumber = 3;
 
 
-const fileArray = new SharedArray('bin file sharedArray F24', function () {
+const fileArray = new SharedArray('bin file sharedArray attach', function () {
     const dataArray = [];
     
     var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
@@ -34,12 +34,19 @@ const fileArray = new SharedArray('bin file sharedArray F24', function () {
       var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
         dataArray.push(obj);
     }
-    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json'))}
-    dataArray.push(obj2);
     
     return dataArray; // must be an array
 });
 
+
+const f24Array = new SharedArray('bin file sharedArray F24', function () {
+    const dataArray2 = [];
+    
+    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json'))}
+    dataArray2.push(obj2);
+    
+    return dataArray2; // must be an array
+});
 
 
 
@@ -132,7 +139,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
 
 export function preloadF24() {
     
-    let currBinFile = encoding.b64decode(fileArray[fileArray.length-1].fileString);
+    let currBinFile = encoding.b64decode(f24Array[f24Array.length-1].fileString);
     sha256 = crypto.sha256(currBinFile, 'base64');
     console.log('Sha: '+sha256);
 
