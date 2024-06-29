@@ -415,12 +415,16 @@ export function internalSendNotification() {
     }
 
     if(withPayment && withPayment !== 'undefined') {
-        let paymentAttachPreload = internalPreloadFile();
-        paymentRequest.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
-        paymentRequest.pagoPaForm.digests.sha256 = sha256;
-        paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
-        notificationRequest.recipients[0].payment = paymentRequest;
-    }
+      let paymentAttachPreload = internalPreloadFile();
+      //console.log('Payment-request: '+JSON.stringify(paymentRequest));
+      //console.log('Payment-request[0]: '+JSON.stringify(paymentRequest[0]));
+      //console.log('Payment-request[0].pagopa: '+JSON.stringify(paymentRequest[0].pagoPa));
+
+      paymentRequest[0].pagoPa.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
+      paymentRequest[0].pagoPa.attachment.digests.sha256 = sha256;
+      paymentRequest[0].pagoPa.attachment.ref.key = paymentAttachPreload.key;
+      notificationRequest.recipients[0].payments = paymentRequest;
+  }
 
     /* 
     if(digitalWorkflow && digitalWorkflow !== 'undefined') {

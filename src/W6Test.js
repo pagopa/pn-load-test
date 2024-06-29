@@ -7,7 +7,7 @@ import http from 'k6/http';
 
 
 
-export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+//export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
@@ -385,7 +385,7 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
     notificationRequest.recipients[0].physicalAddress.province = 'CS';
     
-    let url = `https://${basePath}/delivery/requests`;
+    let url = `https://${basePath}/delivery/v2.3/requests`;
 
      let params = {
         headers: {
@@ -404,10 +404,14 @@ export function internalSendNotification() {
 
     if(withPayment && withPayment !== 'undefined') {
         let paymentAttachPreload = internalPreloadFile();
-        paymentRequest.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
-        paymentRequest.pagoPaForm.digests.sha256 = sha256;
-        paymentRequest.pagoPaForm.ref.key = paymentAttachPreload.key;
-        notificationRequest.recipients[0].payment = paymentRequest;
+        //console.log('Payment-request: '+JSON.stringify(paymentRequest));
+        //console.log('Payment-request[0]: '+JSON.stringify(paymentRequest[0]));
+        //console.log('Payment-request[0].pagopa: '+JSON.stringify(paymentRequest[0].pagoPa));
+
+        paymentRequest[0].pagoPa.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
+        paymentRequest[0].pagoPa.attachment.digests.sha256 = sha256;
+        paymentRequest[0].pagoPa.attachment.ref.key = paymentAttachPreload.key;
+        notificationRequest.recipients[0].payments = paymentRequest;
     }
 
     if(digitalWorkflow && digitalWorkflow !== 'undefined') {
@@ -468,11 +472,9 @@ export default function w6TestOptimized(onlySend,externalIun) {
   }
   
 
-  try{
+  
     internalSendNotification();
-  }catch(error){
-    console.log('internalSendNotification error: ',error)
-  }
+  
   
 
   sleep(2);
