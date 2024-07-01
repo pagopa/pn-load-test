@@ -11,6 +11,7 @@ export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.j
 
 let notificationRequest = JSON.parse(open('./model/notificationRequest.json'));
 let preloadFileRequest = JSON.parse(open('./model/preloadFile.json'));
+let preloadFileF24Request = JSON.parse(open('./model/preloadFileF24.json'));
 let paymentRequestf24 = JSON.parse(open('./model/paymentF24.json'));
 let digitalDomicileRequest = JSON.parse(open('./model/digitalDomicile.json'));
 
@@ -83,7 +84,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
     
-    console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+    console.log("DELIVERY PRELOAD: "+JSON.stringify(preloadResponse));
 
     check(preloadResponse, {
         'status attach-F24 preload is 200': (preloadResponse) => preloadResponse.status === 200,
@@ -154,14 +155,14 @@ export function preloadF24() {
         },
     };
 
-    preloadFileRequest[0].sha256 = sha256;
-    preloadFileRequest[0].contentType = 'application/json'
+    preloadFileF24Request[0].sha256 = sha256;
+    //preloadFileF24Request[0].contentType = 'application/json'
     
-    let payload = JSON.stringify(preloadFileRequest);
+    let payload = JSON.stringify(preloadFileF24Request);
     //console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
     
-    //console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+    console.log("DELIVERY PRELOAD: "+JSON.stringify(preloadResponse));
 
     check(preloadResponse, {
         'status F24 preload is 200': (preloadResponse) => preloadResponse.status === 200,
