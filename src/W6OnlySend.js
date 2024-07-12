@@ -4,7 +4,7 @@ import w6TestOptimized from './W6Test.js';
 
 
 
-//export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 
 
