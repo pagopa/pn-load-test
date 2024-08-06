@@ -220,9 +220,9 @@ export function internalSendNotification() {
     notificationRequest.documents[0].digests.sha256 = sha256;
 
 
-    notificationRequest.recipients[0].physicalAddress.at = 'Via Primo maggio, 34';
+    notificationRequest.recipients[0].physicalAddress.at = 'Via Primo maggio 34';
     console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
-    notificationRequest.recipients[0].physicalAddress.address = 'Via Primo maggio, 34';
+    notificationRequest.recipients[0].physicalAddress.address = 'Via Primo maggio 34';
     notificationRequest.recipients[0].physicalAddress.zip = '00013';
     notificationRequest.recipients[0].physicalAddress.municipality = 'Tor Lupara';
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Tor Lupara';
