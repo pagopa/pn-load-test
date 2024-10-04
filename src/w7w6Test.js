@@ -23,10 +23,28 @@ export const options = {
         stages: [
           { target: 5, duration: '10s' },
           { target: 50, duration: '15m' },
+          { target: 50, duration: '15m' },
+
+          { target: 5, duration: '15m' },
+          { target: 50, duration: '15m' },
+          { target: 50, duration: '15m' },
+
+          { target: 5, duration: '15m' },
+          { target: 50, duration: '15m' },
+          { target: 50, duration: '15m' },
+
+          { target: 5, duration: '0s' },
+          { target: 5, duration: '10s' }
+        ],
+        /*
+        stages: [
+          { target: 5, duration: '10s' },
+          { target: 50, duration: '15m' },
           { target: 50, duration: '60m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
+        */
         tags: { test_type: 'analogicSoakTest' }, 
         exec: 'analogicSoakTest', 
       },
@@ -40,7 +58,16 @@ export const options = {
         stages: [
           { target: 5, duration: '10s' },
           { target: 10, duration: '15m' },
-          { target: 10, duration: '60m' },
+          { target: 10, duration: '15m' },
+
+          { target: 5, duration: '15m' },
+          { target: 10, duration: '15m' },
+          { target: 10, duration: '15m' },
+
+          { target: 5, duration: '15m' },
+          { target: 10, duration: '15m' },
+          { target: 10, duration: '15m' },
+
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
