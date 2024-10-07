@@ -2,7 +2,7 @@ boto3==1.26.146
 botocore==1.29.146
 contourpy==1.0.7
 cycler==0.11.0
-fonttools==4.39.4
+fonttools==4.43.0
 jmespath==1.0.1
 kiwisolver==1.4.4
 matplotlib==3.7.1
