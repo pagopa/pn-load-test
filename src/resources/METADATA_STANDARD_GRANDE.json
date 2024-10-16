@@ -3,7 +3,8 @@
 		"taxPayer": {
 			"taxCode": "GLLGLL64B15G702I",
 			"isNotTaxYear": true,
-			"personalData": {
+			"person": {
+				"personalData": {
 					"surname": "GALILEI",
 					"name": "GALILEO",
 					"birthDate": "15-02-1964",
