@@ -43,7 +43,8 @@ const fileArray = new SharedArray('bin file sharedArray attach', function () {
 const f24Array = new SharedArray('bin file sharedArray F24', function () {
     const dataArray2 = [];
     
-    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_STANDARD_GRANDE.json'))}
+    //var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_STANDARD_GRANDE.json'))}
+    var obj2 = {'fileString': encoding.b64encode(open('./resources/METADATA_f24.json'))}
     dataArray2.push(obj2);
     
     return dataArray2; // must be an array
