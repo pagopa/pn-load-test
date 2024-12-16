@@ -1,0 +1,18 @@
+{
+    "notification": {
+      "iun": "TEST_iun",
+      "subject": "TEST_subject",
+      "sender": {
+        "paDenomination": "TEST_paDenomination"
+      }
+    },
+    "qrCodeQuickAccessLink": "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAALQAAAC0AQAAAAAVtjufAAAEd0lEQVR4Xu2XPdLrJhSGUSO2IBrYGjTSFqCRoIEtQANbkxrRpoQG5Xgk35tkjL8uaULh8Twevzq8cH6Ero/rD/RPcq//+b3+Da4HE7GWdJQkeT4Ej9hXnqodSZTDlfeVr7jWK33lnnh1WRLaptctHK6an/gu13ldzpldRbmifuS1jQixXKum7IjkB56qX6eJaaI50yr/Jf7PXA/hb+u3P585KIXLMo9dYc4Fzx6fe7wQBxYgnDzTaFSNy1uny+mgR1ablBPHjXk6fueXiXRShcsllwkNbV7uffW4cefSWKhuV34U2ZPz1unxfFxt5cyB2qKxa1LdOj0eZyRhU5tf+Xaqww+Pzz1uTIiTlGgk7ioL6MzbV57h6NpWy6JVskMFndvnHg/maOvSRmHpZmpos7x1ejzFkeNcGzxb5HR51m4fetwOKU6sCCvcUZ1ps7j31ePG5dff4fSVsVv26tHpcS/A6JlZNE1KD+DFo9Pj6Rwlzn4rkrOXz+L4zsHntFN1nMziIlyb1l/+f+QuH0VdZYTaQSw+tMi3zz0eNIHfNIPriIacDo0e/zs8Mi+SZVFylZw5HHz/yi0xroLauECxScnDx3fOTJlW5k7wwYqysvjodLhHJOes0aAhT+GeI/L43+EBSpcdqZzoclmxS/rkdY8bP0S0FfwqGYVFSt7n0uHOmQv2Zcd5M6dooHTr9HgwtbpzAp8RgTzVS37i7PC4nCt7+Uz5YsWRy6PT45ZjTZqEQmZJYQHS6vG5x+GJcn3V+XE7xbm94+xxrwrJJ9uHVA3EGbcnzh4PKRs7TuAzVeCzesfZ42af2T5z7FIDn/26vP3vcBf5Sspix6XmJprSb/87HHwOeacsRL5FDIf52/+P/AQLmMZRsmC8gLLz6PT4Lpcayoxw3E7KjDmeOHs8YpP9vAq/eMQ520W5dXpco0mOKxpq8ghhaFb41unxBilElxQ0hXQVTTJ/6/S4J3Yzlugh7cSznf/u7595ZHqDEu/sElnkkKWPTo9Dnl47R6xCiaE4FPTE2ePnOvKRQwFmJysc+vnjQ4/vA4w2Xs44Yigah8lv/zs8Lvtml33wuHHwOb/Psce1qA1t2dS0QwMqg3OP/x3expFP8zqYBnWGUymfvtbj4DMJ8GBER+Ipn7F+fOvwSMUV1Qkd+ZWwMNxN37nn7NrFlSFL55XUfXnqdo+f7NgpX1WoJ4WeY6fl+sp3dRKnyYlhxGyTCFClvnKopFcUeoM7yAeXcnp863GtCkVLPa6s8T7KIcfbtx6P0JLXmUMRBp8RnSd1x9njUIvIAZtixwnDMjSV/Y6zxxvlmxZRBfD5Cteve9LjKSTo3Wi4jEZU+UHj+7k9/qp868yCqznBkAMTxr2vHtfDSWBahEZoSST7RJ6+2eMJJm8YZKEhQKAvn59z73F4j3hNmMPhIFDwGa7hDxx8FrlwaPxY0xmH9AOHSzIhcZgTpmtEYMr4yhNcVS0xvE2MKpl8LvU718Nr1LfiOmDgxDAVPnN1j39a//N7/Wf8TwIyrfH4OjBLAAAAAElFTkSuQmCC",
+    "recipient": {
+      "recipientType": "PG",
+      "taxId": "TEST_taxId"
+    },
+    "piattaformaNotificheURL": "https://cittadini.test.notifichedigitali.it/auth/login",
+    "piattaformaNotificheURLLabel": "TEST_piattaformaNotificheURLLabel",
+    "perfezionamentoURL": "https://www.notifichedigitali.it/it/perfezionamento",
+    "perfezionamentoURLLabel": "TEST_perfezionamentoURLLabel"
+}

@@ -1,0 +1,12 @@
+{
+    "iun": "TEST_iun",
+    "when": "TEST_when",
+    "recipient": {
+      "denomination": "TEST_denomination",
+      "taxId": "TEST_taxId"
+    },
+    "delegate": {
+      "denomination": "TEST_denomination",
+      "taxId": "TEST_taxId"
+    }
+  }

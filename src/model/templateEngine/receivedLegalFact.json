@@ -1,0 +1,41 @@
+{
+    "sendDate": "TEST_sendDate",
+    "notification": {
+      "iun": "TEST_iun",
+      "sender": {
+        "paDenomination": "TEST_paDenomination",
+        "paTaxId": "TEST_paTaxId"
+      },
+      "recipients": [
+        {
+          "denomination": "TEST1_denomination",
+          "taxId": "TEST1_taxId",
+          "physicalAddressAndDenomination": null,
+          "digitalDomicile": {
+            "address": "TEST1_digitalDomicile"
+          }
+        },
+        {
+          "denomination": "TEST2_denomination",
+          "taxId": "TEST2_taxId",
+          "physicalAddressAndDenomination": "TEST2_physicalAddressAndDenomination",
+          "digitalDomicile": {
+            "address": null
+          }
+        },
+        {
+          "denomination": "TEST3_denomination",
+          "taxId": "TEST3_taxId",
+          "physicalAddressAndDenomination": "TEST3_physicalAddressAndDenomination",
+          "digitalDomicile": {
+            "address": "TEST3_address"
+          }
+        }
+      ]
+    },
+    "subject": "TEST_subject",
+    "digests": [
+      "TEST1_digests",
+      "TEST2_digests"
+    ]
+  }

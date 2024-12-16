@@ -1,0 +1,12 @@
+{
+    "perfezionamentoURL": "https://www.notifichedigitali.it/it/perfezionamento/",
+    "quickAccessLink": "TEST_quickAccessLink",
+    "pnFaqSendURL": "https://www.notifichedigitali.it/it/faq/",
+    "piattaformaNotificheURL": "https://cittadini.notifichedigitali.it/auth/login",
+    "notification": {
+      "iun": "TEST_iun",
+      "sender": {
+        "paDenomination": "Comune di Palermo"
+      }
+    }
+  }

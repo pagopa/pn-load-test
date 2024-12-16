@@ -1,0 +1,19 @@
+{
+    "notificationCancelledDate": "TEST_notificationCancelledDate",
+    "notification": {
+      "iun": "TEST_iun",
+      "sender": {
+        "paDenomination": "TEST_paDenomination"
+      },
+      "recipients": [
+        {
+          "denomination": "TEST1_denomination",
+          "taxId": "TEST1_taxId"
+        },
+        {
+          "denomination": "TEST2_denomination",
+          "taxId": "TEST2_taxId"
+        }
+      ]
+    }
+  }

@@ -1,0 +1,17 @@
+{
+    "notification": {
+      "iun": "TEST",
+      "subject": "Notifica digitale",
+      "sender": {
+        "paDenomination": "Comune di Palermo"
+      }
+    },
+    "perfezionamentoURL": "https://www.notifichedigitali.it/it/perfezionamento/",
+    "quickAccessLink": "TEST",
+    "pnFaqSendURL": "https://www.notifichedigitali.it/it/faq/",
+    "piattaformaNotificheURL": "https://cittadini.notifichedigitali.it/auth/login",
+    "recipientType": "PG",
+    "recipient": {
+      "taxId": "897645321"
+    }
+  }

@@ -1,0 +1,79 @@
+{
+    "iun": "TEST_iun",
+    "endWorkflowDate": null,
+    "endWorkflowStatus": "SUCCESS",
+    "deliveries": [
+      {
+        "denomination": "TEST1_denomination",
+        "taxId": "TEST1_taxId",
+        "type": "TEST1_NO_SERCQ",
+        "responseDate": "TEST1_responseDate",
+        "ok": false,
+        "address": "TEST1_address_platform",
+        "addressSource": "PLATFORM"
+      },
+      {
+        "denomination": "TEST1_denomination",
+        "taxId": "TEST1_taxId",
+        "type": "TEST1_NO_SERCQ",
+        "responseDate": "TEST1_responseDate",
+        "ok": false,
+        "address": "TEST2_address_platform",
+        "addressSource": "PLATFORM"
+      },
+      {
+        "denomination": "TEST2_denomination",
+        "taxId": "TEST2_taxId",
+        "type": "TEST2_NO_SERCQ",
+        "responseDate": "TEST2_responseDate",
+        "ok": false,
+        "address": "TEST2_address_special",
+        "addressSource": "SPECIAL"
+      },
+      {
+        "denomination": "TEST3_denomination",
+        "taxId": "TEST3_taxId",
+        "type": "TEST2_NO_SERCQ",
+        "responseDate": "TEST3_responseDate",
+        "ok": true,
+        "address": "TEST3_address_general",
+        "addressSource": "GENERAL"
+      },
+      {
+        "denomination": "TEST1_denomination",
+        "taxId": "TEST1_taxId",
+        "type": "TEST1_NO_SERCQ",
+        "responseDate": "TEST1_responseDate",
+        "ok": false,
+        "address": "TEST1_address_platform",
+        "addressSource": "PLATFORM"
+      },
+      {
+        "denomination": "TEST1_denomination",
+        "taxId": "TEST1_taxId",
+        "type": "TEST1_NO_SERCQ",
+        "responseDate": "TEST1_responseDate",
+        "ok": false,
+        "address": "TEST1_address_platform",
+        "addressSource": "PLATFORM"
+      },
+      {
+        "denomination": "TEST2_denomination",
+        "taxId": "TEST2_taxId",
+        "type": "TEST2_NO_SERCQ",
+        "responseDate": "TEST2_responseDate",
+        "ok": false,
+        "address": "TEST2_address_special",
+        "addressSource": "SPECIAL"
+      },
+      {
+        "denomination": "TEST3_denomination",
+        "taxId": "TEST3_taxId",
+        "type": "TEST2_NO_SERCQ",
+        "responseDate": "TEST3_responseDate",
+        "ok": true,
+        "address": "TEST3_address_general",
+        "addressSource": "GENERAL"
+      }
+    ]
+  }

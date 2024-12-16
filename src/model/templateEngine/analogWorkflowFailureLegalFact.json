@@ -1,0 +1,9 @@
+{
+  "iun": "TEST_iun",
+  "endWorkflowDate": "TEST_endWorkflowDate",
+  "endWorkflowTime": "TEST_endWorkflowTime",
+  "recipient": {
+    "denomination": "TEST_denomination",
+    "taxId": "TEST_taxId"
+  }
+}
