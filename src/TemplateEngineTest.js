@@ -25,17 +25,20 @@ let notificationAarForSms = JSON.parse(open('./model/templateEngine/notification
 export function templateEngineTest(request, body) {
     let url = `http://localhost:8886/${request}`;
 
-    console.log(`Url ${url}`);
+    //console.log(`Url ${url}`);
 
     let params = {
       headers: {
       'Content-Type': 'application/json',
-      'x-language': 'DE'
+      'x-language': 'IT'
       }
     };
 
     let payload = JSON.stringify(body);
     let response = http.put(url, payload, params);
+
+    let requestId = request.replace('templates-engine-private/v1/templates/','');
+    if(response.status > 202)console.log("http response value is: "+response.status+"for request: "+requestId);
 
     check(response, {
         'status templateEngine is KO': (response) => response.status > 202,
