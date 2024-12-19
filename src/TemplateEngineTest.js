@@ -41,11 +41,11 @@ export function templateEngineTest(request, body) {
     if(response.status > 202)console.log("http response value is: "+response.status+"for request: "+requestId);
 
     check(response, {
-        'status templateEngine is KO': (response) => response.status > 202,
+        'status templateEngine is KO': (response) => response.status > 200,
     });
 
     check(response, {
-        'status templateEngine is 202': (response) => response.status === 202,
+        'status templateEngine is 200': (response) => response.status === 200,
     });
  
 }
