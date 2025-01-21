@@ -397,7 +397,7 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.province = 'CS';
 
     
-    let url = `https://${basePath}/delivery/2.4/requests`;
+    let url = `https://${basePath}/delivery/v2.4/requests`;
 
      let params = {
         headers: {
