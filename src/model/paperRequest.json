@@ -6,16 +6,16 @@
     "productType": "",
     "attachments": [
         {
-            "uri": "safestorage://PN_AAR-100016ec3f0b4a69b126dea59589004d.pdf",
+            "uri": "safestorage://PN_AAR-10000d9a5fd3495f8eabd5cf7ebc74da.pdf",
             "order": 0,
             "documentType": "AAR",
-            "sha256": "SpJKcsY+7/EGUWhpYriKf15RgEJCOGuWZNE5T9MNFWk="
+            "sha256": "gC3dAYli194W3bOWM306mV2isnQz4HUlBujjZYHawpE="
         },
         {
-            "uri": "safestorage://PN_NOTIFICATION_ATTACHMENTS-709ca25c412d42fcb94fb66f2764279d.pdf",
+            "uri": "safestorage://PN_NOTIFICATION_ATTACHMENTS-b507973f1c6147bf8cc8bbfe118edd65.pdf",
             "order": 1,
             "documentType": "ATTO",
-            "sha256": "saWa3TnlafVwzFv2CLu+kqW++zfFsjLVe60L/QcYfDE="
+            "sha256": "V8et70pSHZNQ+UtTnK6NiYEDHjLKbD53SSG+h/zxr4s="
         }
     ],
     "printType": "BN_FRONTE_RETRO",

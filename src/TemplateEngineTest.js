@@ -23,7 +23,7 @@ let notificationAarForSms = JSON.parse(open('./model/templateEngine/notification
 
 
 export function templateEngineTest(request, body) {
-    let url = `http://localhost:8886/${request}`;
+    let url = `http://localhost:8099/${request}`;
 
     //console.log(`Url ${url}`);
 

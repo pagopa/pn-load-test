@@ -385,7 +385,7 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
     notificationRequest.recipients[0].physicalAddress.province = 'CS';
     
-    let url = `https://${basePath}/delivery/v2.3/requests`;
+    let url = `https://${basePath}/delivery/v2.4/requests`;
 
      let params = {
         headers: {

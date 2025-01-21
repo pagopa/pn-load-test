@@ -38,10 +38,10 @@ export function sendConsolidatore() {
     delete notificationRequest.recipients[0].physicalAddress.at;
    
     notificationRequest.recipients[0].physicalAddress.address = 'VIA_PN_2_CONS';
-    notificationRequest.recipients[0].physicalAddress.zip = '00013';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'CASTELCHIODATO';
+    notificationRequest.recipients[0].physicalAddress.zip = '80012';
+    notificationRequest.recipients[0].physicalAddress.municipality = 'CALVIZZANO';
     delete notificationRequest.recipients[0].physicalAddress.municipalityDetails;
-    notificationRequest.recipients[0].physicalAddress.province = 'RM';
+    notificationRequest.recipients[0].physicalAddress.province = 'NA';
 
     
     let url = `https://${basePath}/delivery/v2.3/requests`;
