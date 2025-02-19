@@ -1,0 +1,16 @@
+{
+  "name": "script-stream",
+  "version": "1.0.0",
+  "description": "script for read and write stream ",
+  "main": "stream.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "fs": "^0.0.1-security"
+  },
+  "type": "module"
+}
