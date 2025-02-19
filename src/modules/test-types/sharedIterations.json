@@ -1,0 +1,14 @@
+{
+    "scenarios": {
+        "tracing": {
+          "executor": "shared-iterations",
+          "iterations": 20,
+          "vus": 2
+      }
+    },
+    "thresholds": {
+        "http_req_duration": [
+            "avg<2000"
+          ]
+      }
+}
