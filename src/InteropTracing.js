@@ -68,11 +68,12 @@ const code_serviceunavailable = new Counter('code_serviceunavailable');
 
 
 export default function replaceTracingTest(data) {
-  const successFile = `date,purpose_id,token,status,requests_count\n${data.tracingList[exec.scenario.iterationInTest].date},28874634-6ea6-4def-b200-7377182c71be,12345678-90ab-cdef-1234-567890abcdef,200,48\n${data.tracingList[exec.scenario.iterationInTest].date},0e1114e6-31d1-41a4-811d-a0c3d1b70bbf,99382e29-b0cf-412b-a060-72e421b6d167,404,48`;
+  const successFile = `date,purpose_id,status,token_id,requests_count\n${data.tracingList[exec.scenario.iterationInTest].date},59b568cc-a097-4217-9c58-66fa76389fe0,200,c7ebf39e-e323-46f1-92d8-0482bcc3bfe3,555\n${data.tracingList[exec.scenario.iterationInTest].date},59b568cc-a097-4217-9c58-66fa76389fe0,404,c7ebf39e-e323-46f1-92d8-0482bcc3bfe3,0`;
+  console.log(successFile)
   const formData = {
     file: http.file(successFile, 'data.csv', 'text/csv')
   };
-  let url = `https://api.dev.tracing.interop.pagopa.it/tracings/${data.tracingList[exec.scenario.iterationInTest].tracingId}/replace`;
+  let url = `https://api.qa.tracing.interop.pagopa.it/tracings/${data.tracingList[exec.scenario.iterationInTest].tracingId}/replace`;
   
   let tracingResponse = http.post(url, formData, params );
 
