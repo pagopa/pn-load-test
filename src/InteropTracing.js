@@ -69,7 +69,6 @@ const code_serviceunavailable = new Counter('code_serviceunavailable');
 
 export default function replaceTracingTest(data) {
   const successFile = `date,purpose_id,status,token_id,requests_count\n${data.tracingList[exec.scenario.iterationInTest].date},59b568cc-a097-4217-9c58-66fa76389fe0,200,c7ebf39e-e323-46f1-92d8-0482bcc3bfe3,555\n${data.tracingList[exec.scenario.iterationInTest].date},59b568cc-a097-4217-9c58-66fa76389fe0,404,c7ebf39e-e323-46f1-92d8-0482bcc3bfe3,0`;
-  console.log(successFile)
   const formData = {
     file: http.file(successFile, 'data.csv', 'text/csv')
   };
