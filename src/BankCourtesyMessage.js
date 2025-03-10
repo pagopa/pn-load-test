@@ -22,16 +22,38 @@ let sendMessagePayload = JSON.stringify({
 
 let summaryTracker = {};
 
+let retrievalId = 'YTWY-GAWU-XAGD-202502-E-1~OK~13212-abvee1-3332-aaa'
+let requests = [
+  { name: "/send-message",    method: 'POST', url: 'http://localhost:8886/emd-integration-private/send-message', payload: sendMessagePayload },
+  { name: "/token/check-tpp", method: 'GET',  url: `http://localhost:8886/emd-integration-private/token/check-tpp?retrievalId=${retrievalId}`, payload: null },
+  { name: "/emd/check-tpp",   method: 'GET',  url: `http://localhost:8886/emd-integration-private/emd/check-tpp?retrievalId=${retrievalId}`, payload: null },
+  { name: "/payment-url",     method: 'GET', url: `http://localhost:8886/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`, payload: null },
+];
+
+
+function sanitizeMetricName(name) {
+  return name.replace(/[^a-zA-Z0-9_]/g, "_"); // Sostituisce caratteri non validi con "_"
+}
+
+
+let counters = {};
+for (let req of requests) {
+  let sanitizedName = sanitizeMetricName(req.name);
+  counters[sanitizedName] = {};
+  for (let status of [200, 400, 401, 403, 404, 500]) {  // Definisci gli status di interesse
+      let key = `${sanitizedName}_${status}`;
+      counters[sanitizedName][status] = new Counter(key);
+  }
+}
+
+function trackStatus(endpoint, status) {
+  let sanitizedName = sanitizeMetricName(endpoint);
+  if (counters[sanitizedName][status]) {
+      counters[sanitizedName][status].add(1);
+  }
+}
 
 export function performCall() {
-    let retrievalId = 'YTWY-GAWU-XAGD-202502-E-1~OK~13212-abvee1-3332-aaa'
-    let requests = [
-        { name: "/send-message",    method: 'POST', url: 'http://localhost:8886/emd-integration-private/send-message', payload: sendMessagePayload },
-        { name: "/token/check-tpp", method: 'GET',  url: `http://localhost:8886/emd-integration-private/token/check-tpp?retrievalId=${retrievalId}`, payload: null },
-        { name: "/emd/check-tpp",   method: 'GET',  url: `http://localhost:8886/emd-integration-private/emd/check-tpp?retrievalId=${retrievalId}`, payload: null },
-        { name: "/payment-url",     method: 'GET', url: `http://localhost:8886/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`, payload: null },
-    ];
-
     for (let req of requests) {
         let response;
 
@@ -41,22 +63,10 @@ export function performCall() {
             response = http.get(req.url)
         }
 
-        if (!summaryTracker[req.name]) {
-          summaryTracker[req.name] = {};
-        }
-        if (!summaryTracker[req.name][response.status]) {
-          summaryTracker[req.name][response.status] = 0;
-        }
-        summaryTracker[req.name][response.status]++;
+        trackStatus(req.name, response.status);
     }
 }
 
 export default function callEmdIntegration() {
   performCall();
-  for (let endpoint in summaryTracker) {
-    console.log(`${endpoint}`);
-    for (let status in summaryTracker[endpoint]) {
-      console.log(`   - Status ${status}: ${summaryTracker[endpoint][status]} chiamate`);
-    }
-  }
 }
