@@ -20,8 +20,6 @@ let sendMessagePayload = JSON.stringify({
     associatedPayment: true,
 });
 
-let summaryTracker = {};
-
 let retrievalId = 'YTWY-GAWU-XAGD-202502-E-1~OK~13212-abvee1-3332-aaa'
 let requests = [
   { name: "/send-message",    method: 'POST', url: 'http://localhost:8886/emd-integration-private/send-message', payload: sendMessagePayload },
@@ -30,9 +28,8 @@ let requests = [
   { name: "/payment-url",     method: 'GET', url: `http://localhost:8886/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`, payload: null },
 ];
 
-
 function sanitizeMetricName(name) {
-  return name.replace(/[^a-zA-Z0-9_]/g, "_"); // Sostituisce caratteri non validi con "_"
+  return name.replace(/[^a-zA-Z0-9_]/g, "_"); // Replaces invalid characters with "_"
 }
 
 
@@ -40,7 +37,7 @@ let counters = {};
 for (let req of requests) {
   let sanitizedName = sanitizeMetricName(req.name);
   counters[sanitizedName] = {};
-  for (let status of [200, 400, 401, 403, 404, 500]) {  // Definisci gli status di interesse
+  for (let status of [200, 400, 401, 403, 404, 500]) {  // Define the status codes of interest
       let key = `${sanitizedName}_${status}`;
       counters[sanitizedName][status] = new Counter(key);
   }
