@@ -16,7 +16,7 @@ let iunFile = open('./resources/NotificationIUN.txt');
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
-      w7_test: {
+      rest_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
         startRate: 5, 
@@ -25,12 +25,12 @@ export const options = {
 
         stages: [
           { target: 5, duration: '10s' },
-          { target: 50, duration: '15m' },
-          { target: 50, duration: '60m' },
+          { target: 60, duration: '15m' },
+          { target: 60, duration: '60m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
-        tags: { test_type: 'analogicSoakTest' }, 
+        tags: { test_type: 'getNotificationAndLegalFacts' }, 
         exec: 'getNotificationAndLegalFacts', 
       },
     }
@@ -77,6 +77,22 @@ export function getNotificationAndLegalFacts(iun) {
     throttling.add(1);
   }
 
+  console.log("INTERNAL IUN: "+currentIun);
+  let urlLegalFacts = `https://${basePath}/delivery-push/v2.0/${currentIun}/legal-facts`;
+  console.log('URL: '+url)
+
+  let response = http.get(urlLegalFacts, params);
+
+  console.log(`Status ${response.status}`);
+
+  check(r, {
+    'status get legatFact list is 200': (response) => response.status === 200,
+  });
+
+  if (response.status === 403) {
+    throttling.add(1);
+  }
+
   let result = JSON.parse(r.body);
   console.log(JSON.stringify(result));
 
@@ -94,43 +110,27 @@ export function getNotificationAndLegalFacts(iun) {
       }
       console.log(keySearch);
 
-      let url = `https://${basePath}/delivery-push/${currentIun}/legal-facts/${keySearch}`
-      //console.log('URL download atto opponibile: '+url);
-
-      let paramsLegalFact = {
-        headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json, text/plain, */*',
-        'x-api-key': apiKey
-        },
-        tags: { name: 'getLegalFact' },
-      };
-
-      let downloadLegalFact = http.get(url, paramsLegalFact);
-
-      check(downloadLegalFact, {
-          'status W6 received-download-LegalFact is 200': (r) => downloadLegalFact.status === 200,
-        });
-
-        let paramsDownloadS3LegalFact = {
+      if(keySearch !== undefined){
+        let url = `https://${basePath}/delivery-push/${currentIun}/download/legal-facts/${keySearch}`
+        //console.log('URL download atto opponibile: '+url);
+  
+        let paramsLegalFact = {
           headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Host': 'pn-safestorage-eu-south-1-089813480515.s3.eu-south-1.amazonaws.com'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/plain, */*',
+          'x-api-key': apiKey
           },
-          responseType: 'none',
-          tags: { name: 'getLegalFactDownload' },
+          tags: { name: 'getLegalFact' },
         };
+  
+        let downloadLegalFact = http.get(url, paramsLegalFact);
+  
+        check(downloadLegalFact, {
+            'status W6 received-download-LegalFact is 200': (r) => downloadLegalFact.status === 200,
+          });
+      }
+     
 
-        //console.log('DOWNLOAD LEGAL FACT RES '+JSON.stringify(downloadLegalFact.body));
-
-        console.log("S3 URL: "+JSON.parse(downloadLegalFact.body).url);
-        let downloadLegalFactS3 = http.get(JSON.parse(downloadLegalFact.body).url,paramsDownloadS3LegalFact);
-        
-        check(downloadLegalFactS3, {
-          'status W6 download-s3-LegalFact is 200': (r) => downloadLegalFactS3.status === 200,
-        });
-        
     })
  });
 
