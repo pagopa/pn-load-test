@@ -21,11 +21,13 @@ let sendMessagePayload = JSON.stringify({
 });
 
 let retrievalId = 'YTWY-GAWU-XAGD-202502-E-1~OK~13212-abvee1-3332-aaa'
+
+let basePath = 'http://internal-ecsa-20230504103152508600000011-1839177861.eu-south-1.elb.amazonaws.com:8080'
 let requests = [
-  { name: "/send-message",    method: 'POST', url: 'http://localhost:8886/emd-integration-private/send-message', payload: sendMessagePayload },
-  { name: "/token/check-tpp", method: 'GET',  url: `http://localhost:8886/emd-integration-private/token/check-tpp?retrievalId=${retrievalId}`, payload: null },
-  { name: "/emd/check-tpp",   method: 'GET',  url: `http://localhost:8886/emd-integration-private/emd/check-tpp?retrievalId=${retrievalId}`, payload: null },
-  { name: "/payment-url",     method: 'GET', url: `http://localhost:8886/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`, payload: null },
+  { name: "/send-message",    method: 'POST', url: `${basePath}/emd-integration-private/send-message`, payload: sendMessagePayload },
+  { name: "/token/check-tpp", method: 'GET',  url: `${basePath}/emd-integration-private/token/check-tpp?retrievalId=${retrievalId}`, payload: null },
+  { name: "/emd/check-tpp",   method: 'GET',  url: `${basePath}/emd-integration-private/emd/check-tpp?retrievalId=${retrievalId}`, payload: null },
+  { name: "/payment-url",     method: 'GET', url: `${basePath}/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`, payload: null },
 ];
 
 function sanitizeMetricName(name) {
