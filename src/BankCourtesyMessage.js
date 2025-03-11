@@ -58,8 +58,14 @@ export function performCall() {
 
         if (req.method == 'POST') {
             response = http.post(req.url, req.payload, params);
+            check(response, {
+              'status post emd is 200': (response) => response.status === 200,
+            });
         } else {
             response = http.get(req.url)
+            check(response, {
+              'status get emd is 200': (response) => response.status === 200,
+            });
         }
 
         trackStatus(req.name, response.status);
