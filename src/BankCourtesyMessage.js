@@ -61,10 +61,16 @@ export function performCall() {
             check(response, {
               'status post emd is 200': (response) => response.status === 200,
             });
+            check(response, {
+              'status post emd is not 200': (response) => response.status !== 200,
+            });
         } else {
             response = http.get(req.url)
             check(response, {
               'status get emd is 200': (response) => response.status === 200,
+            });
+            check(response, {
+              'status get emd is not 200': (response) => response.status !== 200,
             });
         }
 
