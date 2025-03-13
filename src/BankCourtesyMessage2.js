@@ -50,12 +50,23 @@ function convertToAlphanumeric(input) {
   return convertedParts.join('-');
 }
 
+let recipient = [
+  {recipientId: "CLMCST42R12D969Z", internalId: "PF-a6c1350d-1d69-4209-8bf8-31de58c79d6e" },
+  {recipientId: "MRARSS80A01F839V", internalId: "PF-903e4d7f-6b18-480a-8230-c1d63e6bb9b0" },
+  {recipientId: "LVLDAA85T50G702B", internalId: "PF-b32e4920-6ff3-4872-8018-d60a4e5827f9" },
+];
 
 export default function callEmdIntegration() {
 
+  let currentRecipient = recipient[exec.scenario.iterationInTest % recipient.length];
+  console.log(currentRecipient);
+  console.log(currentRecipient);
+  console.log(currentRecipient.recipientId);
+  console.log(currentRecipient.internalId);
+
   let sendMessagePayload = JSON.stringify({
-    internalRecipientId: '5b334d4a-0gt7-24ac-9c7b-354e2d44w5tr',
-    recipientId: 'RSSMRA85T10A562S',
+    internalRecipientId: currentRecipient.internalId,
+    recipientId: currentRecipient.recipientId,
     senderDescription: 'Comune di Milano',
     originId: generateFakeIUN(),
     associatedPayment: true,
@@ -102,7 +113,7 @@ export default function callEmdIntegration() {
     check(responsePayment, {
       'status payment-url emd is not 200': (responsePayment) => responsePayment.status !== 200,
     });
-    
+
   }
   
 
