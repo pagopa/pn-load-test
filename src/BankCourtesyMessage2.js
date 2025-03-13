@@ -69,7 +69,7 @@ export default function callEmdIntegration() {
   check(responseEmd, {
     'status emd/check-tpp emd is 200': (responseEmd) => responseEmd.status === 200,
   });
-  check(retrievalIdEmd, {
+  check(responseEmd, {
     'status emd/check-tpp emd is not 200': (responseEmd) => responseEmd.status !== 200,
   });
 
