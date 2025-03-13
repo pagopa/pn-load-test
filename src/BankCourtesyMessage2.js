@@ -31,7 +31,24 @@ function generateFakeIUN() {
  
   let resultString = initialString+'-'+centralString+'-'+dateAndVu+'-'+ finalString.slice(0,1)+'-'+finalString.slice(1,2);
   
-  return resultString;
+  return convertToAlphanumeric(resultString);
+}
+
+function convertToAlphanumeric(input) {
+  const parts = input.split('-');
+  const lastPart = parts.pop();
+
+  const convertedParts = parts.map(part =>
+    part.split('').map(char =>
+      (char >= '0' && char <= '9')
+        ? String.fromCharCode('A'.charCodeAt(0) + parseInt(char))
+        : char
+    ).join('')
+  );
+
+  convertedParts.push(lastPart); 
+
+  return convertedParts.join('-');
 }
 
 
