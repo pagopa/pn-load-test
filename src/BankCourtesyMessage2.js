@@ -12,6 +12,7 @@ let params = {
     }
 };
 
+let otherBankCall = `${__ENV.BANK_OTHER_CALL}`
 let basePath = 'http://internal-ecsa-20230504103152508600000011-1839177861.eu-south-1.elb.amazonaws.com:8080';
 
 
@@ -24,8 +25,6 @@ function generateFakeIUN() {
   const centralString = ((new Date()).getTime()+'').slice(-4);
 
   const dateAndVu = ((new Date())).getFullYear() + ((exec.vu.idInTest%99)+'').padStart(2,'1'); 
-
-  //const vuId = ((exec.vu.idInTest%99999)+'').padStart(5,'1'); 
  
   let finalString = (exec.vu.idInTest%99+'').padStart(2,'1');
  
@@ -73,34 +72,38 @@ export default function callEmdIntegration() {
   });
 
 
-  let retrievalIdToken = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
-  let responseToken = http.get(`${basePath}/emd-integration-private/token/check-tpp?retrievalId=${retrievalIdToken}`);
-  check(responseToken, {
-    'status token/check-tpp emd is 200': (responseToken) => responseToken.status === 200,
-  });
-  check(responseToken, {
-    'status token/check-tpp emd is not 200': (responseToken) => responseToken.status !== 200,
-  });
+  if(otherBankCall && otherBankCall !== 'undefined') {
+
+    let retrievalIdToken = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
+    let responseToken = http.get(`${basePath}/emd-integration-private/token/check-tpp?retrievalId=${retrievalIdToken}`);
+    check(responseToken, {
+      'status token/check-tpp emd is 200': (responseToken) => responseToken.status === 200,
+    });
+    check(responseToken, {
+      'status token/check-tpp emd is not 200': (responseToken) => responseToken.status !== 200,
+    });
   
 
-  let retrievalIdEmd = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
-  let responseEmd = http.get(`${basePath}/emd-integration-private/emd/check-tpp?retrievalId=${retrievalIdEmd}`);
-  check(responseEmd, {
-    'status emd/check-tpp emd is 200': (responseEmd) => responseEmd.status === 200,
-  });
-  check(responseEmd, {
-    'status emd/check-tpp emd is not 200': (responseEmd) => responseEmd.status !== 200,
-  });
+    let retrievalIdEmd = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
+    let responseEmd = http.get(`${basePath}/emd-integration-private/emd/check-tpp?retrievalId=${retrievalIdEmd}`);
+    check(responseEmd, {
+      'status emd/check-tpp emd is 200': (responseEmd) => responseEmd.status === 200,
+    });
+    check(responseEmd, {
+      'status emd/check-tpp emd is not 200': (responseEmd) => responseEmd.status !== 200,
+    });
 
-  let noticeCodeNumber = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
-  let retrievalIdPayment = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
-  let responsePayment = http.get(`${basePath}/emd-integration-private/payment-url?retrievalId=${retrievalIdPayment}&noticeCode=${noticeCodeNumber}&paTaxId=77777777777`);
-  check(responsePayment, {
-    'status payment-url emd is 200': (responsePayment) => responsePayment.status === 200,
-  });
-  check(responsePayment, {
-    'status payment-url emd is not 200': (responsePayment) => responsePayment.status !== 200,
-  });
-
+    let noticeCodeNumber = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
+    let retrievalIdPayment = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
+    let responsePayment = http.get(`${basePath}/emd-integration-private/payment-url?retrievalId=${retrievalIdPayment}&noticeCode=${noticeCodeNumber}&paTaxId=77777777777`);
+    check(responsePayment, {
+      'status payment-url emd is 200': (responsePayment) => responsePayment.status === 200,
+    });
+    check(responsePayment, {
+      'status payment-url emd is not 200': (responsePayment) => responsePayment.status !== 200,
+    });
+    
+  }
+  
 
 }
