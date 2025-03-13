@@ -62,6 +62,8 @@ export default function callEmdIntegration() {
     associatedPayment: true,
   });
 
+  console.log('IUN: '+generateFakeIUN());
+
   let responseSendMessagge = http.post(`${basePath}/emd-integration-private/send-message`, sendMessagePayload, params);
   check(responseSendMessagge, {
     'status send-message emd is 200': (responseSendMessagge) => responseSendMessagge.status === 200,
