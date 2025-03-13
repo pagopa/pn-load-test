@@ -1,4 +1,4 @@
-import { check } from 'k6';
+import { check,sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
 import { Counter } from 'k6/metrics';
@@ -75,7 +75,7 @@ export function performCall() {
     for (let req of requests) {
         let response;
         req.payload.originId = generateFakeIUN();
-        
+
         if (req.method == 'POST') {
             response = http.post(req.url, req.payload, params);
             check(response, {
