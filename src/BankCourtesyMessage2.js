@@ -55,22 +55,22 @@ export default function callEmdIntegration() {
 
 
   let retrievalIdToken = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
-  responseToken = http.get(`${basePath}/emd-integration-private/token/check-tpp?retrievalId=${retrievalIdToken}`);
-  check(retrievalIdToken, {
-    'status token/check-tpp emd is 200': (retrievalIdToken) => retrievalIdToken.status === 200,
+  let responseToken = http.get(`${basePath}/emd-integration-private/token/check-tpp?retrievalId=${retrievalIdToken}`);
+  check(responseToken, {
+    'status token/check-tpp emd is 200': (responseToken) => responseToken.status === 200,
   });
-  check(retrievalIdToken, {
-    'status token/check-tpp emd is not 200': (retrievalIdToken) => retrievalIdToken.status !== 200,
+  check(responseToken, {
+    'status token/check-tpp emd is not 200': (responseToken) => responseToken.status !== 200,
   });
   
 
   let retrievalIdEmd = generateFakeIUN()+"~OK~13212-abvee1-3332-aaa";
-  response = http.get(`${basePath}/emd-integration-private/emd/check-tpp?retrievalId=${retrievalIdEmd}`);
-  check(retrievalIdEmd, {
-    'status emd/check-tpp emd is 200': (retrievalIdEmd) => retrievalIdEmd.status === 200,
+  let responseEmd = http.get(`${basePath}/emd-integration-private/emd/check-tpp?retrievalId=${retrievalIdEmd}`);
+  check(responseEmd, {
+    'status emd/check-tpp emd is 200': (responseEmd) => responseEmd.status === 200,
   });
   check(retrievalIdEmd, {
-    'status emd/check-tpp emd is not 200': (retrievalIdEmd) => retrievalIdEmd.status !== 200,
+    'status emd/check-tpp emd is not 200': (responseEmd) => responseEmd.status !== 200,
   });
 
   let noticeCodeNumber = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
