@@ -45,7 +45,7 @@ export default function callEmdIntegration() {
     associatedPayment: true,
   });
 
-  responseSendMessagge = http.post(`${basePath}/emd-integration-private/send-message`, sendMessagePayload, params);
+  let responseSendMessagge = http.post(`${basePath}/emd-integration-private/send-message`, sendMessagePayload, params);
   check(responseSendMessagge, {
     'status send-message emd is 200': (responseSendMessagge) => responseSendMessagge.status === 200,
   });
@@ -74,7 +74,7 @@ export default function callEmdIntegration() {
   });
 
 
-  responsePayment = http.get(`${basePath}/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`);
+  let responsePayment = http.get(`${basePath}/emd-integration-private/payment-url?retrievalId=${retrievalId}&noticeCode=302000100000019421&paTaxId=77777777777`);
   check(responsePayment, {
     'status send-message emd is 200': (responsePayment) => responsePayment.status === 200,
   });
