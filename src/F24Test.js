@@ -213,7 +213,7 @@ export function preloadF24() {
 }
 
 
-export function internalSendNotification() {
+export function internalSendF24Notification() {
   
     let resultPreload = internalPreloadFile();
 
@@ -229,7 +229,7 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Tor Lupara';
     notificationRequest.recipients[0].physicalAddress.province = 'RM';
     
-    let url = `https://${basePath}/delivery/v2.3/requests`;
+    let url = `https://${basePath}/delivery/v2.4/requests`;
 
      let params = {
         headers: {
@@ -310,7 +310,7 @@ export function internalSendNotification() {
 export default function F24TestOptimized(onlySend,externalIun) {
 
   
-    internalSendNotification();
+    internalSendF24Notification();
  
   
 
