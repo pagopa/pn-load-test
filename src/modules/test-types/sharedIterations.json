@@ -2,8 +2,8 @@
     "scenarios": {
         "tracing": {
           "executor": "shared-iterations",
-          "iterations": 20,
-          "vus": 2
+          "iterations": 7500,
+          "vus": 3000
       }
     },
     "thresholds": {
