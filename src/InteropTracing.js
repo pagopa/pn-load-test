@@ -23,7 +23,7 @@ let tracingIdFile = open('./resources/TracingID-QA.txt');
 
 export function setup() {
     if(tracingIdFile !== 'undefined') {
-      let lines = tracingIdFile.split(';');
+      let lines = tracingIdFile.replace(/[\n\r]/g, '').split(';');
       const tracingIdArray = lines.map(line => {
         const [tracingId, date] = line.split(',');
         return { tracingId, date };
