@@ -1,5 +1,5 @@
 #FROM golang:1.18-alpine as builder
-FROM ubuntu:22.04 as builder
+FROM ubuntu:22.04@sha256:01a3ee0b5e413cefaaffc6abe68c9c37879ae3cced56a8e088b1649e5b269eee as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 #WORKDIR $GOPATH/src/go.k6.io/k6
@@ -28,7 +28,7 @@ RUN curl -O https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/
     dpkg -i -E amazon-cloudwatch-agent.deb && \
     rm -rf /tmp/*
 
-FROM node:19-alpine
+FROM node:19-alpine@sha256:8ec543d4795e2e85af924a24f8acb039792ae9fe8a42ad5b4bf4c277ab34b62e
 RUN apk add --no-cache ca-certificates bash jq aws-cli coreutils python3 py3-pip
 
 RUN pip install boto3
