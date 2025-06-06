@@ -3,7 +3,7 @@ import crypto from 'k6/crypto';
 import http from 'k6/http';
 
 
-//export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 let sha256;
 let binFile = open('./resources/AvvisoPagoPA.pdf', 'b');
