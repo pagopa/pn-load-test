@@ -26,7 +26,7 @@ export default function preloadFileDirect(onlyPreloadUrl) {
     console.log('Sha: '+sha256);
 
  
-    let url = 'http://internal-EcsA-20230504103152508600000011-1839177861.eu-south-1.elb.amazonaws.com/safe-storage/v1/files';
+    let url = 'http://vpce-0644bc537e0a3d85c-t8y3vunc.vpce-svc-06e9167128c810a62.eu-south-1.vpce.amazonaws.com:8080/safe-storage/v1/files';
     let paramsSafeStoragePreload = {
         headers: {
             'Content-Type': 'application/json',
