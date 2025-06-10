@@ -46,83 +46,84 @@ const fileArray = new SharedArray('bin file sharedArray w6', function () {
  * DeliverySendNotification.js
 */
 export function internalPreloadFile(onlyPreloadUrl, otherFile) {
-    let currBinFile = encoding.b64decode(fileArray[0].fileString);
-    if(otherFile){
-        currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
-    }
+  let currBinFile = encoding.b64decode(fileArray[0].fileString);
+  if(otherFile){
+      currBinFile = encoding.b64decode(fileArray[otherFile%pdfNumber].fileString);
+  }
+
   
-    
-    //console.log('BIN FILE: '+currBinFile);
+  //console.log('BIN FILE: '+currBinFile);
 
-    sha256 = crypto.sha256(currBinFile, 'base64');
-    console.log('Sha: '+sha256);
+  sha256 = crypto.sha256(currBinFile, 'base64');
+  console.log('Sha: '+sha256);
 
-    console.log('Apikey: '+apiKey);
+  console.log('Apikey: '+apiKey);
 
-    let url = `https://${basePath}/delivery/attachments/preload`;
 
-    let paramsDeliveryPreload = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-    };
+  let url = `https://${basePath}/delivery/attachments/preload`;
 
-    preloadFileRequest[0].sha256 = sha256;
-    let payload = JSON.stringify(preloadFileRequest);
-    console.log('body: '+payload);
-    let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
-    
-    console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+  let paramsDeliveryPreload = {
+      headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+      },
+  };
 
-    check(preloadResponse, {
-        'status W6 preload is 200': (preloadResponse) => preloadResponse.status === 200,
-    });
+  preloadFileRequest[0].sha256 = sha256;
+  let payload = JSON.stringify(preloadFileRequest);
+  console.log('body: '+payload);
+  let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
+  
+  console.log("DELIVERY PRELOAD: "+preloadResponse.status);
 
-    check(preloadResponse, {
-        'error W6 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
-    });
-    
-    
-    /*
-    "secret": "...",
-    "httpMethod": "PUT",
-    "url": "..."
-    */
+  check(preloadResponse, {
+      'status W7 preload is 200': (preloadResponse) => preloadResponse.status === 200,
+  });
 
-    if(!onlyPreloadUrl){
-        let resultPreload = JSON.parse(preloadResponse.body)[0];
-        let paramsSafeStorage = {
-            headers: {
-                'Content-Type': 'application/pdf',
-                'x-amz-checksum-sha256': sha256,
-                'Content-Length' : currBinFile.byteLength,
-                'x-amz-meta-secret': resultPreload.secret,
-            },
-            responseType: 'none',
-            tags: { name: 'getSafeStorageUrl' },
-        };
-    
-        let urlSafeStorage = resultPreload.url;
-        
-        let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
-    
-        check(safeStorageUploadResponde, {
-            'status W6 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
-        });
-    
-        check(safeStorageUploadResponde, {
-            'error W6 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
-        });
+  check(preloadResponse, {
+      'error W7 delivery-preload is 5xx': (preloadResponse) => preloadResponse.status >= 500,
+  });
+  
+  
+  /*
+  "secret": "...",
+  "httpMethod": "PUT",
+  "url": "..."
+  */
 
-        check(safeStorageUploadResponde, {
-          'error W6 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+  if(!onlyPreloadUrl){
+      let resultPreload = JSON.parse(preloadResponse.body)[0];
+      let paramsSafeStorage = {
+          headers: {
+              'Content-Type': 'application/pdf',
+              'x-amz-checksum-sha256': sha256,
+              'Content-Length' : currBinFile.byteLength,
+              'x-amz-meta-secret': resultPreload.secret,
+          },
+          responseType: 'none',
+          tags: { name: 'getSafeStorageUrl' },
+      };
+  
+      let urlSafeStorage = resultPreload.url;
+      
+      let safeStorageUploadResponde = http.put(urlSafeStorage, currBinFile, paramsSafeStorage);
+  
+      check(safeStorageUploadResponde, {
+          'status W7 safe-storage preload is 200': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 200,
       });
-        
-        console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
-        return resultPreload;   
-    }
-   
+  
+      check(safeStorageUploadResponde, {
+          'error W7 safeStorage is 5xx': (safeStorageUploadResponde) => safeStorageUploadResponde.status >= 500,
+      });
+
+      check(safeStorageUploadResponde, {
+        'error W7 safeStorage is 501': (safeStorageUploadResponde) => safeStorageUploadResponde.status === 501,
+    });
+      
+      console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
+      return resultPreload;   
+  }
+ 
 }
 
 let address = [
@@ -134,7 +135,7 @@ let address = [
   {cap: "70131", via: "Via Agostinelli", province: "BA", municipality: "BARI" },
   {cap: "70125", via: "Via Adige", province: "BA", municipality: "BARI" },
   {cap: "70126", via: "Via Abate Eustasio", province: "BA", municipality: "BARI" },
-  {cap: "80124", via: "Via Acate	", province: "NA", municipality: "NAPOLI" },
+  {cap: "80124", via: "Via Acate", province: "NA", municipality: "NAPOLI" },
   {cap: "70127", via: "Via Adolfo la Volpe", province: "BA", municipality: "BARI" },
   {cap: "70128", via: "Via Alfredo Spilotros", province: "BA", municipality: "BARI" },
   {cap: "70129", via: "Via Ada Negri", province: "BA", municipality: "BARI" }
