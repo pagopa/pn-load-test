@@ -1,0 +1,9 @@
+{
+  "actionId": "test2",
+  "iun": "iun1",
+  "type": "NOTIFICATION_VALIDATION",
+  "notBefore": "2025-06-19T07:18:49.055Z",
+  "recipientIndex": 0,
+  "timelineId": "string",
+  "details": "string"
+}
