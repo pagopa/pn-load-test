@@ -39,23 +39,23 @@ function generateUid(addHours) {
     return resultString;
 }
 
+
 function generateFakeIUN() {
    
-    const millisecondsString = ((new Date()).getTime()+'').slice(-8);
+    const getRandomLetters = (length) =>
+        Array.from({ length }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('');
 
-    const initialString = millisecondsString.slice(0,4)+"-"+millisecondsString.slice(4,millisecondsString.length);
-    sleep(1);
-    const centralString = ((new Date()).getTime()+'').slice(-4);
+    const getRandomDigits = (length) =>
+        Array.from({ length }, () => Math.floor(Math.random() * 10)).join('');
 
-    const dateAndVu = ((new Date())).getFullYear() + ((exec.vu.idInTest%99)+'').padStart(2,'1'); 
+    const part1 = getRandomLetters(4);
+    const part2 = getRandomLetters(4);
+    const part3 = getRandomLetters(4);
+    const part4 = getRandomDigits(6);
+    const part5 = getRandomLetters(1);
+    const part6 = getRandomDigits(1);
 
-    //const vuId = ((exec.vu.idInTest%99999)+'').padStart(5,'1'); 
-   
-    let finalString = (exec.vu.idInTest%99+'').padStart(2,'1');
-   
-    let resultString = initialString+'-'+centralString+'-'+dateAndVu+'-'+ finalString.slice(0,1)+'-'+finalString.slice(1,2);
-    
-    return resultString;
+    return `${part1}-${part2}-${part3}-${part4}-${part5}-${part6}`;
 }
 
 let actionsType = [ "NOTIFICATION_VALIDATION", "NOTIFICATION_REFUSED", "NOTIFICATION_CANCELLATION", "SCHEDULE_RECEIVED_LEGALFACT_GENERATION", "CHECK_ATTACHMENT_RETENTION", "START_RECIPIENT_WORKFLOW", "CHOOSE_DELIVERY_MODE", "ANALOG_WORKFLOW", "DIGITAL_WORKFLOW_NEXT_ACTION", 
