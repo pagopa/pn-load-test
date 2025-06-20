@@ -61,7 +61,7 @@ function generateFakeIUN() {
 
 function insertAction(iun, isCurrentAction){
 
-    let insertActionBasePath = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/action-manager-private/action`;
+    let insertActionBasePath = `http://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com:8080/action-manager-private/action`;
 
     let params = {
         headers: {
