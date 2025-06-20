@@ -61,7 +61,7 @@ function generateFakeIUN() {
 
 function insertAction(iun, isCurrentAction){
 
-    let insertActionBasePath = `https://${basePath}/unique`;
+    let insertActionBasePath = `https://internal-EcsA-20230409091221502000000003-2047636771.eu-south-1.elb.amazonaws.com/action-manager-private/action`;
 
     let params = {
         headers: {
@@ -119,23 +119,7 @@ export default function pocDeliveryPushTest() {
     console.log("Action for iun: "+actionForIun);
 
     let currentIun= generateFakeIUN();
-    for(let i = 0; i < actionForIun; i++){
-        try{
-            if(testMode == 0){
-                insertAction(currentIun,true);
-            }else if(testMode == 1){
-                insertAction(currentIun,false);
-            }else{
-                if(i < numberOfCurrentAction){
-                    insertAction(currentIun,true);
-                }else {
-                    insertAction(currentIun,false);
-                }
-            }
-          }catch(error){
-            console.log('aor error: ',error)
-          }
-    }
+    insertAction(currentIun,false);
    
   
 }
