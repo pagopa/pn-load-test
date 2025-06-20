@@ -58,6 +58,8 @@ function generateFakeIUN() {
     return resultString;
 }
 
+let actionsType = [ "NOTIFICATION_VALIDATION", "NOTIFICATION_REFUSED", "NOTIFICATION_CANCELLATION", "SCHEDULE_RECEIVED_LEGALFACT_GENERATION", "CHECK_ATTACHMENT_RETENTION", "START_RECIPIENT_WORKFLOW", "CHOOSE_DELIVERY_MODE", "ANALOG_WORKFLOW", "DIGITAL_WORKFLOW_NEXT_ACTION", 
+    "DIGITAL_WORKFLOW_NEXT_EXECUTE_ACTION", "DIGITAL_WORKFLOW_NO_RESPONSE_TIMEOUT_ACTION", "DIGITAL_WORKFLOW_RETRY_ACTION", "SEND_DIGITAL_FINAL_STATUS_RESPONSE", "REFINEMENT_NOTIFICATION", "SENDER_ACK", "DOCUMENT_CREATION_RESPONSE", "POST_ACCEPTED_PROCESSING_COMPLETED", "SEND_ANALOG_FINAL_STATUS_RESPONSE" ]
 
 function insertAction(iun, isCurrentAction){
 
@@ -76,6 +78,7 @@ function insertAction(iun, isCurrentAction){
     currentDate.setMinutes(currentDate.getMinutes() - 1);
     actionDeliveryPushRequest.notBefore = currentDate.toISOString();
     actionDeliveryPushRequest.timeslot = (currentDate.toISOString()+'').slice(0,16);
+    actionDeliveryPushRequest.type = actionsType[exec.scenario.iterationInTest % actionsType.length];
 
     //console.log("actionDeliveryPushRequest: "+JSON.stringify(actionDeliveryPushRequest));
     
