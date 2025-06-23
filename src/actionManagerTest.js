@@ -117,8 +117,7 @@ function insertAction(iun, isCurrentAction){
         });
 
         sleep(90);
-        /action-manager-private/action/{actionId}/unschedule
-
+    
         let unscheduleActionResponse = http.put(insertActionBasePath+actionDeliveryPushRequest.actionId+'/unschedule',params);
    
         check(unscheduleActionResponse, {
