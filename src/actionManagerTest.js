@@ -148,14 +148,11 @@ export default function pocDeliveryPushTest() {
     //one execution every 5 
     let futureActionExecution = (exec.scenario.iterationInTest % 5)
     let currentIun= generateFakeIUN();
-      insertAction(currentIun,false);
-    /*
     if(futureActionExecution == 0){
         insertAction(currentIun,false);
     }else{
         insertAction(currentIun,true);
     }
-        */
     
    
   
