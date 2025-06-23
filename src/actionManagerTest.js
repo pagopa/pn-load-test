@@ -120,14 +120,18 @@ function insertAction(iun, isCurrentAction){
             'error insertFutureActionResponse is 5xx': (insertFutureActionResponse) => insertFutureActionResponse.status >= 500,
         });
 
-        sleep(10);
+        sleep(30);
     
         let unscheduleActionResponse = http.put(insertActionBasePath+actionDeliveryPushRequest.actionId+'/unschedule',params);
 
         console.log('STATUS unscheduleActionResponse: ',unscheduleActionResponse.status);
    
         check(unscheduleActionResponse, {
-            'status unscheduleActionResponse is 200': (unscheduleActionResponse) => unscheduleActionResponse.status === 200,
+            'status unscheduleActionResponse is 204': (unscheduleActionResponse) => unscheduleActionResponse.status === 204,
+        });
+
+         check(unscheduleActionResponse, {
+            'error unscheduleActionResponse is 4xx': (unscheduleActionResponse) => unscheduleActionResponse.status >= 400 && unscheduleActionResponse.status < 500,
         });
     
         check(unscheduleActionResponse, {
