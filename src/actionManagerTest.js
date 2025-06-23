@@ -87,7 +87,11 @@ function insertAction(iun, isCurrentAction){
         let insertActionResponse = http.post(insertActionBasePath, JSON.stringify(actionDeliveryPushRequest) ,params);
    
         check(insertActionResponse, {
-            'status insertActionResponse is 200': (insertActionResponse) => insertActionResponse.status === 200,
+            'status insertActionResponse is 201': (insertActionResponse) => insertActionResponse.status === 201,
+        });
+
+        check(insertActionResponse, {
+            'error insertActionResponse is 4xx': (insertActionResponse) => insertActionResponse.status >= 400 && insertActionResponse.status < 500,
         });
     
         check(insertActionResponse, {
