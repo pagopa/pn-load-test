@@ -116,6 +116,18 @@ function insertAction(iun, isCurrentAction){
             'error insertFutureActionResponse is 5xx': (insertFutureActionResponse) => insertFutureActionResponse.status >= 500,
         });
 
+        sleep(90);
+        /action-manager-private/action/{actionId}/unschedule
+
+        let unscheduleActionResponse = http.put(insertActionBasePath+actionDeliveryPushRequest.actionId+'/unschedule',params);
+   
+        check(unscheduleActionResponse, {
+            'status unscheduleActionResponse is 200': (unscheduleActionResponse) => unscheduleActionResponse.status === 200,
+        });
+    
+        check(unscheduleActionResponse, {
+            'error unscheduleActionResponse is 5xx': (unscheduleActionResponse) => unscheduleActionResponse.status >= 500,
+        });
     }
    
 }
@@ -124,9 +136,15 @@ export default function pocDeliveryPushTest() {
     console.log("basePath: "+basePath);
     console.log("apikey: "+apikey);
     console.log("Action for iun: "+actionForIun);
-
+    //one execution every 5 
+    let futureActionExecution = (exec.scenario.iterationInTest % 5)
     let currentIun= generateFakeIUN();
-    insertAction(currentIun,false);
+    if(futureActionExecution == 0){
+        insertAction(currentIun,false);
+    }else{
+        insertAction(currentIun,true);
+    }
+    
    
   
 }
