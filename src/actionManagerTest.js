@@ -122,7 +122,7 @@ function insertAction(iun, isCurrentAction){
 
         sleep(30);
     
-        let unscheduleActionResponse = http.put(insertActionBasePath+actionDeliveryPushRequest.actionId+'/unschedule',params);
+        let unscheduleActionResponse = http.put(insertActionBasePath+'/'+actionDeliveryPushRequest.actionId+'/unschedule',params);
 
         console.log('STATUS unscheduleActionResponse: ',unscheduleActionResponse.status);
    
