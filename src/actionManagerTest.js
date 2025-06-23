@@ -120,9 +120,11 @@ function insertAction(iun, isCurrentAction){
             'error insertFutureActionResponse is 5xx': (insertFutureActionResponse) => insertFutureActionResponse.status >= 500,
         });
 
-        sleep(90);
+        sleep(10);
     
         let unscheduleActionResponse = http.put(insertActionBasePath+actionDeliveryPushRequest.actionId+'/unschedule',params);
+
+        console.log('STATUS unscheduleActionResponse: ',unscheduleActionResponse.status);
    
         check(unscheduleActionResponse, {
             'status unscheduleActionResponse is 200': (unscheduleActionResponse) => unscheduleActionResponse.status === 200,
@@ -142,11 +144,14 @@ export default function pocDeliveryPushTest() {
     //one execution every 5 
     let futureActionExecution = (exec.scenario.iterationInTest % 5)
     let currentIun= generateFakeIUN();
+      insertAction(currentIun,false);
+    /*
     if(futureActionExecution == 0){
         insertAction(currentIun,false);
     }else{
         insertAction(currentIun,true);
     }
+        */
     
    
   
