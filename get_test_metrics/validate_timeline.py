@@ -251,13 +251,13 @@ if __name__ == '__main__':
     processed = get_timelines(iuns)
     
     print(f'Found {len(processed)} timelines, querying DynamoDB for future actions...')
-    #future_actions = get_future_actions();
+    future_actions = get_future_actions();
     
-    #print(f'Found {len(future_actions)} future actions, completing the timelines...')
-    #processed_with_future_actions = complete_timelines_with_future_actions(processed, future_actions)
+    print(f'Found {len(future_actions)} future actions, completing the timelines...')
+    processed_with_future_actions = complete_timelines_with_future_actions(processed, future_actions)
     
-    #print(f'Processed {len(processed_with_future_actions)} timelines, writing to {destination_filename}...')
-    #write_to_file(processed_with_future_actions, destination_filename)
+    print(f'Processed {len(processed_with_future_actions)} timelines, writing to {destination_filename}...')
+    write_to_file(processed_with_future_actions, destination_filename)
 
     end = time.time()
     print(f'Finished in {end - start} seconds')
