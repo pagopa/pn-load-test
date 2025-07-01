@@ -229,7 +229,7 @@ export function internalSendF24Notification() {
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Tor Lupara';
     notificationRequest.recipients[0].physicalAddress.province = 'RM';
     
-    let url = `https://${basePath}/delivery/v2.4/requests`;
+    let url = `https://${basePath}/delivery/v2.5/requests`;
 
      let params = {
         headers: {

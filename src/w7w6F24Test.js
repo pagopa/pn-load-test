@@ -9,9 +9,9 @@ const w7Iteration = new Counter('w7Iteration');
 const f24Iteration = new Counter('f24Iteration');
 const w6Iteration = new Counter('w6Iteration');
 
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
-
-
+/*
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
@@ -68,7 +68,7 @@ export const options = {
       },
     }
   };
-
+*/
 
 
 export function analogicSoakTest() {
