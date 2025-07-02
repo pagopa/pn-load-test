@@ -14,21 +14,21 @@ let basePath = `${__ENV.BASE_PATH}`
 let iunFile = open('./resources/NotificationIUN.txt');
 
 
-// export function setup() {
-//   let useIunFile = `${__ENV.USE_IUN_FILE}`
-//   if(useIunFile && useIunFile !== 'undefined') {
-//     let iunArray = iunFile.split(';');
-//     console.log("IUN_LENGTH: "+ iunArray.length);
-//     return iunArray
-//   }
-//   return sendNotificationToPn("FRMTTR76M06B715E").iun;
-// }
+export function setup() {
+  let useIunFile = `${__ENV.USE_IUN_FILE}`
+  if(useIunFile && useIunFile !== 'undefined') {
+    let iunArray = iunFile.split(';');
+    console.log("IUN_LENGTH: "+ iunArray.length);
+    return iunArray
+  }
+  return sendNotificationToPn("FRMTTR76M06B715E").iun;
+}
 
 
 
 export default function getNotification(iun) {
   let useIunFile = `${__ENV.USE_IUN_FILE}`
-  let currentIun = 'GZKG-AMPR-TANY-202507-N-1';
+  let currentIun = iun;
   if(useIunFile && useIunFile !== 'undefined') {
     currentIun = iun[exec.scenario.iterationInTest % iun.length].trim();
   }
