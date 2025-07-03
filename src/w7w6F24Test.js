@@ -15,7 +15,7 @@ export const options = {
       w7_test: {
         executor: 'constant-arrival-rate',
         timeUnit: '1s',
-        rate: 3, 
+        rate: 6, 
         duration: '60m',
         preAllocatedVUs: 200, 
         maxVUs: 9000,
@@ -25,7 +25,7 @@ export const options = {
       f24_test: {
         executor: 'constant-arrival-rate',
         timeUnit: '1s',
-        rate: 1, 
+        rate: 2, 
         duration: '60m',
         preAllocatedVUs: 200, 
         maxVUs: 9000,
@@ -35,7 +35,7 @@ export const options = {
       w6_test: {
         executor: 'constant-arrival-rate',
         timeUnit: '1s',
-        rate: 2, 
+        rate: 4, 
         duration: '60m',
         preAllocatedVUs: 200, 
         maxVUs: 9000,
