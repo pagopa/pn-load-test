@@ -9,43 +9,8 @@ const w7Iteration = new Counter('w7Iteration');
 const f24Iteration = new Counter('f24Iteration');
 const w6Iteration = new Counter('w6Iteration');
 
-export const options = {
-    setupTimeout: '2400s',
-    scenarios: {
-      w7_test: {
-        executor: 'constant-arrival-rate',
-        timeUnit: '1s',
-        rate: 14, 
-        duration: '60m',
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-        tags: { test_type: 'analogicSoakTest' }, 
-        exec: 'analogicSoakTest', 
-      },
-      f24_test: {
-        executor: 'constant-arrival-rate',
-        timeUnit: '1s',
-        rate: 4, 
-        duration: '60m',
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-        tags: { test_type: 'f24SoakTest' }, 
-        exec: 'f24SoakTest', 
-      },
-      w6_test: {
-        executor: 'constant-arrival-rate',
-        timeUnit: '1s',
-        rate: 6, 
-        duration: '60m',
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-        tags: { test_type: 'digitalSoakTest' }, 
-        exec: 'digitalSoakTest', 
-      },
-    }
-  };
 
-/*
+
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
@@ -58,8 +23,8 @@ export const options = {
 
         stages: [
           { target: 5, duration: '10s' },
-          { target: 30, duration: '30m' },
-          { target: 30, duration: '10m' },
+          { target: 30, duration: '15m' },
+          { target: 30, duration: '45m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
@@ -75,8 +40,8 @@ export const options = {
 
         stages: [
             { target: 5, duration: '10s' },
-            { target: 10, duration: '30m' },
-            { target: 10, duration: '10m' },
+            { target: 10, duration: '15m' },
+            { target: 10, duration: '45m' },
             { target: 5, duration: '0s' },
             { target: 5, duration: '10s' }
         ],
@@ -92,8 +57,8 @@ export const options = {
 
         stages: [
           { target: 5, duration: '10s' },
-          { target: 10, duration: '30m' },
-          { target: 10, duration: '10m' },
+          { target: 10, duration: '15m' },
+          { target: 10, duration: '45m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
@@ -102,7 +67,7 @@ export const options = {
       },
     }
   };
-*/
+
 
 
 export function analogicSoakTest() {
