@@ -17,9 +17,13 @@ export function callDowntimeHistory() {
     };
 
     let response = http.get(url, params);
+
     check(response, {
-      'All the calls succeeded with status code 200!': (response) => response.status === 200,
-  });
+        'status call is 2xx': (r) => Math.floor(response.status / 100) === 2,
+        'status call is 4xx': (r) => Math.floor(response.status / 100) === 4,
+        'status call is 5xx': (r) => Math.floor(response.status / 100) === 5,
+    });
+
     return response;
 
 }
