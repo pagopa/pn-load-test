@@ -71,13 +71,13 @@ export const options = {
 
 
 export function analogicSoakTest() {
-    F24TestOptimized(true);
+    w7TestOptimized(true);
     w7Iteration.add(1);
     sleep(2);
 }
 
 export function f24SoakTest() {
-    w7TestOptimized(true);
+    F24TestOptimized(true);
     f24Iteration.add(1);
     sleep(2);
 }
