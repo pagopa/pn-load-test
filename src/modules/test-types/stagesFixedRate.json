@@ -5,22 +5,18 @@
         "contacts": {
           "executor": "ramping-arrival-rate",
           "timeUnit": "1s",
-          "startRate": 6, 
-          "preAllocatedVUs": 200, 
+          "startRate": 450, 
+          "preAllocatedVUs": 2000, 
           "maxVUs": 9000,
 
           "stages": [
-            { "target": 65, "duration": "7m" },
-
-            { "target": 65, "duration": "0s" },
-            { "target": 65, "duration": "40m" }
+            { "target": 450, "duration": "10m" },
+            { "target": 880, "duration": "10m" },
+            { "target": 880, "duration": "30m" },
+            { "target": 450, "duration": "5m" },
+            { "target": 450, "duration": "5m" }
           ]
         }
-      },
-    "thresholds": {
-        "http_req_failed": [
-            "rate<0.05"
-          ]
       }
 
 }

@@ -41,7 +41,7 @@ export default function callUserAttributeEndpoint() {
     console.log(`Update Courtesy Address Status: ${r.status}`);
 
     check(r, {
-        'status Update Courtesy Address is 200': (r) => r.status === 200,
+        'status Update Courtesy Address is 204': (r) => r.status === 204,
     });
 }
 
