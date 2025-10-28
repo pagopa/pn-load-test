@@ -6,13 +6,14 @@
           "executor": "ramping-arrival-rate",
           "timeUnit": "1s",
           "startRate": 450, 
-          "preAllocatedVUs": 2000, 
+          "preAllocatedVUs": 6500, 
           "maxVUs": 9000,
 
           "stages": [
-            { "target": 450, "duration": "10m" },
-            { "target": 880, "duration": "10m" },
-            { "target": 880, "duration": "30m" },
+            { "target": 450, "duration": "5m" },
+            { "target": 450, "duration": "5m" },
+            { "target": 880, "duration": "5m" },
+            { "target": 880, "duration": "35m" },
             { "target": 450, "duration": "5m" },
             { "target": 450, "duration": "5m" }
           ]
