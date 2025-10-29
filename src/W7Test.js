@@ -349,7 +349,7 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
    
 }
 
-let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@OK-Giacenza-gt10-23L_890','Via@OK_890','Via@OK_AR'];
+let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@FAIL_AR', 'Via@OK_AR', 'Via@OK_RIR', 'Via@OK-Retry_AR'];
 
 export function internalSendNotification() {
 
@@ -359,7 +359,8 @@ export function internalSendNotification() {
     notificationRequest.documents[0].digests.sha256 = sha256;
 
     notificationRequest.recipients[0].taxId ='NVDLVK91L50E991P';
-    notificationRequest.recipients[0].physicalAddress.address = address[exec.scenario.iterationInTest % address.length]
+    let addressVar = address[exec.scenario.iterationInTest % address.length];
+    notificationRequest.recipients[0].physicalAddress.address = addressVar;
 
 
     if(moreAttach && moreAttach !== 'undefined') {
@@ -383,18 +384,32 @@ export function internalSendNotification() {
         number = 310;
     }
 
-    notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
-    console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
-    notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
-    /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
-    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
-    notificationRequest.recipients[0].physicalAddress.province = 'RM';
-    */
-    notificationRequest.recipients[0].physicalAddress.zip = '87100';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.province = 'CS';
+    if (addressVar === 'Via@OK_RIR') {
+      notificationRequest.recipients[0].physicalAddress.at = 'Presso';
+      console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
+      notificationRequest.recipients[0].physicalAddress.addressDetails = 'VIALE C. COLOMBO '+number;
+      notificationRequest.recipients[0].physicalAddress.zip = 'ZONE_2';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
+      notificationRequest.recipients[0].physicalAddress.province = 'CS';
+      notificationRequest.recipients[0].physicalAddress.foreignState = 'MESSICO';
+
+    } else {
+      notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
+      console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
+      notificationRequest.recipients[0].physicalAddress.addressDetails = 'VIALE C. COLOMBO '+number;
+      /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
+      notificationRequest.recipients[0].physicalAddress.province = 'RM';
+      */
+      notificationRequest.recipients[0].physicalAddress.zip = '87100';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
+      notificationRequest.recipients[0].physicalAddress.province = 'CS';
+
+    }
+
 
     
     let url = `https://${basePath}/delivery/v2.5/requests`;

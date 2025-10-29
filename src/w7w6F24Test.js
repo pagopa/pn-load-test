@@ -23,8 +23,8 @@ export const options = {
 
         stages: [
           { target: 5, duration: '10s' },
-          { target: 40, duration: '15m' },
-          { target: 40, duration: '45m' },
+          { target: 50, duration: '15m' },
+          { target: 50, duration: '45m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
@@ -39,11 +39,11 @@ export const options = {
         maxVUs: 9000,
 
         stages: [
-            { target: 5, duration: '10s' },
-            { target: 10, duration: '15m' },
-            { target: 10, duration: '45m' },
-            { target: 5, duration: '0s' },
-            { target: 5, duration: '10s' }
+            { target: 2, duration: '10s' },
+            { target: 5, duration: '15m' },
+            { target: 5, duration: '45m' },
+            { target: 2, duration: '0s' },
+            { target: 2, duration: '10s' }
         ],
         tags: { test_type: 'f24SoakTest' }, 
         exec: 'f24SoakTest', 
@@ -56,11 +56,11 @@ export const options = {
         maxVUs: 9000,
 
         stages: [
-          { target: 5, duration: '10s' },
-          { target: 10, duration: '15m' },
-          { target: 10, duration: '45m' },
-          { target: 5, duration: '0s' },
-          { target: 5, duration: '10s' }
+          { target: 2, duration: '10s' },
+          { target: 5, duration: '15m' },
+          { target: 5, duration: '45m' },
+          { target: 2, duration: '0s' },
+          { target: 2, duration: '10s' }
         ],
         tags: { test_type: 'digitalSoakTest' }, 
         exec: 'digitalSoakTest', 
