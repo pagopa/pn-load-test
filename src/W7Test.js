@@ -407,6 +407,7 @@ export function internalSendNotification() {
       notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
       notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
       notificationRequest.recipients[0].physicalAddress.province = 'CS';
+      notificationRequest.recipients[0].physicalAddress.foreignState = 'ITALIA';
 
     }
 
