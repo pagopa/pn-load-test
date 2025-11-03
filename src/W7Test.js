@@ -389,12 +389,27 @@ export function internalSendNotification() {
       console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
       notificationRequest.recipients[0].physicalAddress.addressDetails = 'VIALE C. COLOMBO '+number;
       notificationRequest.recipients[0].physicalAddress.zip = 'ZONE_2';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'Florianopolis';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Florianopolis';
+      notificationRequest.recipients[0].physicalAddress.province = 'Santa Catarina';
+      notificationRequest.recipients[0].physicalAddress.foreignState = 'BRASILE';
+      notificationRequest.physicalCommunicationType = 'AR_REGISTERED_LETTER';
+
+
+    } else if (addressVar.includes('_890')) {
+      notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
+      console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
+      notificationRequest.recipients[0].physicalAddress.addressDetails = 'VIALE C. COLOMBO '+number;
+      notificationRequest.recipients[0].physicalAddress.zip = '87100';
       notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
       notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
       notificationRequest.recipients[0].physicalAddress.province = 'CS';
-      notificationRequest.recipients[0].physicalAddress.foreignState = 'MESSICO';
+      notificationRequest.recipients[0].physicalAddress.foreignState = 'ITALIA';
+      notificationRequest.physicalCommunicationType = 'REGISTERED_LETTER_890';
+    }
 
-    } else {
+
+    else {
       notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
       console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
       notificationRequest.recipients[0].physicalAddress.addressDetails = 'VIALE C. COLOMBO '+number;
@@ -408,6 +423,7 @@ export function internalSendNotification() {
       notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
       notificationRequest.recipients[0].physicalAddress.province = 'CS';
       notificationRequest.recipients[0].physicalAddress.foreignState = 'ITALIA';
+      notificationRequest.physicalCommunicationType = 'AR_REGISTERED_LETTER';
 
     }
 
