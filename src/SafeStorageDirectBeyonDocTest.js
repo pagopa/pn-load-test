@@ -26,7 +26,8 @@ export default function preloadFileDirect(onlyPreloadUrl) {
     console.log('Sha: '+sha256);
 
  
-    let url = 'http://vpce-0644bc537e0a3d85c-t8y3vunc.vpce-svc-06e9167128c810a62.eu-south-1.vpce.amazonaws.com:8080/safe-storage/v1/files';
+    //let url = 'http://vpce-0644bc537e0a3d85c-t8y3vunc.vpce-svc-06e9167128c810a62.eu-south-1.vpce.amazonaws.com:8080/safe-storage/v1/files';
+    let url = 'http://localhost:8888/safe-storage/v1/files';
     let paramsSafeStoragePreload = {
         headers: {
             'Content-Type': 'application/json',
@@ -64,7 +65,11 @@ export default function preloadFileDirect(onlyPreloadUrl) {
         };
     
         let urlSafeStorage = resultPreload.uploadUrl;
-        
+        let match = urlSafeStorage.match(/\/([^\/?#]+\.pdf)(?:[?#]|$)/i);
+
+        if (match) {
+            console.log("PDF FILE NAME: " + match[1]); // Output: PN_CLEAN_PAPER_ATTACHMENT-fff5718b952c4b669a0a3b720f2b4306.pdf
+        }        
         let safeStorageUploadResponde = http.put(urlSafeStorage, binFile, paramsSafeStorage);
     
         check(safeStorageUploadResponde, {
@@ -78,5 +83,5 @@ export default function preloadFileDirect(onlyPreloadUrl) {
         console.log("SAFE_STORAGE PRELOAD: "+safeStorageUploadResponde.status);
         return resultPreload;   
     }
-   
+
 }
