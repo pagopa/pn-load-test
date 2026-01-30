@@ -358,7 +358,8 @@ export function internalSendNotification() {
     notificationRequest.documents[0].ref.key = resultPreload.key;
     notificationRequest.documents[0].digests.sha256 = sha256;
 
-    notificationRequest.recipients[0].taxId ='NVDLVK91L50E991P';
+    notificationRequest.recipients[0].recipientType ='PG';
+    notificationRequest.recipients[0].taxId ='13022491008';
     notificationRequest.recipients[0].physicalAddress.address = address[exec.scenario.iterationInTest % address.length]
 
 

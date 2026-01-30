@@ -1,14 +1,9 @@
 import { sleep } from 'k6';
 import { Counter } from 'k6/metrics';
-import w6TestOptimized from "./W6Test.js";
 import w7TestOptimized from "./W7Test.js";
-import F24TestOptimized from './F24Test.js';
 
 
 const w7Iteration = new Counter('w7Iteration');
-const f24Iteration = new Counter('f24Iteration');
-const w6Iteration = new Counter('w6Iteration');
-
 
 
 export const options = {
@@ -23,48 +18,14 @@ export const options = {
 
         stages: [
           { target: 5, duration: '10s' },
-          { target: 40, duration: '15m' },
-          { target: 40, duration: '45m' },
+          { target: 60, duration: '1m' },
+          { target: 60, duration: '3m' },
           { target: 5, duration: '0s' },
           { target: 5, duration: '10s' }
         ],
         tags: { test_type: 'analogicSoakTest' }, 
         exec: 'analogicSoakTest', 
-      },
-      f24_test: {
-        executor: 'ramping-arrival-rate',
-        timeUnit: '1s',
-        startRate: 5, 
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-
-        stages: [
-            { target: 5, duration: '10s' },
-            { target: 10, duration: '15m' },
-            { target: 10, duration: '45m' },
-            { target: 5, duration: '0s' },
-            { target: 5, duration: '10s' }
-        ],
-        tags: { test_type: 'f24SoakTest' }, 
-        exec: 'f24SoakTest', 
-      },
-      w6_test: {
-        executor: 'ramping-arrival-rate',
-        timeUnit: '1s',
-        startRate: 1, 
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-
-        stages: [
-          { target: 5, duration: '10s' },
-          { target: 10, duration: '15m' },
-          { target: 10, duration: '45m' },
-          { target: 5, duration: '0s' },
-          { target: 5, duration: '10s' }
-        ],
-        tags: { test_type: 'digitalSoakTest' }, 
-        exec: 'digitalSoakTest', 
-      },
+      }
     }
   };
 
@@ -73,17 +34,5 @@ export const options = {
 export function analogicSoakTest() {
     w7TestOptimized(true);
     w7Iteration.add(1);
-    sleep(2);
-}
-
-export function f24SoakTest() {
-    F24TestOptimized(true);
-    f24Iteration.add(1);
-    sleep(2);
-}
-
-export function digitalSoakTest() {
-    w6TestOptimized(true);
-    w6Iteration.add(1);
     sleep(2);
 }
