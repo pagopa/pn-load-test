@@ -351,6 +351,15 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
 
 let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@OK-Giacenza-gt10-23L_890','Via@OK_890','Via@OK_AR'];
 
+const userArray = new SharedArray('load test', function () {
+  const userFile = open('./resources/infocamereTaxId-UAT.txt');
+
+  return userFile
+    .split('\n')
+    .map(cf => cf.trim())
+    .filter(cf => cf !== '');
+});
+
 export function internalSendNotification() {
 
     let resultPreload = internalPreloadFile();
@@ -359,7 +368,7 @@ export function internalSendNotification() {
     notificationRequest.documents[0].digests.sha256 = sha256;
 
     notificationRequest.recipients[0].recipientType ='PG';
-    notificationRequest.recipients[0].taxId ='13022491008';
+    notificationRequest.recipients[0].taxId = userArray[exec.scenario.iterationInTest % userArray.length];
     notificationRequest.recipients[0].physicalAddress.address = address[exec.scenario.iterationInTest % address.length]
 
 
