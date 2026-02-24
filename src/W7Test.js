@@ -297,7 +297,14 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
     console.log('body: '+payload);
     let preloadResponse = http.post(url, payload, paramsDeliveryPreload);
     
-    console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+    //console.log("DELIVERY PRELOAD: "+preloadResponse.status);
+
+    console.log(JSON.stringify({
+      message: "DELIVERY PRELOAD:",
+      status: preloadResponse.status,
+      headers: preloadResponse.headers,
+      body: preloadResponse.body
+    }));
 
     check(preloadResponse, {
         'status W7 preload is 200': (preloadResponse) => preloadResponse.status === 200,
@@ -463,7 +470,12 @@ export function internalSendNotification() {
         'status W7 is 202': (r) => r.status === 202,
     });
     
-    console.log('REQUEST-ID-LOG: '+r.body)
+    console.log(JSON.stringify({
+      message: "REQUEST-ID-LOG:",
+      status: r.status,
+      headers: r.headers,
+      body: r.body
+    }));
 
     if (r.status === 403) {
         throttling.add(1);
