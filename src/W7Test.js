@@ -28,7 +28,7 @@ let moreAttach = `${__ENV.MORE_ATTACH}`;
 let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
 
 let sha256;
-let pdfNumber = 3;
+let pdfNumber = 1;
 
 let iunArray = new SharedArray('iun sharedArray w7', function () {
   let iunFile = open('./resources/NotificationIUN.txt');
@@ -46,8 +46,8 @@ let iunArray = new SharedArray('iun sharedArray w7', function () {
 const fileArray = new SharedArray('bin file sharedArray w7', function () {
     const dataArray = [];
     
-    var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
-    dataArray.push(obj);
+    //var obj = {'fileString': encoding.b64encode(open('./resources/AvvisoPagoPA.pdf','b'))}
+    //dataArray.push(obj);
     for(let i = 0; i< pdfNumber; i++){
       var obj = {'fileString': encoding.b64encode(open('./resources/PDF_'+(i+1)+'.pdf','b'))}
         dataArray.push(obj);
