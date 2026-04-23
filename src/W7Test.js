@@ -4,6 +4,7 @@ import { SharedArray } from 'k6/data';
 import encoding from 'k6/encoding';
 import exec from 'k6/execution';
 import http from 'k6/http';
+import { NotificationService } from './NotificationService.js';
 
 
 
@@ -29,6 +30,10 @@ let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
 
 let sha256;
 let pdfNumber = 3;
+
+export function getSha256(value) {
+    return sha256;
+}
 
 let iunArray = new SharedArray('iun sharedArray w7', function () {
   let iunFile = open('./resources/NotificationIUN.txt');
@@ -349,30 +354,26 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
    
 }
 
+// Initialize NotificationService
+let notificationService = new NotificationService({
+    basePath: basePath,
+    apiKey: apiKey,
+    paTaxId: paTaxId,
+    withGroup: withGroup,
+    withPayment: withPayment,
+    moreAttach: moreAttach,
+    randomAddress: randomAddress,
+    notificationRequest: notificationRequest,
+    notificationDocument: notificationDocument,
+    internalPreloadFile: internalPreloadFile
+});
+
 let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@OK-Giacenza-gt10-23L_890','Via@OK_890','Via@OK_AR'];
 
+/**
+ * Send notification with single recipient (original behavior)
+ */
 export function internalSendNotification() {
-
-    let resultPreload = internalPreloadFile();
-
-    notificationRequest.documents[0].ref.key = resultPreload.key;
-    notificationRequest.documents[0].digests.sha256 = sha256;
-
-    notificationRequest.recipients[0].taxId ='NVDLVK91L50E991P';
-    notificationRequest.recipients[0].physicalAddress.address = address[exec.scenario.iterationInTest % address.length]
-
-
-    if(moreAttach && moreAttach !== 'undefined') {
-        for(let i = 1; i <= moreAttach; i++){
-            let preloadDocument = internalPreloadFile(false,i);
-            notificationDocument.ref.key = preloadDocument.key;
-            notificationDocument.digests.sha256 = sha256;
-            notificationDocument.title = 'TEST_PDF_'+i;
-
-            notificationRequest.documents[i] = JSON.parse(JSON.stringify(notificationDocument));
-        }
-    }
-
     let number;
     if(randomAddress && randomAddress !== 'undefined'){
         number = exec.scenario.iterationInTest % 3000;
@@ -383,86 +384,17 @@ export function internalSendNotification() {
         number = 310;
     }
 
-    notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
-    console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
-    notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
-    /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
-    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
-    notificationRequest.recipients[0].physicalAddress.province = 'RM';
-    */
-    notificationRequest.recipients[0].physicalAddress.zip = '87100';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.province = 'CS';
+    let recipientAddress = address[exec.scenario.iterationInTest % address.length];
+    notificationService.setSha256(sha256);
+    return notificationService.sendSingleRecipientNotification('NVDLVK91L50E991P', recipientAddress, number);
+}
 
-    
-    let url = `https://${basePath}/delivery/v2.5/requests`;
-
-     let params = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-        },
-    };
-
-    if(withGroup && withGroup !== 'undefined') {
-        let gruopUrl = `https://${basePath}/ext-registry-b2b/pa/v1/groups?metadataOnly=true`;
-        let groupList = JSON.parse((http.get(gruopUrl, params)).body);
-        console.log(JSON.stringify(groupList));
-        let group = groupList.find((elem) => elem.status === 'ACTIVE');
-        notificationRequest.group = group.id;
-    }
-
-    if(withPayment && withPayment !== 'undefined') {
-      let paymentAttachPreload = internalPreloadFile();
-      //console.log('Payment-request: '+JSON.stringify(paymentRequest));
-      //console.log('Payment-request[0]: '+JSON.stringify(paymentRequest[0]));
-      //console.log('Payment-request[0].pagopa: '+JSON.stringify(paymentRequest[0].pagoPa));
-
-      paymentRequest[0].pagoPa.noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
-      paymentRequest[0].pagoPa.attachment.digests.sha256 = sha256;
-      paymentRequest[0].pagoPa.attachment.ref.key = paymentAttachPreload.key;
-      notificationRequest.recipients[0].payments = paymentRequest;
-  }
-
-    /* 
-    if(digitalWorkflow && digitalWorkflow !== 'undefined') {
-        notificationRequest.recipients[0].digitalDomicile = digitalDomicileRequest;
-    }
-    */
-
-    notificationRequest.senderTaxId = paTaxId;
-
-    notificationRequest.paProtocolNumber = ("2023" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(0,13)).padStart(20, '0').substring(0, 20)));
-
-    console.log('paprotocol: '+notificationRequest.paProtocolNumber);
-    let payload = JSON.stringify(notificationRequest);
-
-    console.log('notificationRequest: '+JSON.stringify(notificationRequest));
-
-    let r = http.post(url, payload, params);
-
-    console.log(`Status ${r.status}`);
-
-    check(r, {
-        'status W7 is 409': (r) => r.status === 409,
-    });
-
-    check(r, {
-        'status W7 is 202': (r) => r.status === 202,
-    });
-    
-    console.log('REQUEST-ID-LOG: '+r.body)
-
-    if (r.status === 403) {
-        throttling.add(1);
-     }
-
-    
-
-    return r;
-  
+/**
+ * Send notification with multiple recipients (15 fixed recipients)
+ */
+export function internalSendNotificationMultiRecipients() {
+    notificationService.setSha256(sha256);
+    return notificationService.sendMultiRecipientNotification();
 }
 
 
@@ -491,9 +423,9 @@ export default function w7TestOptimized(onlySend,externalIun) {
   
 
   try{
-    internalSendNotification();
+    internalSendNotificationMultiRecipients();
   }catch(error){
-    console.log('internalSendNotification error: ',error)
+    console.log('internalSendNotificationMultiRecipients error: ',error)
   }
   
 
