@@ -7,6 +7,7 @@ import http from 'k6/http';
 import { internalPreloadFile as w7InternalPreloadFile } from './W7Test.js';
 import { getSha256 as w7sha256 } from './W7Test.js';
 
+let noticeSeq = 0;
 
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
@@ -388,7 +389,8 @@ export function internalSendF24NotificationNew() {
         };
 
         // ===== PAGO PA (SEMPRE) =====
-        let noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
+        //let noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
+        let noticeCode = buildUniqueNoticeCode(index);
 
         let pagoPaPayment = {
             pagoPa: {
@@ -459,4 +461,17 @@ export function internalSendF24NotificationNew() {
     console.log('REQUEST-ID-LOG: ' + r.body);
 
     return r;
+}
+
+// 18 cifre totali: "3" + 17
+function buildUniqueNoticeCode(recipientIndex) {
+  noticeSeq += 1;
+
+  const iter = String(exec.scenario.iterationInTest).padStart(8, '0').slice(-8); // 8
+  const vu = String(exec.vu.idInTest).padStart(4, '0').slice(-4);               // 4
+  const idx = String(recipientIndex).padStart(2, '0').slice(-2);                 // 2
+  const seq = String(noticeSeq).padStart(3, '0').slice(-3);                      // 3
+
+  // 8 + 4 + 2 + 3 = 17
+  return `3${iter}${vu}${idx}${seq}`;
 }
