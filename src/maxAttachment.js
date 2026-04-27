@@ -7,6 +7,22 @@ const w7Iteration = new Counter('w7Iteration');
 const w6Iteration = new Counter('w6Iteration');
 const f24Iteration = new Counter('f24Iteration');
 
+/*
+export const options = {
+    setupTimeout: '2400s',
+    scenarios: {
+      w7_test: {
+        executor: 'shared-iterations',
+        vus: 1,
+        iterations: 1,
+        tags: { test_type: 'singleRecipient' },
+        exec: 'singleRecipient',
+      }
+    }
+  };
+*/
+
+
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
