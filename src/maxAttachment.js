@@ -7,11 +7,25 @@ const w7Iteration = new Counter('w7Iteration');
 const w6Iteration = new Counter('w6Iteration');
 const f24Iteration = new Counter('f24Iteration');
 
-
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
       w7_test: {
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
+        startRate: 5, 
+        preAllocatedVUs: 200, 
+        maxVUs: 9000,
+        stages: [
+          { target: 1, duration: '2s' },
+          { target: 20, duration: '10m' },
+          { target: 20, duration: '25m' },
+          { target: 1, duration: '5m' }
+        ],
+        tags: { test_type: 'singleRecipient' }, 
+        exec: 'singleRecipient', 
+      },
+      multiRecipient_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
         startRate: 1, 
@@ -24,16 +38,20 @@ export const options = {
           { target: 7, duration: '25m' },
           { target: 1, duration: '5m' }
         ],
-        tags: { test_type: 'analogicSoakTest' }, 
-        exec: 'analogicSoakTest', 
+        tags: { test_type: 'multiRecipient' }, 
+        exec: 'multiRecipient', 
       }
     }
   };
 
-
-
-export function analogicSoakTest() {
+export function multiRecipient() {
     F24TestOptimized(true);
     f24Iteration.add(1);
+    sleep(2);
+}
+
+export function singleRecipient() {
+    w7TestOptimized(true);
+    w7Iteration.add(1);
     sleep(2);
 }

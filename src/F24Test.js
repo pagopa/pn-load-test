@@ -7,8 +7,6 @@ import http from 'k6/http';
 import { internalPreloadFile as w7InternalPreloadFile } from './W7Test.js';
 import { getSha256 as w7sha256 } from './W7Test.js';
 
-let noticeSeq = 0;
-
 
 export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
@@ -27,6 +25,9 @@ let paTaxId = `${__ENV.PA_TAX_ID}`;
 
 let sha256;
 let pdfNumber = 3;
+const PAYMENTS_PER_RECIPIENT = 5;
+const F24_RECIPIENTS_COUNT = 3;
+const NOTICE_RUN_SEED = String(Date.now()).slice(-6);
 
 
 const fileArray = new SharedArray('bin file sharedArray attach', function () {
@@ -346,8 +347,8 @@ export function internalSendF24NotificationNew() {
 
     // PRELOAD
     let paymentAttachPreloadF24 = preloadF24();
-    let paymentAttachPreloadPagoPa = w7InternalPreloadFile();
-    let pagoPaSha256 = w7sha256();
+ //   let paymentAttachPreloadPagoPa = w7InternalPreloadFile();
+ //   let pagoPaSha256 = w7sha256();
 
     const recipientsData = [
         { taxId: "GRBGPP87L04L741X", name: "Giuseppe Maria Garibaldi", address: "Via @OK_AR" },
@@ -388,32 +389,37 @@ export function internalSendF24NotificationNew() {
             payments: []
         };
 
-        // ===== PAGO PA (SEMPRE) =====
-        //let noticeCode = ("3" + (((exec.scenario.iterationInTest+''+exec.vu.idInTest+''+(Math.floor(Math.random() * 9999999))).substring(0,7) +''+ new Date().getTime().toString().substring(3,13)).padStart(17, '0').substring(0, 17)));
-        let noticeCode = buildUniqueNoticeCode(index);
+        const pagoPaPaymentsCount = PAYMENTS_PER_RECIPIENT;
 
-        let pagoPaPayment = {
-            pagoPa: {
-                noticeCode: noticeCode,
-                creditorTaxId: "77777777777",
-                applyCost: true,
-                attachment: {
-                    digests: {
-                        sha256: pagoPaSha256
-                    },
-                    contentType: "application/pdf",
-                    ref: {
-                        key: paymentAttachPreloadPagoPa.key,
-                        versionToken: "v1"
+        for (let paymentIndex = 0; paymentIndex < pagoPaPaymentsCount; paymentIndex += 1) {
+            // PRELOAD
+            let paymentAttachPreloadPagoPa = w7InternalPreloadFile();
+            let pagoPaSha256 = w7sha256();
+            let noticeCode = buildUniqueNoticeCode(index, paymentIndex);
+
+            let pagoPaPayment = {
+                pagoPa: {
+                    noticeCode: noticeCode,
+                    creditorTaxId: "77777777777",
+                    applyCost: true,
+                    attachment: {
+                        digests: {
+                            sha256: pagoPaSha256
+                        },
+                        contentType: "application/pdf",
+                        ref: {
+                            key: paymentAttachPreloadPagoPa.key,
+                            versionToken: "v1"
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        recipient.payments.push(pagoPaPayment);
+            recipient.payments.push(pagoPaPayment);
+        }
 
-        // ===== F24 SOLO PRIMI 6 =====
-        if (index < 3) {
+        // ===== F24 SOLO PRIMI 3 =====
+        if (index < F24_RECIPIENTS_COUNT) {
             let f24Payment = JSON.parse(JSON.stringify(paymentRequestf24[0]));
 
             f24Payment.f24.metadataAttachment.digests.sha256 = sha256;
@@ -463,15 +469,13 @@ export function internalSendF24NotificationNew() {
     return r;
 }
 
-// 18 cifre totali: "3" + 17
-function buildUniqueNoticeCode(recipientIndex) {
-  noticeSeq += 1;
+// 18 cifre totali: "3" + 17. Include un seed di run per evitare duplicati tra run diverse.
+function buildUniqueNoticeCode(recipientIndex, paymentIndex) {
+    const iter = String(exec.scenario.iterationInTest).padStart(8, '0').slice(-8); // 8
+    const rp = String((recipientIndex * PAYMENTS_PER_RECIPIENT) + paymentIndex)
+        .padStart(3, '0')
+        .slice(-3); // 3
 
-  const iter = String(exec.scenario.iterationInTest).padStart(8, '0').slice(-8); // 8
-  const vu = String(exec.vu.idInTest).padStart(4, '0').slice(-4);               // 4
-  const idx = String(recipientIndex).padStart(2, '0').slice(-2);                 // 2
-  const seq = String(noticeSeq).padStart(3, '0').slice(-3);                      // 3
-
-  // 8 + 4 + 2 + 3 = 17
-  return `3${iter}${vu}${idx}${seq}`;
+    // 6 (run seed) + 8 (iteration) + 3 (recipient/payment) = 17
+    return `3${NOTICE_RUN_SEED}${iter}${rp}`;
 }
