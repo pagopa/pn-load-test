@@ -97,8 +97,8 @@ export const options = {
         maxVUs: 9000,
         stages: [
           { target: 5, duration: '10s' },
-          { target: 20, duration: '5m' },
-          { target: 20, duration: '50m' },
+          { target: 60, duration: '5m' },
+          { target: 60, duration: '50m' },
           { target: 5, duration: '5m' },
           { target: 5, duration: '10s' }
         ],
