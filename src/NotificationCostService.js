@@ -17,6 +17,7 @@ export const retrieveNotificationCostForPayment_403 = new Counter('retrieveNotif
 export const retrieveNotificationCostForPayment_404 = new Counter('retrieveNotificationCostForPayment_404');
 export const retrieveNotificationCostForPayment_500 = new Counter('retrieveNotificationCostForPayment_500');
 
+/*
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
@@ -31,6 +32,45 @@ export const options = {
         executor: 'shared-iterations',
         vus: 1,
         iterations: 4,
+        tags: { test_type: 'retrieveNotificationCostForPayment' }, 
+        exec: 'retrieveNotificationCostForPayment', 
+      }
+    }
+  };
+*/
+
+export const options = {
+    setupTimeout: '2400s',
+    scenarios: {
+      notificationCost: {
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
+        startRate: 5, 
+        preAllocatedVUs: 200, 
+        maxVUs: 9000,
+        stages: [
+          { target: 5, duration: '10s' },
+          { target: 20, duration: '10m' },
+          { target: 20, duration: '30m' },
+          { target: 5, duration: '0s' },
+          { target: 5, duration: '10s' }
+        ],
+        tags: { test_type: 'retrieveNotificationCost' }, 
+        exec: 'retrieveNotificationCost', 
+      },
+      notificationCostForPayment: {
+        executor: 'ramping-arrival-rate',
+        timeUnit: '1s',
+        startRate: 5, 
+        preAllocatedVUs: 200, 
+        maxVUs: 9000,
+        stages: [
+            { target: 5, duration: '10s' },
+            { target: 20, duration: '10m' },
+            { target: 20, duration: '30m' },
+            { target: 5, duration: '0s' },
+            { target: 5, duration: '10s' }
+        ],
         tags: { test_type: 'retrieveNotificationCostForPayment' }, 
         exec: 'retrieveNotificationCostForPayment', 
       }
