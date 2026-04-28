@@ -50,9 +50,9 @@ export const options = {
         maxVUs: 9000,
         stages: [
           { target: 5, duration: '10s' },
-          { target: 20, duration: '10m' },
-          { target: 20, duration: '30m' },
-          { target: 5, duration: '0s' },
+          { target: 20, duration: '5m' },
+          { target: 20, duration: '50m' },
+          { target: 5, duration: '5m' },
           { target: 5, duration: '10s' }
         ],
         tags: { test_type: 'retrieveNotificationCost' }, 
@@ -66,9 +66,9 @@ export const options = {
         maxVUs: 9000,
         stages: [
             { target: 5, duration: '10s' },
-            { target: 20, duration: '10m' },
-            { target: 20, duration: '30m' },
-            { target: 5, duration: '0s' },
+            { target: 20, duration: '5m' },
+            { target: 20, duration: '50m' },
+            { target: 5, duration: '5m' },
             { target: 5, duration: '10s' }
         ],
         tags: { test_type: 'retrieveNotificationCostForPayment' }, 
@@ -79,10 +79,10 @@ export const options = {
 
 
 //DA LOCALE
-let domain = 'http://localhost:8886';
+//let domain = 'http://localhost:8886';
 
 //DA REMOTO
-//let domain = 'http://internal-EcsA-20230504103152508600000011-1839177861.eu-south-1.elb.amazonaws.com:8080';
+let domain = 'http://internal-EcsA-20230504103152508600000011-1839177861.eu-south-1.elb.amazonaws.com:8080';
 
 //notification-cost-private/cost/{iun}/recipient/{recIndex}
 export function retrieveNotificationCost() {
