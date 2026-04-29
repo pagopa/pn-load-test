@@ -26,7 +26,7 @@ let paTaxId = `${__ENV.PA_TAX_ID}`;
 let sha256;
 let pdfNumber = 3;
 const PAYMENTS_PER_RECIPIENT = 5;
-const F24_RECIPIENTS_COUNT = 3;
+const F24_RECIPIENTS_COUNT = 0;
 const NOTICE_RUN_SEED = String(Date.now()).slice(-6);
 
 
@@ -346,7 +346,7 @@ export function internalSendF24NotificationNew() {
     }
 
     // PRELOAD
-    let paymentAttachPreloadF24 = preloadF24();
+ //   let paymentAttachPreloadF24 = preloadF24();
  //   let paymentAttachPreloadPagoPa = w7InternalPreloadFile();
  //   let pagoPaSha256 = w7sha256();
 
@@ -419,14 +419,14 @@ export function internalSendF24NotificationNew() {
         }
 
         // ===== F24 SOLO PRIMI 3 =====
-        if (index < F24_RECIPIENTS_COUNT) {
-            let f24Payment = JSON.parse(JSON.stringify(paymentRequestf24[0]));
-
-            f24Payment.f24.metadataAttachment.digests.sha256 = sha256;
-            f24Payment.f24.metadataAttachment.ref.key = paymentAttachPreloadF24.key;
-
-            recipient.payments.push(f24Payment);
-        }
+//        if (index < F24_RECIPIENTS_COUNT) {
+//            let f24Payment = JSON.parse(JSON.stringify(paymentRequestf24[0]));
+//
+//            f24Payment.f24.metadataAttachment.digests.sha256 = sha256;
+//            f24Payment.f24.metadataAttachment.ref.key = paymentAttachPreloadF24.key;
+//
+//            recipient.payments.push(f24Payment);
+//        }
 
         notificationRequest.recipients.push(recipient);
     });

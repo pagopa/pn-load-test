@@ -15,8 +15,8 @@ export const options = {
         executor: 'shared-iterations',
         vus: 1,
         iterations: 1,
-        tags: { test_type: 'singleRecipient' },
-        exec: 'singleRecipient',
+        tags: { test_type: 'multiRecipient' },
+        exec: 'multiRecipient',
       }
     }
   };
@@ -34,8 +34,8 @@ export const options = {
         maxVUs: 9000,
         stages: [
           { target: 1, duration: '2s' },
-          { target: 20, duration: '10m' },
-          { target: 20, duration: '25m' },
+          { target: 15, duration: '10m' },
+          { target: 15, duration: '25m' },
           { target: 1, duration: '5m' }
         ],
         tags: { test_type: 'singleRecipient' }, 
@@ -59,6 +59,7 @@ export const options = {
       }
     }
   };
+
 
 export function multiRecipient() {
     F24TestOptimized(true);
