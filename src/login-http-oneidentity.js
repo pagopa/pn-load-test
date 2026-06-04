@@ -2,34 +2,43 @@ import { check, sleep } from 'k6';
 import exec from 'k6/execution';
 import http from 'k6/http';
 
-export const options = {
-  scenarios: {
-    login_test: {
-      executor: 'shared-iterations',
-      vus: 3,
-      iterations: 3,
-      maxDuration: '2m',
-    },
-  },
-  thresholds: {
-    http_req_duration: ['p(95)<5000'],
-    http_req_failed:   ['rate<0.05'],
-  },
-};
+export let options = JSON.parse(open('./modules/test-types/'+__ENV.TEST_TYPE+'.json'));
 
 // ── Configurazione ────────────────────────────────────────────────────────────
 
-const WEBAPI_BASE = 'https://webapi.dev.notifichedigitali.it';
-const SP_BASE     = 'https://cittadini.dev.notifichedigitali.it';
-const IDP_BASE    = 'https://idp.uat.oneid.pagopa.it';
+const password = `${__ENV.PASSWORD}`
+let env = `${__ENV.LOGIN_ENV}`
+
+const usernames = [
+    'cesare',
+    'ada',
+    'garibaldi',
+    'lucrezia',
+    'cristoforocolombo',
+    'lapulzella',
+    'fieramosca',
+    'cleopatra',
+    'marcopolo',
+    'innominato',
+    'Louis',
+    'montessori',
+    'little',
+    'dino',
+    'galileo',
+    'leonardo',
+    'MarcoTullioCicerone',
+    'LucioAnneoSeneca',
+    'MarcoPorcioCatoneSpqr'
+]
+
+const WEBAPI_BASE = `https://webapi.${env}.notifichedigitali.it`;
+const SP_BASE     = `https://cittadini.${env}.notifichedigitali.it`;
+const IDP_BASE    = `https://idp.uat.oneid.pagopa.it`;
 const IDP_PARAM   = IDP_BASE;
 
 // Costanti fisse del Service Provider — non cambiano tra sessioni
 const CLIENT_ID   = 'DFCUf4W3KHfKUl4USEVYrMgpMxvyKICHM_ZPiZ3ftm0';
-const CLIENT_NAME = 'Cittadini-DEV';
-
-const usernames = ['ada'];
-const password  = 'password123';
+const CLIENT_NAME = `Cittadini-${env.toUpperCase()}`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -116,7 +125,7 @@ export default function loginTest() {
   });
   if (!step3Ok) { console.error(`[step3] FALLITO — body: ${res3.body.substring(0, 300)}`); return; }
 
-  // ── Step 4: POST credenziali — chiamata diretta come da DevTools ──────────
+  // ── Step 4: POST credenziali ──
   // POST /login con authnRequestId (dinamico) + clientId/clientName (fissi SP) + credenziali
   const res4 = http.post(
     `${IDP_BASE}/login`,
