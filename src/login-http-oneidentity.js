@@ -81,12 +81,12 @@ export default function loginTest() {
   // GET webapi/oidc-authorize → { location: "https://uat.oneid.../oidc/authorize?...&nonce=X&state=Y" }
   const res1 = http.get(
     `${WEBAPI_BASE}/oidc-authorize?idp=${encodeURIComponent(IDP_PARAM)}`,
-    { jar, headers: { ...headers, Origin: SP_BASE } },
+    { jar: jar, headers: Object.assign({}, headers, { Origin: SP_BASE }) },
   );
 
   const step1Ok = check(res1, {
-    '[step1] webapi risponde 200':      r => r.status === 200,
-    '[step1] location presente nel JSON': r => !!r.json('location'),
+    '[step1] webapi risponde 200':      function(r) { return r.status === 200; },
+    '[step1] location presente nel JSON': function(r) { return !!r.json('location'); },
   });
   if (!step1Ok) { console.error(`[step1] FALLITO — status: ${res1.status}`); return; }
 
@@ -94,16 +94,16 @@ export default function loginTest() {
 
   // ── Step 2: OneID genera il SAMLRequest e lo mette in un form auto-submit ─
   // GET oidc/authorize → HTML con <form action="/samlsso"> + SAMLRequest firmato
-  const res2 = http.get(oidcUrl, { jar, headers, redirects: 5 });
+  const res2 = http.get(oidcUrl, { jar: jar, headers: headers, redirects: 5 });
 
   const samlRequest = extractField(res2.body, 'SAMLRequest');
   const relayState  = extractField(res2.body, 'RelayState');
   const samlAction  = extractAction(res2.body);
 
   const step2Ok = check(res2, {
-    '[step2] risponde 200':        r => r.status === 200,
-    '[step2] SAMLRequest presente': () => !!samlRequest,
-    '[step2] action presente':      () => !!samlAction,
+    '[step2] risponde 200':        function(r) { return r.status === 200; },
+    '[step2] SAMLRequest presente': function() { return !!samlRequest; },
+    '[step2] action presente':      function() { return !!samlAction; },
   });
   if (!step2Ok) { console.error(`[step2] FALLITO — body: ${res2.body.substring(0, 300)}`); return; }
 
@@ -113,15 +113,15 @@ export default function loginTest() {
   const res3 = http.post(
     samlAction,
     { SAMLRequest: samlRequest, RelayState: relayState },
-    { jar, headers, redirects: 5 },
+    { jar: jar, headers: headers, redirects: 5 },
   );
 
   const authnRequestId = extractField(res3.body, 'authnRequestId');
 
   const step3Ok = check(res3, {
-    '[step3] risponde 200':           r => r.status === 200,
-    '[step3] pagina login presente':  r => r.body.includes('login-form'),
-    '[step3] authnRequestId trovato': () => !!authnRequestId,
+    '[step3] risponde 200':           function(r) { return r.status === 200; },
+    '[step3] pagina login presente':  function(r) { return r.body.includes('login-form'); },
+    '[step3] authnRequestId trovato': function() { return !!authnRequestId; },
   });
   if (!step3Ok) { console.error(`[step3] FALLITO — body: ${res3.body.substring(0, 300)}`); return; }
 
@@ -129,64 +129,115 @@ export default function loginTest() {
   // POST /login con authnRequestId (dinamico) + clientId/clientName (fissi SP) + credenziali
   const res4 = http.post(
     `${IDP_BASE}/login`,
-    { authnRequestId, clientId: CLIENT_ID, clientName: CLIENT_NAME, username, password },
-    { jar, headers: { ...headers, Origin: IDP_BASE, Referer: `${IDP_BASE}/samlsso` }, redirects: 10 },
+    { authnRequestId: authnRequestId, clientId: CLIENT_ID, clientName: CLIENT_NAME, username: username, password: password },
+    { jar: jar, headers: Object.assign({}, headers, { Origin: IDP_BASE, Referer: `${IDP_BASE}/samlsso` }), redirects: 10 },
   );
 
+  console.log(`[step4] status: ${res4.status} — url: ${res4.url} — body: ${res4.body.substring(0, 500)}`);
+
   const step4Ok = check(res4, {
-    '[step4] risponde 200':              r => r.status === 200,
-    '[step4] credenziali valide':        r => !r.body.includes('Credenziali non valide'),
-    '[step4] pagina consenso presente':  r => r.body.includes('consent-form'),
+    '[step4] risponde 200':              function(r) { return r.status === 200; },
+    '[step4] credenziali valide':        function(r) { return !r.body.includes('Credenziali non valide'); },
+    '[step4] pagina consenso presente':  function(r) { return r.body.includes('consent-form'); },
+  });
+  const oidcUrl = res1.json('location');
+
+  // ── Step 2: OneID genera il SAMLRequest e lo mette in un form auto-submit ─
+  // GET oidc/authorize → HTML con <form action="/samlsso"> + SAMLRequest firmato
+  const res2 = http.get(oidcUrl, { jar: jar, headers: headers, redirects: 5 });
+
+  const samlRequest = extractField(res2.body, 'SAMLRequest');
+  const relayState  = extractField(res2.body, 'RelayState');
+  const samlAction  = extractAction(res2.body);
+
+  const step2Ok = check(res2, {
+    '[step2] risponde 200':        function(r) { return r.status === 200; },
+    '[step2] SAMLRequest presente': function() { return !!samlRequest; },
+    '[step2] action presente':      function() { return !!samlAction; },
+  });
+  if (!step2Ok) { console.error(`[step2] FALLITO — body: ${res2.body.substring(0, 300)}`); return; }
+
+  // ── Step 3: POST SAMLRequest a OneID — otteniamo authnRequestId ───────────
+  // POST /samlsso → HTML pagina login con authnRequestId come campo hidden
+  // authnRequestId è l'ID del SAMLRequest, legato a questa sessione SAML
+  const res3 = http.post(
+    samlAction,
+    { SAMLRequest: samlRequest, RelayState: relayState },
+    { jar: jar, headers: headers, redirects: 5 },
+  );
+
+  const authnRequestId = extractField(res3.body, 'authnRequestId');
+
+  const step3Ok = check(res3, {
+    '[step3] risponde 200':           function(r) { return r.status === 200; },
+    '[step3] pagina login presente':  function(r) { return r.body.includes('login-form'); },
+    '[step3] authnRequestId trovato': function() { return !!authnRequestId; },
+  });
+  if (!step3Ok) { console.error(`[step3] FALLITO — body: ${res3.body.substring(0, 300)}`); return; }
+
+  // ── Step 4: POST credenziali ──
+  // POST /login con authnRequestId (dinamico) + clientId/clientName (fissi SP) + credenziali
+  const res4 = http.post(
+    `${IDP_BASE}/login`,
+    { authnRequestId: authnRequestId, clientId: CLIENT_ID, clientName: CLIENT_NAME, username: username, password: password },
+    { jar: jar, headers: Object.assign({}, headers, { Origin: IDP_BASE, Referer: `${IDP_BASE}/samlsso` }), redirects: 10 },
+  );
+
+  console.log(`[step4] status: ${res4.status} — url: ${res4.url} — body: ${res4.body.substring(0, 500)}`);
+
+  const step4Ok = check(res4, {
+    '[step4] risponde 200':              function(r) { return r.status === 200; },
+    '[step4] credenziali valide':        function(r) { return !r.body.includes('Credenziali non valide'); },
+    '[step4] pagina consenso presente':  function(r) { return r.body.includes('consent-form'); },
   });
   if (!step4Ok) { console.error(`[step4] FALLITO — url: ${res4.url} body: ${res4.body.substring(0, 300)}`); return; }
 
   // ── Step 5: POST consenso — chiamata diretta, authnRequestId riusato ──────
   // POST /consent — authnRequestId e clientId sono gli stessi della sessione attiva
-const res5 = http.post(
-  `${IDP_BASE}/consent`,
-  { authnRequestId, clientId: CLIENT_ID, username, consent: 'true' },
-  { jar, headers: { ...headers, Origin: IDP_BASE, Referer: `${IDP_BASE}/` }, redirects: 0 },
-);
+  const res5 = http.post(
+    `${IDP_BASE}/consent`,
+    { authnRequestId: authnRequestId, clientId: CLIENT_ID, username: username, consent: 'true' },
+    { jar: jar, headers: Object.assign({}, headers, { Origin: IDP_BASE, Referer: `${IDP_BASE}/` }), redirects: 0 },
+  );
 
-check(res5, {
-  '[step5] consenso inviato': r => r.status === 200 || r.status === 302,
-});
+  check(res5, {
+    '[step5] consenso inviato': function(r) { return r.status === 200 || r.status === 302; },
+  });
 
-// ── Step 6: POST SAMLResponse all'ACS di OneID ───────────────────────────────
-// L'ACS è https://uat.oneid.pagopa.it/saml/acs (non idp.uat.oneid.pagopa.it)
-// RelayState va estratto dal form — il browser invia "internal-idp"
-const ACS_URL     = 'https://uat.oneid.pagopa.it/saml/acs';
-const samlResponse = extractSamlResponse(res5.body);
-const relayStateAcs = extractField(res5.body, 'RelayState') || 'internal-idp';
+  // ── Step 6: POST SAMLResponse all'ACS di OneID ───────────────────────────────
+  // L'ACS è https://uat.oneid.pagopa.it/saml/acs (non idp.uat.oneid.pagopa.it)
+  // RelayState va estratto dal form — il browser invia "internal-idp"
+  const ACS_URL      = 'https://uat.oneid.pagopa.it/saml/acs';
+  const samlResponse = extractSamlResponse(res5.body);
+  const relayStateAcs = extractField(res5.body, 'RelayState') || 'internal-idp';
 
-const step6DataOk = check(res5, {
-  '[step6] SAMLResponse estratta': () => !!samlResponse,
-});
-if (!step6DataOk) {
-  console.error(`[step6] SAMLResponse non trovata — body: ${res5.body.substring(0, 400)}`);
-  return;
-}
+  const step6DataOk = check(res5, {
+    '[step6] SAMLResponse estratta': function() { return !!samlResponse; },
+  });
+  if (!step6DataOk) {
+    console.error(`[step6] SAMLResponse non trovata — body: ${res5.body.substring(0, 400)}`);
+    return;
+  }
 
-const res6 = http.post(
-  ACS_URL,
-  { SAMLResponse: samlResponse, RelayState: relayStateAcs },
-  {
-    jar,
-    headers: {
-      ...headers,
-      Origin:  IDP_BASE,                // https://idp.uat.oneid.pagopa.it
-      Referer: `${IDP_BASE}/`,          // https://idp.uat.oneid.pagopa.it/
+  const res6 = http.post(
+    ACS_URL,
+    { SAMLResponse: samlResponse, RelayState: relayStateAcs },
+    {
+      jar: jar,
+      headers: Object.assign({}, headers, {
+        Origin:  IDP_BASE,
+        Referer: `${IDP_BASE}/`,
+      }),
+      redirects: 10,
     },
-    redirects: 10,
-  },
-);
+  );
 
-check(res6, {
-  '[step6] login completato': r => r.status === 200,
-  '[step6] callback SP':      r => r.url.startsWith(SP_BASE),
-  '[step6] nessun errore':    r => !r.url.includes('error'),
-});
+  check(res6, {
+    '[step6] login completato': function(r) { return r.status === 200; },
+    '[step6] callback SP':      function(r) { return r.url.startsWith(SP_BASE); },
+    '[step6] nessun errore':    function(r) { return !r.url.includes('error'); },
+  });
 
-console.log(`[iter ${exec.scenario.iterationInTest}] completato — url finale: ${res6.url}`);
+  console.log(`[iter ${exec.scenario.iterationInTest}] completato — url finale: ${res6.url}`);
   sleep(1);
 }
