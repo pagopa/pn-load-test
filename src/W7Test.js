@@ -4,6 +4,7 @@ import { SharedArray } from 'k6/data';
 import encoding from 'k6/encoding';
 import exec from 'k6/execution';
 import http from 'k6/http';
+import { Counter } from 'k6/metrics';
 
 
 
@@ -29,6 +30,15 @@ let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
 
 let sha256;
 let pdfNumber = 3;
+
+// Target spedizioni per lo scenario "Ente A - Virtuoso"
+const CAP_16010_TARGET = 129000;
+const CAP_16011_TARGET = 10000;
+const TOTAL_TARGET = CAP_16010_TARGET + CAP_16011_TARGET; // 139.000
+
+// Contatori spedizioni accettate (202) per CAP, visibili nel summary di fine test
+const sentCap16010 = new Counter('sent_cap_16010');
+const sentCap16011 = new Counter('sent_cap_16011');
 
 let iunArray = new SharedArray('iun sharedArray w7', function () {
   let iunFile = open('./resources/NotificationIUN.txt');
@@ -349,9 +359,15 @@ export function internalPreloadFile(onlyPreloadUrl, otherFile) {
    
 }
 
-let address = ['Via@OK-Retry_890','Via@OK-Giacenza-lte10_890','Via@OK-Giacenza-gt10-23L_890','Via@OK_890','Via@OK_AR'];
+let address = ['Via@OK_AR'];
 
 export function internalSendNotification() {
+
+    // Guardia: una volta raggiunto il target totale non si creano altre spedizioni
+    // (le iterazioni successive diventano no-op, niente chiamate HTTP)
+    if (exec.scenario.iterationInTest >= TOTAL_TARGET) {
+        return;
+    }
 
     let resultPreload = internalPreloadFile();
 
@@ -391,10 +407,24 @@ export function internalSendNotification() {
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
     notificationRequest.recipients[0].physicalAddress.province = 'RM';
     */
-    notificationRequest.recipients[0].physicalAddress.zip = '87100';
-    notificationRequest.recipients[0].physicalAddress.municipality = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Cosenza';
-    notificationRequest.recipients[0].physicalAddress.province = 'CS';
+    // Distribute notifications: first CAP_16010_TARGET to CAP 16010, the rest to CAP 16011
+    let iterationNumber = exec.scenario.iterationInTest;
+    let targetCap;
+    if (iterationNumber < CAP_16010_TARGET) {
+      // CAP 16010 (Liguria)
+      notificationRequest.recipients[0].physicalAddress.zip = '16010';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'Genova';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Genova';
+      notificationRequest.recipients[0].physicalAddress.province = 'GE';
+      targetCap = sentCap16010;
+    } else {
+      // CAP 16011 (Liguria)
+      notificationRequest.recipients[0].physicalAddress.zip = '16011';
+      notificationRequest.recipients[0].physicalAddress.municipality = 'Genova';
+      notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'Genova';
+      notificationRequest.recipients[0].physicalAddress.province = 'GE';
+      targetCap = sentCap16011;
+    }
 
     
     let url = `https://${basePath}/delivery/v2.5/requests`;
@@ -452,7 +482,11 @@ export function internalSendNotification() {
     check(r, {
         'status W7 is 202': (r) => r.status === 202,
     });
-    
+
+    if (r.status === 202) {
+        targetCap.add(1);
+    }
+
     console.log('REQUEST-ID-LOG: '+r.body)
 
     if (r.status === 403) {
