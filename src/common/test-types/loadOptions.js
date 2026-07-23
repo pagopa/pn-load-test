@@ -4,5 +4,5 @@ export function loadTestOptions(testType = __ENV.TEST_TYPE) {
     throw new Error('Missing TEST_TYPE env var');
   }
 
-  return JSON.parse(open(import.meta.resolve(`./${testType}.json`)));
+  return JSON.parse(open(`./${testType}.json`));
 }
