@@ -1,9 +1,8 @@
-//import {loadTestOptions} from '../common/test-types/loadOptions.js';
+import {loadTestOptions} from '../common/test-types/loadOptions.js';
 import { check, sleep } from 'k6';
 import http from 'k6/http';
 
-//export let options = loadTestOptions();
-export let options = JSON.parse(open('./common/test-type/'+__ENV.TEST_TYPE+'.json'));
+export let options = loadTestOptions();
 
 let bearerToken = `${__ENV.ADMIN_GSP_TOKEN}`
 let bffBasePath = `${__ENV.BFF_BASE_PATH}`
