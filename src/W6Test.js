@@ -372,9 +372,11 @@ export function internalSendNotification() {
         number = 310;
     }
 
+    notificationRequest.recipients[0].recipientType='PG'
+    notificationRequest.recipients[0].taxId='23278600954'
     notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
     console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
-    notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
+    notificationRequest.recipients[0].physicalAddress.address = 'Via@FAIL-IRREPERIBILE_890';
     /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
     notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';
