@@ -43,6 +43,17 @@ let iunArray = new SharedArray('iun sharedArray w6', function () {
 });
 
 
+const taxIdArray = new SharedArray('taxId sharedArray w6', function () {
+  let taxIdFile = open('./resources/lista_cf_numerici_inipec_collaudo.txt');
+  if (taxIdFile) {
+    const dataArray = taxIdFile.split('\n').filter((line) => line.trim() !== '');
+    console.log("TAXID_LENGTH: " + dataArray.length);
+    return dataArray; // must be an array
+  } else {
+    return [];
+  }
+});
+
 const fileArray = new SharedArray('bin file sharedArray w6', function () {
     const dataArray = [];
     
@@ -372,9 +383,12 @@ export function internalSendNotification() {
         number = 310;
     }
 
+    notificationRequest.recipients[0].recipientType='PG'
+    //notificationRequest.recipients[0].taxId='23278600954'
+    notificationRequest.recipients[0].taxId=taxIdArray[exec.scenario.iterationInTest % taxIdArray.length].trim()
     notificationRequest.recipients[0].physicalAddress.at = 'VIALE C. COLOMBO '+number;
     console.log('ADDRESS: '+notificationRequest.recipients[0].physicalAddress.at);
-    notificationRequest.recipients[0].physicalAddress.address = 'VIALE C. COLOMBO '+number;
+    notificationRequest.recipients[0].physicalAddress.address = 'Via@FAIL-IRREPERIBILE_890';
     /*notificationRequest.recipients[0].physicalAddress.zip = '00100';
     notificationRequest.recipients[0].physicalAddress.municipality = 'roma';
     notificationRequest.recipients[0].physicalAddress.municipalityDetails = 'roma';

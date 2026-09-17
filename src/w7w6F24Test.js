@@ -14,7 +14,7 @@ const w6Iteration = new Counter('w6Iteration');
 export const options = {
     setupTimeout: '2400s',
     scenarios: {
-      w7_test: {
+      /*w7_test: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1s',
         startRate: 5, 
@@ -46,22 +46,13 @@ export const options = {
             { target: 5, duration: '10s' }
         ],
         tags: { test_type: 'f24SoakTest' }, 
-        exec: 'f24SoakTest', 
-      },
+        exec: 'f24SoakTest',
+      },*/
       w6_test: {
-        executor: 'ramping-arrival-rate',
-        timeUnit: '1s',
-        startRate: 1, 
-        preAllocatedVUs: 200, 
-        maxVUs: 9000,
-
-        stages: [
-          { target: 5, duration: '10s' },
-          { target: 10, duration: '15m' },
-          { target: 10, duration: '45m' },
-          { target: 5, duration: '0s' },
-          { target: 5, duration: '10s' }
-        ],
+        executor: 'shared-iterations',
+        vus: 1,
+        iterations: 2,
+        maxDuration: '5m',
         tags: { test_type: 'digitalSoakTest' }, 
         exec: 'digitalSoakTest', 
       },
