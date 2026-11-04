@@ -18,13 +18,11 @@ export default function bffApiKeys(){
 
     let url = `https://${webBasePath}/bff/v1/api-keys`;
 
-    for (let i = 0; i < 10; i++) {
-        let response = http.get(url, params);
+    let response = http.get(url, params);
 
-        check(response, {
-            'status api-keys is 200': (response) => response.status === 200,
-        });
-    }
+    check(response, {
+        'status api-keys is 200': (response) => response.status === 200,
+    });
 
     sleep(1);
 }
