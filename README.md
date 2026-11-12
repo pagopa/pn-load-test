@@ -46,13 +46,15 @@ Il mock non è esposto sull'API Gateway: si raggiunge solo dall'ALB interno dell
     -e TEST_TYPE=paymentEventsSmoke ^
     -e EXTERNAL_CHANNELS_BASE_URL=http://localhost:8887 ^
     -e IUV_FILE=./resources/PaymentEventsIUV.txt ^ OPZIONALE (default ./resources/PaymentEventsIUV.txt, relativo a src/)
-    -e AMOUNT=1000 OPZIONALE (eurocent; se assente il mock usa 1000)
+    -e AMOUNT=1000 ^ OPZIONALE (eurocent; se assente il mock usa 1000)
+    -e SEND_EVENT_RATIO=0.06 OPZIONALE (quota di eventi su IUV di SEND, default 1)
 ```
 - In locale e negli ambienti condivisi usare solo `paymentEventsSmoke` (shared-iterations, 20 chiamate in tutto). I profili di carico vanno lanciati solo nella finestra e nell'ambiente concordati.
 - Da locale serve un tunnel SSM verso l'ALB interno core, ad esempio:
   `aws ssm start-session --profile <profilo core> --region eu-south-1 --target <bastion> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters host="<alb interno core>",portNumber="8080",localPortNumber="8887"`.
   Da CodeBuild (dentro la VPC) si usa direttamente `http://<alb interno core>:8080`.
 - Dataset: un IUV per riga (o separati da `;`) nel formato SEND `<creditorTaxId>##<noticeCode>` (11 + 18 cifre), cioè la `pk` di `pn-PaymentInfo` dell'ambiente di test, usati a rotazione. Lo script si ferma se trova righe malformate.
+- `SEND_EVENT_RATIO`: con 0.06 su ogni 100 eventi 6 usano gli IUV del dataset e 94 IUV che SEND non conosce (`00000000000##3<progressivo>`), che pn-notification-cost-service cerca su `pn-PaymentInfo` e scarta, come gli eventi pagoPA non destinati a SEND.
 - Profili: `paymentEventsSmoke` (20 chiamate, 1 VU), `paymentEventsFirstIteration` (10 eventi/s per 10 minuti) e `paymentEventsRamp` (10 → 92 → 140 → 200 eventi/s, 73 minuti, circa 623 mila eventi).
 - Protezioni: il test si interrompe se il mock ha disattivato la connessione a Kafka (lo script non la riattiva mai) e, nei profili di carico, quando errori, p99 o iterazioni scartate superano le soglie.
-- Metriche custom: `payment_events_published` (con tag `partition`), `code_success`, `code_badrequest`, `code_iserror`, `code_serviceunavailable`, `code_other`.
+- Metriche custom: `payment_events_published` (con tag `partition`), `payment_events_send`, `payment_events_not_send`, `code_success`, `code_badrequest`, `code_iserror`, `code_serviceunavailable`, `code_other`.
