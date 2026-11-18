@@ -15,7 +15,11 @@ import { Counter } from 'k6/metrics';
  *  - TEST_TYPE                   file in modules/test-types (paymentEventsSmoke, paymentEventsFirstIteration, paymentEventsRamp)
  *  - EXTERNAL_CHANNELS_BASE_URL  base url di pn-external-channels raggiungibile dal runner (es. http://<alb-interno>:8080)
  *  - IUV_FILE                    OPZIONALE, dataset degli IUV (default ./resources/PaymentEventsIUV.txt)
- *  - AMOUNT                      OPZIONALE, importo in eurocent; se assente il mock usa "1000"
+ *  - AMOUNT                      OPZIONALE, importo in euro (anche decimali, es. 10.50): pn-kafka-bridge lo converte
+ *                                in centesimi; se assente il mock usa "1000", cioè 1000 euro
+ *
+ * paymentDateTime viene inviato come ora locale di Roma senza offset e con 6 decimali (uuuu-MM-ddTHH:mm:ss.SSSSSS),
+ * l'unico formato accettato da pn-kafka-bridge: gli altri finiscono fra i messaggi malformati.
  *  - SEND_EVENT_RATIO            OPZIONALE, quota di eventi su IUV di SEND fra 0 e 1 (default 1). Es. 0.06: su ogni
  *                                100 eventi 6 usano gli IUV del dataset e 94 IUV che SEND non conosce e scarta
  *  - ITERATION_OFFSET            OPZIONALE, numero di eventi già generati da fasi precedenti: la numerazione riparte da lì
@@ -37,6 +41,10 @@ export let options = JSON.parse(open('./modules/test-types/' + __ENV.TEST_TYPE +
 const baseUrl = `${__ENV.EXTERNAL_CHANNELS_BASE_URL}`.replace(/\/+$/, '');
 const iuvFile = __ENV.IUV_FILE || './resources/PaymentEventsIUV.txt';
 const amount = __ENV.AMOUNT;
+// pn-kafka-bridge interpreta amount in euro (anche decimali) e lo converte in centesimi
+if (amount && !/^\d+(\.\d{1,2})?$/.test(amount)) {
+    throw new Error(`AMOUNT deve essere un importo in euro, es. 10 o 10.50: ${amount}`);
+}
 const sendEventRatio = __ENV.SEND_EVENT_RATIO === undefined || __ENV.SEND_EVENT_RATIO === '' ? 1 : Number(__ENV.SEND_EVENT_RATIO);
 if (!(sendEventRatio >= 0 && sendEventRatio <= 1)) {
     throw new Error(`SEND_EVENT_RATIO deve essere un numero fra 0 e 1: ${__ENV.SEND_EVENT_RATIO}`);
@@ -127,7 +135,7 @@ export default function paymentEvents() {
     const request = {
         noticeNumber: notice.noticeNumber,
         creditorTaxId: notice.creditorTaxId,
-        paymentDateTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+        paymentDateTime: romeLocalDateTime(new Date())
     };
     if (amount) {
         request.amount = `${amount}`;
@@ -174,6 +182,22 @@ function isKafkaConnectionEnabled() {
         console.error(`KAFKA_CONNECTION_DISABLED status=${r.status} body=${r.body}`);
     }
     return enabled;
+}
+
+/**
+ * Ora locale di Roma nel formato uuuu-MM-ddTHH:mm:ss.SSSSSS. Il runtime di k6 non ha i fusi orari di Intl:
+ * l'ora legale europea va dall'ultima domenica di marzo all'ultima domenica di ottobre, alle 01:00 UTC.
+ */
+function romeLocalDateTime(date) {
+    const year = date.getUTCFullYear();
+    const lastSundayAt1Utc = (month) => {
+        const lastDay = new Date(Date.UTC(year, month + 1, 0, 1));
+        return lastDay.getTime() - lastDay.getUTCDay() * 86400000;
+    };
+    const t = date.getTime();
+    const offsetHours = t >= lastSundayAt1Utc(2) && t < lastSundayAt1Utc(9) ? 2 : 1;
+    const local = new Date(t + offsetHours * 3600000).toISOString(); // yyyy-MM-ddTHH:mm:ss.SSSZ
+    return local.slice(0, 23) + '000';
 }
 
 function optionalNonNegativeInteger(name) {
