@@ -18,6 +18,9 @@ import { Counter } from 'k6/metrics';
  *  - AMOUNT                      OPZIONALE, importo in eurocent; se assente il mock usa "1000"
  *  - SEND_EVENT_RATIO            OPZIONALE, quota di eventi su IUV di SEND fra 0 e 1 (default 1). Es. 0.06: su ogni
  *                                100 eventi 6 usano gli IUV del dataset e 94 IUV che SEND non conosce e scarta
+ *  - ITERATION_OFFSET            OPZIONALE, numero di eventi già generati da fasi precedenti: la numerazione riparte da lì
+ *  - MAX_EVENTS                  OPZIONALE, numero massimo di eventi pubblicati dallo scenario; le iterazioni oltre non pubblicano
+ *  ITERATION_OFFSET e MAX_EVENTS si possono valorizzare anche nell'env del singolo scenario del test type.
  *
  * Dataset: un IUV per riga (o separati da ';'), nel formato SEND <creditorTaxId>##<noticeCode>,
  * es. 77777777777##302000100000019421. Gli IUV vengono usati a rotazione.
@@ -102,7 +105,18 @@ export function setup() {
 }
 
 export default function paymentEvents() {
-    const iteration = exec.scenario.iterationInTest;
+    const scenarioIteration = exec.scenario.iterationInTest;
+    // MAX_EVENTS e ITERATION_OFFSET possono arrivare dall'env dello scenario (es. paymentEventsBacklog)
+    const maxEvents = optionalNonNegativeInteger('MAX_EVENTS');
+    if (maxEvents !== undefined && scenarioIteration >= maxEvents) {
+        return;
+    }
+    if (scenarioIteration === 0) {
+        // Segna nel console-output l'inizio di ogni fase (es. fine del pregresso e avvio del traffico a regime)
+        console.log(`SCENARIO_START name=${exec.scenario.name} at=${new Date().toISOString()}`);
+    }
+    // Continua la numerazione delle fasi precedenti: IUV SEND a rotazione e numeri avviso non SEND non si ripetono
+    const iteration = scenarioIteration + (optionalNonNegativeInteger('ITERATION_OFFSET') || 0);
     // Ripartizione deterministica: l'iterazione è SEND quando fa salire il numero di eventi SEND attesi
     const sendEventsBefore = Math.floor(iteration * sendEventRatio);
     const isSendEvent = Math.floor((iteration + 1) * sendEventRatio) > sendEventsBefore;
@@ -160,6 +174,18 @@ function isKafkaConnectionEnabled() {
         console.error(`KAFKA_CONNECTION_DISABLED status=${r.status} body=${r.body}`);
     }
     return enabled;
+}
+
+function optionalNonNegativeInteger(name) {
+    const raw = __ENV[name];
+    if (raw === undefined || raw === '') {
+        return undefined;
+    }
+    const value = Number(raw);
+    if (!Number.isInteger(value) || value < 0) {
+        exec.test.abort(`${name} deve essere un intero >= 0: ${raw}`);
+    }
+    return value;
 }
 
 function countStatus(status) {
