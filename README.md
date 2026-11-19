@@ -59,6 +59,18 @@ Il mock non è esposto sull'API Gateway: si raggiunge solo dall'ALB interno dell
 - Profili: `paymentEventsSmoke` (20 chiamate, 1 VU), `paymentEventsFirstIteration` (10 eventi/s per 10 minuti), `paymentEventsRamp` (10 → 92 → 150 → 200 eventi/s, 73 minuti, circa 634 mila eventi), `paymentEventsConstant` (150 eventi/s senza rampa per 1 ora, 540 mila eventi) e `paymentEventsBacklog` (descritto sotto). Nei test di carico usare `SEND_EVENT_RATIO=0.06`.
 - `paymentEventsBacklog` (smaltimento del pregresso): lo scenario `backlog` pubblica 11 milioni di eventi a 1000 eventi/s (3h03m20s, `MAX_EVENTS=11000000` come tetto), poi lo scenario `steady` parte da solo a 60 eventi/s per 1 ora (`ITERATION_OFFSET=11000000`, la numerazione degli eventi continua senza ripetizioni). La consume di pn-kafka-bridge va disattivata prima del lancio e riattivata alla fine del pregresso: il momento esatto è la riga `SCENARIO_START name=steady` nel console-output. Le due fasi si possono anche lanciare separatamente con `-e MAX_EVENTS=...` e `-e ITERATION_OFFSET=...`.
 - `paymentEventsBacklogTrial`: prova breve dello stesso profilo (1000 eventi/s per 5 minuti, 300 mila eventi, poi 60 eventi/s per 2 minuti) per verificare che mock, broker e runner reggano il rate prima del test reale.
+- Sull'EC2 di load test usare `run-test.sh`: genera le options k6 dagli argomenti (niente JSON da creare a mano), avvia in background con output leggero, archivia su S3 e libera il disco. Le options generate restano in `outputs/<run>/k6-options.json` con `run-params.txt`.
+  ```
+  ./run-test.sh start --rate 3000 --duration 45m --max-dropped 20000 -- SEND_EVENT_RATIO=0.06
+  ./run-test.sh start --rate 1000 --duration 3h3m20s --then-rate 60 --then-duration 1h -- SEND_EVENT_RATIO=0.06
+  ./run-test.sh start --start-rate 10 --ramp "92:5m,92:20m,150:5m,150:20m,200:5m,200:13m"   # rampa: stage target:durata
+  ./run-test.sh start --iterations 1200000 --vus 200 --max-duration 30m
+  ./run-test.sh start --test-type paymentEventsSmoke      # profilo JSON esistente
+  ./run-test.sh plan  --rate 3000 --duration 45m          # mostra solo il JSON generato
+  ./run-test.sh list | status | logs | stop [run]
+  ./run-test.sh archive <run>   # tar.gz + sha256 su s3://pn-temporary-load-test-core-test/runs/, verifica, poi chiede se cancellare
+  ```
+  Env file di default `credentials/payment-test.env` (non versionato, `ENV_FILE` per cambiarlo); `--full-output` riattiva i log per singola richiesta (solo run brevi). Elenco completo delle opzioni: `./run-test.sh` senza argomenti.
 - Per i profili da centinaia di migliaia o milioni di eventi non usare `--http-debug` né `--out json` per ogni richiesta (come fa `local-start-docker.sh`): i log occuperebbero decine di GB.
 - Protezioni: il test si interrompe se il mock ha disattivato la connessione a Kafka (lo script non la riattiva mai) e, nei profili di carico, quando errori, p99 o iterazioni scartate superano le soglie.
 - Metriche custom: `payment_events_published` (con tag `partition`), `payment_events_send`, `payment_events_not_send`, `code_success`, `code_badrequest`, `code_iserror`, `code_serviceunavailable`, `code_other`.
