@@ -159,8 +159,8 @@ case "$cmd" in
     light=true; [ "$full_output" == "true" ] && light=false
     K6_SCRIPT=$K6_SCRIPT LIGHT_OUTPUT=$light CONTAINER_NAME=$(container_of "$run") \
       K6_OPTIONS_FILE=$([ -z "$test_type" ] && echo "$PWD/$OUT/$run/k6-options.json") REUSE_RUN_DIR=true \
-      nohup ./local-start-docker.sh "$OUT/.env_$run" "$run" run > "$OUT/.launcher_$run.log" 2>&1 < /dev/null &
-    ( sleep 300; rm -f "$OUT/.env_$run" ) >/dev/null 2>&1 &
+      setsid nohup bash -c './local-start-docker.sh "$1" "$2" run; rm -f "$1"' _ "$OUT/.env_$run" "$run"       > "$OUT/.launcher_$run.log" 2>&1 < /dev/null &
+    # setsid: la run sopravvive alla chiusura della sessione SSM; l'env temporaneo si cancella a fine run
     echo "Avviata run '$run' (light=$light)."
     echo "  log:   $0 logs $run      stato: $0 status $run      fine: $0 archive $run"
     ;;
