@@ -36,3 +36,47 @@ TestName.js deve essere valorizzato con il nome del file di test da eseguire:
 ** I parametri WITH_GROUP e WITH_PAYMENT se presenti causeranno l'invio di una notifica rispettivamente con gruppo e con pagamento (con conseguente upload del file collegato) per escludere uno o entrambi di queste comportamenti è sufficiente non inserire il parametro nel comando di avvio
 
 Parametro ONLY_PRELOAD_URL: Per i soli test SafeStorage.js e SafeStorageDirectTest.js è possibile specificare il parametro ONLY_PRELOAD_URL (-e ONLY_PRELOAD_URL=si) per effettuare un test che preveda la sola richiesta di presigned url.
+
+## Eventi di pagamento pagoPA (PN-20853) - PaymentEventsTest.js
+Pubblica eventi di pagamento sul topic Kafka dei pagamenti tramite il mock Kafka di pn-external-channels
+(`POST /external-channels/v1/kafka/payment`); gli eventi vengono poi elaborati da pn-kafka-bridge, pn-notification-cost-service e delivery-push (PAYMENT_NOTICE_PAID).
+Il mock non è esposto sull'API Gateway: si raggiunge solo dall'ALB interno dell'ambiente (porta 8080), quindi l'URL va passato con `EXTERNAL_CHANNELS_BASE_URL`.
+```
+    k6 run src/PaymentEventsTest.js ^
+    -e TEST_TYPE=paymentEventsSmoke ^
+    -e EXTERNAL_CHANNELS_BASE_URL=http://localhost:8887 ^
+    -e IUV_FILE=./resources/PaymentEventsIUV.txt ^ OPZIONALE (default ./resources/PaymentEventsIUV.txt, relativo a src/)
+    -e AMOUNT=10.50 ^ OPZIONALE (euro, anche decimali: pn-kafka-bridge lo converte in centesimi; se assente il mock usa 1000, cioè 1000 euro)
+    -e SEND_EVENT_RATIO=0.06 OBBLIGATORIO (quota di eventi su IUV di SEND, nessun default)
+```
+- In locale e negli ambienti condivisi usare solo `paymentEventsSmoke` (shared-iterations, 20 chiamate in tutto). I profili di carico vanno lanciati solo nella finestra e nell'ambiente concordati.
+- Da locale serve un tunnel SSM verso l'ALB interno core, ad esempio:
+  `aws ssm start-session --profile <profilo core> --region eu-south-1 --target <bastion> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters host="<alb interno core>",portNumber="8080",localPortNumber="8887"`.
+  Da CodeBuild (dentro la VPC) si usa direttamente `http://<alb interno core>:8080`.
+- `paymentDateTime` è inviato come ora locale di Roma senza offset e con 6 decimali (`uuuu-MM-ddTHH:mm:ss.SSSSSS`), l'unico formato accettato da pn-kafka-bridge; il `timestamp` dell'evento (millisecondi epoch) lo genera il mock.
+- Dataset: un IUV per riga (o separati da `;`) nel formato SEND `<creditorTaxId>##<noticeCode>` (11 + 18 cifre), cioè la `pk` di `pn-PaymentInfo` dell'ambiente di test, usati a rotazione. Lo script si ferma se trova righe malformate.
+- `SEND_EVENT_RATIO`: con 0.06 su ogni 100 eventi 6 usano gli IUV del dataset e 94 IUV che SEND non conosce (`00000000000##3<progressivo>`), che pn-notification-cost-service cerca su `pn-PaymentInfo` e scarta, come gli eventi pagoPA non destinati a SEND.
+- Profili: `paymentEventsSmoke` (20 chiamate, 1 VU), `paymentEventsFirstIteration` (10 eventi/s per 10 minuti), `paymentEventsRamp` (10 → 92 → 150 → 200 eventi/s, 73 minuti, circa 634 mila eventi), `paymentEventsConstant` (150 eventi/s senza rampa per 1 ora, 540 mila eventi) e `paymentEventsBacklog` (descritto sotto). Nei test di carico usare `SEND_EVENT_RATIO=0.06`: la variabile è obbligatoria e senza default, perché con 1 tutti gli eventi vanno su notifiche reali di TEST e ne generano gli effetti a valle (timeline, delivery-push). `run-test.sh` la registra in `run-params.txt` e chiede conferma per valori sopra 0.06.
+- `paymentEventsBacklog` (smaltimento del pregresso): lo scenario `backlog` pubblica 11 milioni di eventi a 1000 eventi/s (3h03m20s, `MAX_EVENTS=11000000` come tetto), poi lo scenario `steady` parte da solo a 60 eventi/s per 1 ora (`ITERATION_OFFSET=11000000`, la numerazione degli eventi continua senza ripetizioni). La consume di pn-kafka-bridge va disattivata prima del lancio e riattivata alla fine del pregresso: il momento esatto è la riga `SCENARIO_START name=steady` nel console-output. Le due fasi si possono anche lanciare separatamente con `-e MAX_EVENTS=...` e `-e ITERATION_OFFSET=...`.
+- `paymentEventsBacklogTrial`: prova breve dello stesso profilo (1000 eventi/s per 5 minuti, 300 mila eventi, poi 60 eventi/s per 2 minuti) per verificare che mock, broker e runner reggano il rate prima del test reale.
+- Sull'EC2 di load test usare `run-test.sh`: genera le options k6 dagli argomenti (niente JSON da creare a mano), avvia in background con output leggero, archivia su S3 e libera il disco. Le options generate restano in `outputs/<run>/k6-options.json` con `run-params.txt`.
+  ```
+  ./run-test.sh start --rate 3000 --duration 45m --max-dropped 20000 -- SEND_EVENT_RATIO=0.06
+  ./run-test.sh start --rate 1000 --duration 3h3m20s --then-rate 60 --then-duration 1h -- SEND_EVENT_RATIO=0.06
+  ./run-test.sh start --start-rate 10 --ramp "92:5m,92:20m,150:5m,150:20m,200:5m,200:13m"   # rampa: stage target:durata
+  ./run-test.sh start --iterations 1200000 --vus 200 --max-duration 30m
+  ./run-test.sh start --test-type paymentEventsSmoke      # profilo JSON esistente
+  ./run-test.sh plan  --rate 3000 --duration 45m          # mostra solo il JSON generato
+  ./run-test.sh list | status | logs | stop [run]
+  ./run-test.sh archive <run>   # tar.gz + sha256 su s3://pn-temporary-load-test-core-test/runs/, verifica, poi chiede se cancellare
+  ```
+  Env file di default `credentials/payment-test.env` (non versionato, `ENV_FILE` per cambiarlo); `--full-output` riattiva i log per singola richiesta (solo run brevi). Elenco completo delle opzioni: `./run-test.sh` senza argomenti.
+- Eventi di pagamento insieme all'invio di notifiche: `--with-notifications` aggiunge gli scenari di `w7w6F24Test.js`, usato senza modifiche (W7 analogico fino a 40 notifiche/s, F24 e W6 digitale fino a 10/s, rampa di 15 minuti poi mantenimento) e lancia `src/PaymentEventsWithNotificationsTest.js`. `--notif-hold` cambia la durata del mantenimento (default 45m), `--notif-start` ritarda l'avvio delle notifiche; con `--then-rate` le notifiche partono di default insieme alla seconda fase (traffico a regime), non durante il pregresso. L'env file deve contenere anche `BASE_PATH`, `API_KEY` e `PA_TAX_ID` (più `WITH_PAYMENT`, `WITH_GROUP`, `RANDOM_ADDRESS` se servono). Le soglie con interruzione automatica restano solo sugli eventi di pagamento.
+  ```
+  ./run-test.sh start --rate 150 --duration 1h --with-notifications --notif-hold 45m -- SEND_EVENT_RATIO=0.06
+  # 15 milioni di eventi accodati (2000/s per 2h5m), poi 60 eventi/s per 1h insieme alle notifiche (rampa 15m + 45m)
+  ./run-test.sh start --rate 2000 --duration 2h5m --then-rate 60 --then-duration 1h --with-notifications -- SEND_EVENT_RATIO=0.06
+  ```
+- Per i profili da centinaia di migliaia o milioni di eventi non usare `--http-debug` né `--out json` per ogni richiesta (come fa `local-start-docker.sh`): i log occuperebbero decine di GB.
+- Protezioni: il test si interrompe se il mock ha disattivato la connessione a Kafka (lo script non la riattiva mai) e, nei profili di carico, quando errori, p99 o iterazioni scartate superano le soglie.
+- Metriche custom: `payment_events_published` (con tag `partition`), `payment_events_send`, `payment_events_not_send`, `code_success`, `code_badrequest`, `code_iserror`, `code_serviceunavailable`, `code_other`.

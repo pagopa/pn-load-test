@@ -1,0 +1,70 @@
+{
+    "setupTimeout": "240s",
+    "maxRedirects": 0,
+    "summaryTrendStats": [
+        "avg",
+        "min",
+        "med",
+        "max",
+        "p(95)",
+        "p(99)",
+        "p(99.99)",
+        "count"
+    ],
+    "scenarios": {
+        "backlog": {
+            "executor": "constant-arrival-rate",
+            "rate": 1000,
+            "timeUnit": "1s",
+            "duration": "3h3m20s",
+            "gracefulStop": "10s",
+            "preAllocatedVUs": 500,
+            "maxVUs": 3000,
+            "env": {
+                "MAX_EVENTS": "11000000"
+            }
+        },
+        "steady": {
+            "executor": "constant-arrival-rate",
+            "startTime": "3h3m20s",
+            "rate": 60,
+            "timeUnit": "1s",
+            "duration": "1h",
+            "preAllocatedVUs": 50,
+            "maxVUs": 300,
+            "env": {
+                "ITERATION_OFFSET": "11000000"
+            }
+        }
+    },
+    "thresholds": {
+        "http_req_failed{name:producePayment}": [
+            {
+                "threshold": "rate<0.01",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ],
+        "http_req_duration{name:producePayment}": [
+            {
+                "threshold": "p(99)<1500",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ],
+        "dropped_iterations{scenario:backlog}": [
+            {
+                "threshold": "count<1000",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ],
+        "dropped_iterations{scenario:steady}": [
+            {
+                "threshold": "count<100",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ]
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "setupTimeout": "240s",
+    "maxRedirects": 0,
+    "summaryTrendStats": [
+        "avg",
+        "min",
+        "med",
+        "max",
+        "p(95)",
+        "p(99)",
+        "p(99.99)",
+        "count"
+    ],
+    "scenarios": {
+        "payment_events": {
+            "executor": "constant-arrival-rate",
+            "rate": 2000,
+            "timeUnit": "1s",
+            "duration": "1h",
+            "gracefulStop": "30s",
+            "preAllocatedVUs": 1000,
+            "maxVUs": 6000
+        }
+    },
+    "thresholds": {
+        "http_req_failed{name:producePayment}": [
+            {
+                "threshold": "rate<0.01",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ],
+        "http_req_duration{name:producePayment}": [
+            {
+                "threshold": "p(99)<1500",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ],
+        "dropped_iterations": [
+            {
+                "threshold": "count<2000",
+                "abortOnFail": true,
+                "delayAbortEval": "1m"
+            }
+        ]
+    }
+}
