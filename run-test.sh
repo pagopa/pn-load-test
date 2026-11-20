@@ -24,6 +24,7 @@
 #   --name NOME                  nome run (default payment_<rate>rps_<durata>_<ddmmyyyy_HHMM>)
 #   --full-output                riattiva --http-debug e --out json (solo run brevi: 2000 req/s x 1h ~ 37GB)
 # Dopo "--": KEY=VAL passate a k6 come env (es. SEND_EVENT_RATIO=0.06), sovrascrivono l'env file.
+# SEND_EVENT_RATIO e' obbligatorio (env file o "--"); un valore > 0.06 chiede conferma (1 = tutti su notifiche reali).
 #
 # Variabili: ENV_FILE (default credentials/payment-test.env), K6_SCRIPT (default src/PaymentEventsTest.js),
 #            S3_ARCHIVE (default s3://pn-temporary-load-test-core-test/runs)
@@ -150,18 +151,27 @@ case "$cmd" in
       run=${name:-payment_${label}_$(date +%d%m%Y_%H%M)}
     fi
     [ -e "$OUT/$run" ] && die "outputs/$run esiste gia'"
+    # quota di eventi su notifiche reali: l'ultimo valore vince ("--" sovrascrive l'env file)
+    ratio=$( { grep -E '^SEND_EVENT_RATIO=' "$ENV_FILE" || true; for kv in "${extra_env[@]}"; do echo "$kv"; done; }       | grep -E '^SEND_EVENT_RATIO=' | tail -1 | cut -d= -f2- | tr -d '[:space:]"'"'" )
+    [ -n "$ratio" ] || die "SEND_EVENT_RATIO mancante: aggiungi '-- SEND_EVENT_RATIO=0.06' (quota eventi su notifiche reali)"
+    awk -v r="$ratio" 'BEGIN { exit !(r ~ /^(0(\.[0-9]+)?|1(\.0+)?)$/) }' || die "SEND_EVENT_RATIO non valido: $ratio (atteso fra 0 e 1)"
+    if awk -v r="$ratio" 'BEGIN { exit !(r > 0.06) }'; then
+      echo "ATTENZIONE: SEND_EVENT_RATIO=$ratio, cioe' il $(awk -v r="$ratio" 'BEGIN{print r*100}')% degli eventi su notifiche REALI di TEST."
+      read -r -p "Confermi? Scrivi 'si' per procedere: " ans < /dev/tty || ans=
+      [ "$ans" == "si" ] || die "run annullata"
+    fi
     mkdir -p "$OUT/$run"
     { grep -v '^TEST_TYPE=' "$ENV_FILE"; echo "TEST_TYPE=${test_type:-_run}"; for kv in "${extra_env[@]}"; do echo "$kv"; done; } > "$OUT/.env_$run"
     [ -z "$test_type" ] && echo "$opts" > "$OUT/$run/k6-options.json"
     # parametri della run, senza segreti (solo i KEY=VAL passati a mano)
     { echo "date=$(date -Is)"; echo "git=$(git -c safe.directory="$PWD" rev-parse --short HEAD 2>/dev/null)"
-      echo "args=$*"; } > "$OUT/$run/run-params.txt"
+      echo "args=$*"; echo "SEND_EVENT_RATIO=$ratio"; } > "$OUT/$run/run-params.txt"
     light=true; [ "$full_output" == "true" ] && light=false
     K6_SCRIPT=$K6_SCRIPT LIGHT_OUTPUT=$light CONTAINER_NAME=$(container_of "$run") \
       K6_OPTIONS_FILE=$([ -z "$test_type" ] && echo "$PWD/$OUT/$run/k6-options.json") REUSE_RUN_DIR=true \
       setsid nohup bash -c './local-start-docker.sh "$1" "$2" run; rm -f "$1"' _ "$OUT/.env_$run" "$run"       > "$OUT/.launcher_$run.log" 2>&1 < /dev/null &
     # setsid: la run sopravvive alla chiusura della sessione SSM; l'env temporaneo si cancella a fine run
-    echo "Avviata run '$run' (light=$light)."
+    echo "Avviata run '$run' (light=$light, SEND_EVENT_RATIO=$ratio)."
     echo "  log:   $0 logs $run      stato: $0 status $run      fine: $0 archive $run"
     ;;
   list)

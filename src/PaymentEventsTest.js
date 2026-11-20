@@ -20,8 +20,9 @@ import { Counter } from 'k6/metrics';
  *
  * paymentDateTime viene inviato come ora locale di Roma senza offset e con 6 decimali (uuuu-MM-ddTHH:mm:ss.SSSSSS),
  * l'unico formato accettato da pn-kafka-bridge: gli altri finiscono fra i messaggi malformati.
- *  - SEND_EVENT_RATIO            OPZIONALE, quota di eventi su IUV di SEND fra 0 e 1 (default 1). Es. 0.06: su ogni
- *                                100 eventi 6 usano gli IUV del dataset e 94 IUV che SEND non conosce e scarta
+ *  - SEND_EVENT_RATIO            OBBLIGATORIO, quota di eventi su IUV di SEND fra 0 e 1, senza default. Es. 0.06: su
+ *                                ogni 100 eventi 6 usano gli IUV del dataset (notifiche reali) e 94 IUV che SEND non
+ *                                conosce e scarta. Con 1 tutti gli eventi vanno su notifiche reali: usare solo di proposito
  *  - ITERATION_OFFSET            OPZIONALE, numero di eventi già generati da fasi precedenti: la numerazione riparte da lì
  *  - MAX_EVENTS                  OPZIONALE, numero massimo di eventi pubblicati dallo scenario; le iterazioni oltre non pubblicano
  *  ITERATION_OFFSET e MAX_EVENTS si possono valorizzare anche nell'env del singolo scenario del test type.
@@ -45,7 +46,11 @@ const amount = __ENV.AMOUNT;
 if (amount && !/^\d+(\.\d{1,2})?$/.test(amount)) {
     throw new Error(`AMOUNT deve essere un importo in euro, es. 10 o 10.50: ${amount}`);
 }
-const sendEventRatio = __ENV.SEND_EVENT_RATIO === undefined || __ENV.SEND_EVENT_RATIO === '' ? 1 : Number(__ENV.SEND_EVENT_RATIO);
+// Nessun default: con 1 tutti gli eventi andrebbero su notifiche reali, la quota va scelta esplicitamente
+if (__ENV.SEND_EVENT_RATIO === undefined || __ENV.SEND_EVENT_RATIO.trim() === '') {
+    throw new Error('SEND_EVENT_RATIO obbligatorio (es. 0.06 nei test di carico): quota di eventi su notifiche reali');
+}
+const sendEventRatio = Number(__ENV.SEND_EVENT_RATIO);
 if (!(sendEventRatio >= 0 && sendEventRatio <= 1)) {
     throw new Error(`SEND_EVENT_RATIO deve essere un numero fra 0 e 1: ${__ENV.SEND_EVENT_RATIO}`);
 }
