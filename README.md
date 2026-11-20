@@ -71,6 +71,12 @@ Il mock non è esposto sull'API Gateway: si raggiunge solo dall'ALB interno dell
   ./run-test.sh archive <run>   # tar.gz + sha256 su s3://pn-temporary-load-test-core-test/runs/, verifica, poi chiede se cancellare
   ```
   Env file di default `credentials/payment-test.env` (non versionato, `ENV_FILE` per cambiarlo); `--full-output` riattiva i log per singola richiesta (solo run brevi). Elenco completo delle opzioni: `./run-test.sh` senza argomenti.
+- Eventi di pagamento insieme all'invio di notifiche: `--with-notifications` aggiunge gli scenari di `w7w6F24Test.js`, usato senza modifiche (W7 analogico fino a 40 notifiche/s, F24 e W6 digitale fino a 10/s, rampa di 15 minuti poi mantenimento) e lancia `src/PaymentEventsWithNotificationsTest.js`. `--notif-hold` cambia la durata del mantenimento (default 45m), `--notif-start` ritarda l'avvio delle notifiche; con `--then-rate` le notifiche partono di default insieme alla seconda fase (traffico a regime), non durante il pregresso. L'env file deve contenere anche `BASE_PATH`, `API_KEY` e `PA_TAX_ID` (più `WITH_PAYMENT`, `WITH_GROUP`, `RANDOM_ADDRESS` se servono). Le soglie con interruzione automatica restano solo sugli eventi di pagamento.
+  ```
+  ./run-test.sh start --rate 150 --duration 1h --with-notifications --notif-hold 45m -- SEND_EVENT_RATIO=0.06
+  # 15 milioni di eventi accodati (2000/s per 2h5m), poi 60 eventi/s per 1h insieme alle notifiche (rampa 15m + 45m)
+  ./run-test.sh start --rate 2000 --duration 2h5m --then-rate 60 --then-duration 1h --with-notifications -- SEND_EVENT_RATIO=0.06
+  ```
 - Per i profili da centinaia di migliaia o milioni di eventi non usare `--http-debug` né `--out json` per ogni richiesta (come fa `local-start-docker.sh`): i log occuperebbero decine di GB.
 - Protezioni: il test si interrompe se il mock ha disattivato la connessione a Kafka (lo script non la riattiva mai) e, nei profili di carico, quando errori, p99 o iterazioni scartate superano le soglie.
 - Metriche custom: `payment_events_published` (con tag `partition`), `payment_events_send`, `payment_events_not_send`, `code_success`, `code_badrequest`, `code_iserror`, `code_serviceunavailable`, `code_other`.

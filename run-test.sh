@@ -23,16 +23,24 @@
 #   --test-type NOME             usa invece un JSON esistente in src/modules/test-types (es. paymentEventsSmoke)
 #   --name NOME                  nome run (default payment_<rate>rps_<durata>_<ddmmyyyy_HHMM>)
 #   --full-output                riattiva --http-debug e --out json (solo run brevi: 2000 req/s x 1h ~ 37GB)
+#   --with-notifications         aggiunge in parallelo il flusso standard di invio notifiche (w7w6F24Test.js,
+#                                invariato): W7 analogico fino a 40/s, F24 e W6 digitale fino a 10/s, rampa 15m
+#                                poi mantenimento; script src/PaymentEventsWithNotificationsTest.js.
+#                                L'env file deve contenere anche BASE_PATH, API_KEY, PA_TAX_ID (WITH_PAYMENT opz.)
+#   --notif-hold D               (notifiche) durata del mantenimento dopo la rampa (default 45m, come il file)
+#   --notif-start D              (notifiche) ritardo di avvio rispetto agli eventi (default: con --then-rate
+#                                all'inizio della seconda fase, es. i 60/s dopo il pregresso; altrimenti 0s)
 # Dopo "--": KEY=VAL passate a k6 come env (es. SEND_EVENT_RATIO=0.06), sovrascrivono l'env file.
 # SEND_EVENT_RATIO e' obbligatorio (env file o "--"); un valore > 0.06 chiede conferma (1 = tutti su notifiche reali).
 #
-# Variabili: ENV_FILE (default credentials/payment-test.env), K6_SCRIPT (default src/PaymentEventsTest.js),
+# Variabili: ENV_FILE (default credentials/payment-test.env), K6_SCRIPT (default src/PaymentEventsTest.js,
+#            src/PaymentEventsWithNotificationsTest.js con --with-notifications),
 #            S3_ARCHIVE (default s3://pn-temporary-load-test-core-test/runs)
 set -euo pipefail
 cd "$(dirname "$0")"
 
 ENV_FILE=${ENV_FILE:-credentials/payment-test.env}
-K6_SCRIPT=${K6_SCRIPT:-src/PaymentEventsTest.js}
+K6_SCRIPT_USER=${K6_SCRIPT:-}
 S3_ARCHIVE=${S3_ARCHIVE:-s3://pn-temporary-load-test-core-test/runs}
 OUT=outputs
 
@@ -52,6 +60,7 @@ to_sec() { # 1h30m20s -> 5420
 parse_load() {
   ramp= start_rate=0 rate= duration= vus= iterations= max_duration= then_rate= then_duration= max_vus= max_dropped=
   p99=1500 max_fail=0.01 test_type= name= full_output=false extra_env=()
+  with_notif=false notif_hold=45m notif_start=
   while [ $# -gt 0 ]; do
     case "$1" in
       --rate) rate=$2; shift 2;;            --duration) duration=$2; shift 2;;
@@ -63,6 +72,8 @@ parse_load() {
       --p99) p99=$2; shift 2;;              --max-fail) max_fail=$2; shift 2;;
       --test-type) test_type=$2; shift 2;;  --name) name=$2; shift 2;;
       --full-output) full_output=true; shift;;
+      --with-notifications) with_notif=true; shift;;
+      --notif-hold) notif_hold=$2; shift 2;; --notif-start) notif_start=$2; shift 2;;
       --) shift; extra_env=("$@"); break;;
       *) die "opzione sconosciuta: $1 (vedi $0 senza argomenti)";;
     esac
@@ -118,13 +129,32 @@ gen_options() { # stampa il JSON delle options k6
             \"duration\": \"$then_duration\", \"preAllocatedVUs\": $(( then_rate / 2 > 1 ? then_rate / 2 : 1 )), \"maxVUs\": $((then_rate * 5)),
             \"env\": { \"ITERATION_OFFSET\": \"$first_events\" } }"
   fi
+  local notif=""
+  if [ "$with_notif" == "true" ]; then
+    # default: notifiche in parallelo alla fase a regime (--then-rate), non durante il pregresso
+    if [ -z "$notif_start" ]; then
+      if [ -n "$then_rate" ]; then notif_start=${duration:-$max_duration}; else notif_start=0s; fi
+    fi
+    to_sec "$notif_hold" > /dev/null; to_sec "$notif_start" > /dev/null
+    # stesso profilo di w7w6F24Test.js: scenario:target:startRate:exec:test_type
+    for sc in w7_test:40:5:analogicSoakTest:analogicSoakTest f24_test:10:5:f24SoakTest:f24SoakTest               w6_test:10:1:digitalSoakTest:digitalSoakTest; do
+      IFS=: read -r sname starget srate sexec stag <<< "$sc"
+      notif="$notif,
+    \"$sname\": { \"executor\": \"ramping-arrival-rate\", \"startTime\": \"$notif_start\", \"timeUnit\": \"1s\",
+            \"startRate\": $srate, \"preAllocatedVUs\": 200, \"maxVUs\": 9000,
+            \"stages\": [ { \"target\": 5, \"duration\": \"10s\" }, { \"target\": $starget, \"duration\": \"15m\" },
+                        { \"target\": $starget, \"duration\": \"$notif_hold\" }, { \"target\": 5, \"duration\": \"0s\" },
+                        { \"target\": 5, \"duration\": \"10s\" } ],
+            \"tags\": { \"test_type\": \"$stag\" }, \"exec\": \"$sexec\" }"
+    done
+  fi
   cat <<EOF
 {
     "setupTimeout": "240s",
     "maxRedirects": 0,
     "summaryTrendStats": ["avg", "min", "med", "max", "p(95)", "p(99)", "p(99.99)", "count"],
     "scenarios": {
-    $first$second
+    $first$second$notif
     },
     "thresholds": {
         $thr_common
@@ -141,6 +171,16 @@ case "$cmd" in
   start)
     parse_load "$@"
     [ -f "$ENV_FILE" ] || die "env file $ENV_FILE inesistente (imposta ENV_FILE)"
+    if [ "$with_notif" == "true" ]; then
+      [ -z "$test_type" ] || die "--with-notifications non si combina con --test-type"
+      for k in BASE_PATH API_KEY PA_TAX_ID; do
+        { grep -qE "^$k=." "$ENV_FILE" || printf '%s
+' "${extra_env[@]}" | grep -qE "^$k=."; }           || die "--with-notifications richiede $k nell'env file o dopo '--'"
+      done
+      K6_SCRIPT=${K6_SCRIPT_USER:-src/PaymentEventsWithNotificationsTest.js}
+    else
+      K6_SCRIPT=${K6_SCRIPT_USER:-src/PaymentEventsTest.js}
+    fi
     if [ -n "$test_type" ]; then
       [ -f "src/modules/test-types/$test_type.json" ] || die "src/modules/test-types/$test_type.json inesistente"
       run=${name:-${test_type}_$(date +%d%m%Y_%H%M)}
@@ -148,6 +188,7 @@ case "$cmd" in
       opts=$(gen_options)
       if [ -n "$ramp" ]; then label="ramp${start_rate}to${ramp##*,}"; label=${label%%:*}rps
       elif [ -n "$rate" ]; then label="${rate}rps_${duration}"; else label="shared${vus}vu_${iterations}"; fi
+      [ "$with_notif" == "true" ] && label="${label}_notif"
       run=${name:-payment_${label}_$(date +%d%m%Y_%H%M)}
     fi
     [ -e "$OUT/$run" ] && die "outputs/$run esiste gia'"
@@ -165,13 +206,15 @@ case "$cmd" in
     [ -z "$test_type" ] && echo "$opts" > "$OUT/$run/k6-options.json"
     # parametri della run, senza segreti (solo i KEY=VAL passati a mano)
     { echo "date=$(date -Is)"; echo "git=$(git -c safe.directory="$PWD" rev-parse --short HEAD 2>/dev/null)"
-      echo "args=$*"; echo "SEND_EVENT_RATIO=$ratio"; } > "$OUT/$run/run-params.txt"
+      echo "args=$*"; echo "script=$K6_SCRIPT"; echo "SEND_EVENT_RATIO=$ratio"
+      if [ "$with_notif" == "true" ]; then echo "WITH_PAYMENT=$( { grep -E '^WITH_PAYMENT=' "$ENV_FILE" || true; printf '%s
+' "${extra_env[@]}"; } | grep -E '^WITH_PAYMENT=' | tail -1 | cut -d= -f2-)"; fi; } > "$OUT/$run/run-params.txt"
     light=true; [ "$full_output" == "true" ] && light=false
     K6_SCRIPT=$K6_SCRIPT LIGHT_OUTPUT=$light CONTAINER_NAME=$(container_of "$run") \
       K6_OPTIONS_FILE=$([ -z "$test_type" ] && echo "$PWD/$OUT/$run/k6-options.json") REUSE_RUN_DIR=true \
       setsid nohup bash -c './local-start-docker.sh "$1" "$2" run; rm -f "$1"' _ "$OUT/.env_$run" "$run"       > "$OUT/.launcher_$run.log" 2>&1 < /dev/null &
     # setsid: la run sopravvive alla chiusura della sessione SSM; l'env temporaneo si cancella a fine run
-    echo "Avviata run '$run' (light=$light, SEND_EVENT_RATIO=$ratio)."
+    echo "Avviata run '$run' (script=$K6_SCRIPT, light=$light, SEND_EVENT_RATIO=$ratio)."
     echo "  log:   $0 logs $run      stato: $0 status $run      fine: $0 archive $run"
     ;;
   list)
@@ -212,6 +255,6 @@ case "$cmd" in
     if [ "$ans" == "s" ]; then rm -rf "${OUT:?}/$run" "$OUT/.launcher_$run.log"; echo "Cancellata."; fi
     ;;
   *)
-    sed -n '2,32p' "$0"; exit 1
+    sed -n '2,38p' "$0"; exit 1
     ;;
 esac
