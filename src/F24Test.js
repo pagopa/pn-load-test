@@ -20,8 +20,10 @@ let basePath = `${__ENV.BASE_PATH}`;
 let withGroup = `${__ENV.WITH_GROUP}`;
 let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
-// Destinatario dedicato ai test di carico, senza recapiti in rubrica. Il CF del template (GLLGLL64B15G702I)
-// ha accumulato recapiti oltre 256 KB e pn-user-attributes risponde 500 dopo AAR_GENERATION (PN-20853).
+// Destinatario dedicato ai test di carico, senza recapiti in rubrica (PN-20853). Il CF del template (GLLGLL64B15G702I)
+// ha un'email di cortesia: ogni notifica aggiunge in pn-data-vault un record COURTESY_PLANNED che scade dopo 24 ore,
+// sotto carico la lista degli indirizzi supera 256 KB e pn-user-attributes risponde 500 dopo AAR_GENERATION.
+// Non registrare recapiti (soprattutto di cortesia) su questo CF.
 let recipientTaxId = __ENV.RECIPIENT_TAX_ID_W6_F24 || 'LDTCRC80A01H501V';
 
 
