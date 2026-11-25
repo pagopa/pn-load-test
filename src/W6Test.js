@@ -26,6 +26,9 @@ let withPayment = `${__ENV.WITH_PAYMENT}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
 let moreAttach = `${__ENV.MORE_ATTACH}`;
 let randomAddress = `${__ENV.RANDOM_ADDRESS}`;
+// Destinatario dedicato ai test di carico, senza recapiti in rubrica. Il CF del template (GLLGLL64B15G702I)
+// ha accumulato recapiti oltre 256 KB e pn-user-attributes risponde 500 dopo AAR_GENERATION (PN-20853).
+let recipientTaxId = __ENV.RECIPIENT_TAX_ID_W6_F24 || 'LDTCRC80A01H501V';
 
 let sha256;
 let pdfNumber = 3;
@@ -350,6 +353,7 @@ export function internalSendNotification() {
 
     notificationRequest.documents[0].ref.key = resultPreload.key;
     notificationRequest.documents[0].digests.sha256 = sha256;
+    notificationRequest.recipients[0].taxId = recipientTaxId;
 
     if(moreAttach && moreAttach !== 'undefined') {
         for(let i = 1; i <= moreAttach; i++){

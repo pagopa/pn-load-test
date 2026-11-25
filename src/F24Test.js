@@ -20,6 +20,9 @@ let basePath = `${__ENV.BASE_PATH}`;
 let withGroup = `${__ENV.WITH_GROUP}`;
 let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
+// Destinatario dedicato ai test di carico, senza recapiti in rubrica. Il CF del template (GLLGLL64B15G702I)
+// ha accumulato recapiti oltre 256 KB e pn-user-attributes risponde 500 dopo AAR_GENERATION (PN-20853).
+let recipientTaxId = __ENV.RECIPIENT_TAX_ID_W6_F24 || 'LDTCRC80A01H501V';
 
 
 let sha256;
@@ -219,6 +222,7 @@ export function internalSendF24Notification() {
 
     notificationRequest.documents[0].ref.key = resultPreload.key;
     notificationRequest.documents[0].digests.sha256 = sha256;
+    notificationRequest.recipients[0].taxId = recipientTaxId;
 
 
     notificationRequest.recipients[0].physicalAddress.at = 'Via Primo maggio 34';
