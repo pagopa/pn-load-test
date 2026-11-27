@@ -20,6 +20,13 @@ let basePath = `${__ENV.BASE_PATH}`;
 let withGroup = `${__ENV.WITH_GROUP}`;
 let digitalWorkflow = `${__ENV.DIGITAL_WORKFLOW}`;
 let paTaxId = `${__ENV.PA_TAX_ID}`;
+// Destinatario dedicato ai test di carico, senza recapiti in rubrica (PN-20853). Il CF del template (GLLGLL64B15G702I)
+// ha un'email di cortesia: ogni notifica aggiunge in pn-data-vault un record COURTESY_PLANNED che scade dopo 24 ore,
+// sotto carico la lista degli indirizzi supera 256 KB e pn-user-attributes risponde 500 dopo AAR_GENERATION.
+// RSSLCU72H01L219S e' una PF del mock dei registri senza PEC su INAD, IPA e INI-PEC, come GLLGLL64B15G702I:
+// W6 segue lo stesso percorso di prima (registri senza PEC, secondo tentativo sul domicilio speciale), senza
+// il messaggio di cortesia. Non registrare recapiti su questo CF.
+let recipientTaxId = __ENV.RECIPIENT_TAX_ID_W6_F24 || 'RSSLCU72H01L219S';
 
 
 let sha256;
@@ -219,6 +226,7 @@ export function internalSendF24Notification() {
 
     notificationRequest.documents[0].ref.key = resultPreload.key;
     notificationRequest.documents[0].digests.sha256 = sha256;
+    notificationRequest.recipients[0].taxId = recipientTaxId;
 
 
     notificationRequest.recipients[0].physicalAddress.at = 'Via Primo maggio 34';

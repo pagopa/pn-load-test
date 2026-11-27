@@ -1,0 +1,16 @@
+{
+    "setupTimeout": "60s",
+    "maxRedirects": 0,
+    "summaryTrendStats": ["avg", "min", "med", "max", "p(95)", "p(99)", "count"],
+    "scenarios": {
+        "payment_events": {
+            "executor": "shared-iterations",
+            "iterations": 20,
+            "vus": 1,
+            "maxDuration": "2m"
+        }
+    },
+    "thresholds": {
+        "http_req_failed{name:producePayment}": [{ "threshold": "rate<0.01", "abortOnFail": true }]
+    }
+}

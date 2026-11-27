@@ -20,19 +20,54 @@ output_subfolder=$2
 execution_or_download=$3
 
 if ( [ "$execution_or_download" == "run" ] ) then
+  # Variabili opzionali:
+  #  K6_SCRIPT     script da eseguire (default src/DeliverySendAndReceiverGetDownload.js)
+  #  LIGHT_OUTPUT  se "true" disabilita --http-debug e --out json (per run lunghe ad alto rate:
+  #                a 2000 req/s per 1h producono ~37GB)
+  #  MIN_FREE_GB   spazio libero minimo richiesto per partire (default 40)
+  k6_script=${K6_SCRIPT:-src/DeliverySendAndReceiverGetDownload.js}
+  min_free_gb=${MIN_FREE_GB:-40}
+
+  free_gb=$(df -BG --output=avail "$(pwd)" | tail -1 | tr -dc '0-9')
+  if [ "$free_gb" -lt "$min_free_gb" ]; then
+    echo "Spazio libero insufficiente: ${free_gb}GB < ${min_free_gb}GB. Archivia/pulisci outputs/ prima di lanciare."
+    exit 1
+  fi
+
+  # REUSE_RUN_DIR=true: la cartella l'ha gia' creata run-test.sh (con k6-options.json)
+  if [ "$REUSE_RUN_DIR" != "true" ] && [ -e "$(pwd)/outputs/$output_subfolder" ]; then
+    echo "La cartella outputs/$output_subfolder esiste gia': usa un nome run univoco."
+    exit 1
+  fi
   mkdir -p $(pwd)/outputs/$output_subfolder
+
+  verbose_opts="--out json=/outputs/result-timing.json --http-debug"
+  if [ "$LIGHT_OUTPUT" == "true" ]; then
+    verbose_opts=""
+  fi
 
   echo "======= Rebuild Image"
   docker build --rm -t k6 .
-  
-  echo "======= Run K6"
-  docker run --rm -ti --env-file $credentials_files \
+  docker image prune -f
+
+  echo "======= Run K6 ($k6_script)"
+  # -ti solo se c'e' un terminale (permette l'avvio in background con nohup)
+  tty_opts=""
+  if [ -t 0 ]; then tty_opts="-ti"; fi
+  # CONTAINER_NAME opzionale: usato da run-test.sh per status/stop
+  name_opts=""
+  if [ -n "$CONTAINER_NAME" ]; then name_opts="--name $CONTAINER_NAME"; fi
+  # K6_OPTIONS_FILE opzionale: options k6 generate, montate come profilo "_run" (TEST_TYPE=_run)
+  if [ -n "$K6_OPTIONS_FILE" ]; then
+    name_opts="$name_opts -v $K6_OPTIONS_FILE:/tests/src/modules/test-types/_run.json:ro"
+  fi
+  docker run --rm $tty_opts $name_opts --env-file $credentials_files \
     -v $(pwd)/outputs/$output_subfolder:/outputs/ \
     k6 run \
     --log-format json \
-    src/DeliverySendAndReceiverGetDownload.js \
-    --out json=/outputs/result-timing.json \
-    --http-debug \
+    $k6_script \
+    $verbose_opts \
+    --summary-export=/outputs/summary.json \
     --console-output=/outputs/console-output.txt \
     --log-output=file=/outputs/http-output.json
 
